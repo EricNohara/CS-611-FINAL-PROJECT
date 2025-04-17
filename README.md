@@ -1,1 +1,22 @@
-"# CS-611-FINAL-PROJECT" 
+# CS611 Final Project
+- Grading system
+- Support for file upload, or just text boxes
+- Support for autogravder?
+- Users and accounts
+    - Student vs Teacher vs Admin
+- Have different courses
+    - Create, enroll, invite to course
+- Create assignments
+    - Deadlines
+    - Scoring
+- Way to view submissions
+- Group submissions
+    - Attaching more than one user to submission
+- Sorting courses/displaying only active courses
+- Categorize assignments/submissions
+- Assign pages for submissions
+- Creating rubric
+- Grade statistics
+- Interface to grade from rubric
+- Publish grades
+- Different interfaces for different users
