@@ -20,3 +20,19 @@
 - Interface to grade from rubric
 - Publish grades
 - Different interfaces for different users
+
+# Notes from Q&A
+- Teacher view of grading system
+    - Teachers usually teach same course over different semesters
+    - Content of class might change, but breakdown of assignments and exams remain the same
+        - Every single semester/class has to be built from the beginning
+        - Create template for classes?
+        - Ability to copy from previous classes?
+    - Gradescope does not automatically calculate grades
+        - Compute weighted average of assignments
+        - Maybe compute grade statistics to figure out curves?
+    - Submit any type of file, based on assignment
+    - Keep grade statistics
+    - Ease of changing assignments/grades
+    - Can assign different roles to different users
+    - Similarity checker
