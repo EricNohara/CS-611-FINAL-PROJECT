@@ -25,6 +25,7 @@
 # Notes from Q&A
 
 - Teacher view of grading system
+
   - Teachers usually teach same course over different semesters
   - Content of class might change, but breakdown of assignments and exams remain the same
     - Every single semester/class has to be built from the beginning
@@ -38,3 +39,10 @@
   - Ease of changing assignments/grades
   - Can assign different roles to different users
   - Similarity checker
+
+  ***
+
+  ## References
+
+  - [Java SQL Integration](https://docs.oracle.com/javase/8/docs/api/java/sql/package-summary.html)
+  - [Try with Resources Statement](https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html)

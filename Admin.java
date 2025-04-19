@@ -5,6 +5,10 @@ public class Admin extends User {
         super(id, name, email, passwordHash, createdAt, lastUpdated);
     }
 
+    public Admin(String name, String email, String passwordHash) {
+        super(name, email, passwordHash);
+    }
+
     @Override
     public User.Role getRole() { return User.Role.ADMIN; }
 
