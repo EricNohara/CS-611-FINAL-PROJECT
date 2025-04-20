@@ -1,16 +1,14 @@
 import java.util.*;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.sql.Timestamp;
 
 abstract class AbstractAssignment implements Assignment {
     private final String    id;
     private final String    title;
-    private final LocalDate dueDate;
-    private final LocalTime dueTime;
+    private final Timestamp dueDate;
     private final double    maxPoints;
     private final double    weight;
 
-    AbstractAssignment(String id, String title, LocalDate dueDate, LocalTime dueTime, double maxPoints, double weight) {
+    AbstractAssignment(String id, String title, Timestamp dueDate, double maxPoints, double weight) {
         Objects.requireNonNull(id); Objects.requireNonNull(title);
         Objects.requireNonNull(dueDate);
 
@@ -20,7 +18,6 @@ abstract class AbstractAssignment implements Assignment {
         this.id = id;
         this.title = title;
         this.dueDate = dueDate;
-        this.dueTime = dueTime;
         this.maxPoints = maxPoints;
         this.weight = weight;
     }
@@ -28,8 +25,7 @@ abstract class AbstractAssignment implements Assignment {
     /* GETTERS */
     @Override public String getId() { return id; }
     @Override public String getTitle() { return title; }
-    @Override public LocalDate getDueDate() { return dueDate; }
-    @Override public LocalTime getDueTime() { return dueTime; }
+    @Override public Timestamp getDueDate() { return dueDate; }
     @Override public double getMaxPoints() { return maxPoints; }
     @Override public double getWeight() { return weight; }
 }

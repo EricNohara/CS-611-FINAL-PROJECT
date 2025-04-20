@@ -1,13 +1,11 @@
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.sql.Timestamp;
 
 public interface Assignment {
     enum Type { HOMEWORK, QUIZ, EXAM, PROJECT }
 
     String getId();          // unique per course‑instance
     String getTitle();
-    LocalDate getDueDate();
-    LocalTime getDueTime();
+    Timestamp getDueDate();
     double getMaxPoints();   // denominator
     double getWeight();      // used in weighted average
 

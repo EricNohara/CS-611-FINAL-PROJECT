@@ -56,6 +56,14 @@ public class DBSetup {
                                                             "FOREIGN KEY (user_id) REFERENCES users(id)," +
                                                             "FOREIGN KEY (submission_id) REFERENCES submissions(id));";
 
+    public static final String createAssignmentsQuery = "CREATE TABLE assignments (" +
+                                                        "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                                        "name TEXT NOT NULL," +
+                                                        "due_date TIMESTAMP NOT NULL," +
+                                                        "max_points INTEGER NOT NULL," +
+                                                        "assignment_template_id INTEGER," +
+                                                        "FOREIGN KEY (assignment_template_id) REFERENCES assignment_templates(id));";
+
     private static final String[] createTableQueries = {
         createUsersQuery, 
         createCourseTemplatesQuery, 
@@ -63,7 +71,8 @@ public class DBSetup {
         createCoursesQuery, 
         createUserCoursesQuery,
         createSubmissionsQuery,
-        createUserSubmissionsQuery
+        createUserSubmissionsQuery,
+        createAssignmentsQuery
     };
 
     public static void createTables() {
