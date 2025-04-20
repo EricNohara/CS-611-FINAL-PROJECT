@@ -74,4 +74,49 @@ public class UserDAO {
                 throw new IllegalArgumentException("Unknown role: " + role);
         }
     }
+
+    // Update an existing user
+    public static void updateUser(User user) {
+        String query = "UPDATE users SET name = ?, email = ?, password_hash = ?, role = ?, last_updated = ? WHERE id = ?";
+        Timestamp current = new Timestamp(System.currentTimeMillis());
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+
+            stmt.setString(1, user.getName());
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, user.getPasswordHash());
+            stmt.setInt(4, user.getRole().ordinal());
+            stmt.setTimestamp(5, current);
+            stmt.setInt(6, user.getId());
+
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Updating user failed, no rows affected.");
+            }
+
+            // Update the lastUpdated field in the User object
+            user.setLastUpdated(current);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Delete a user by ID
+    public static void deleteUser(int userId) {
+        String query = "DELETE FROM users WHERE id = ?";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+
+            stmt.setInt(1, userId);
+
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Deleting user failed, no rows affected.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -40,9 +40,20 @@
   - Can assign different roles to different users
   - Similarity checker
 
-  ***
+---
 
-  ## References
+## Compile + Run
 
-  - [Java SQL Integration](https://docs.oracle.com/javase/8/docs/api/java/sql/package-summary.html)
-  - [Try with Resources Statement](https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html)
+#### Windows
+
+```
+javac -cp ".;lib/sqlite-jdbc-3.49.1.0.jar" UserDAOTest.java
+java -cp ".;lib/sqlite-jdbc-3.49.1.0.jar" UserDAOTest
+```
+
+---
+
+## References
+
+- [Java SQL Integration](https://docs.oracle.com/javase/8/docs/api/java/sql/package-summary.html)
+- [Try with Resources Statement](https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html)
