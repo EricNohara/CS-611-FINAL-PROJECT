@@ -1,6 +1,6 @@
 import java.sql.Timestamp;
 
-public class Grader extends User {
+public class Grader extends User implements SubmissionGrader {
     public Grader(int id, String name, String email, String passwordHash, Timestamp createdAt, Timestamp lastUpdated) {
         super(id, name, email, passwordHash, createdAt, lastUpdated);
     }
@@ -11,6 +11,9 @@ public class Grader extends User {
 
     @Override
     public User.Role getRole() { return User.Role.GRADER; }
+
+    @Override
+    public void gradeSubmission(Submission submission) {}
 
     // Student specific methods...
 }
