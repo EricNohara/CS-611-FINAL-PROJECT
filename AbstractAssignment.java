@@ -6,20 +6,19 @@ abstract class AbstractAssignment implements Assignment {
     private final String    title;
     private final Timestamp dueDate;
     private final double    maxPoints;
-    private final double    weight;
+    private final AssignmentTemplate template;
 
-    AbstractAssignment(String id, String title, Timestamp dueDate, double maxPoints, double weight) {
+    AbstractAssignment(String id, String title, Timestamp dueDate, double maxPoints, AssignmentTemplate template) {
         Objects.requireNonNull(id); Objects.requireNonNull(title);
         Objects.requireNonNull(dueDate);
 
         if (maxPoints <= 0) throw new IllegalArgumentException("maxPoints ≤ 0");
-        if (weight < 0 || weight > 1) throw new IllegalArgumentException("weight must be in [0,1]");
 
         this.id = id;
         this.title = title;
         this.dueDate = dueDate;
         this.maxPoints = maxPoints;
-        this.weight = weight;
+        this.template = template;
     }
 
     /* GETTERS */
@@ -27,5 +26,5 @@ abstract class AbstractAssignment implements Assignment {
     @Override public String getTitle() { return title; }
     @Override public Timestamp getDueDate() { return dueDate; }
     @Override public double getMaxPoints() { return maxPoints; }
-    @Override public double getWeight() { return weight; }
+    @Override public double getWeight() { return template.getWeight(); }
 }

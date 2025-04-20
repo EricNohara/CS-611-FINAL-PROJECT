@@ -8,6 +8,8 @@ public class AssignmentTemplate {
     private List<String> submissionTypes; // list of allowed file extensions
 
     public AssignmentTemplate(int courseTemplateId, double weight, Assignment.Type type, List<String> submissionTypes) {
+        if (weight < 0 || weight > 1) throw new IllegalArgumentException("weight must be in [0,1]");
+
         this.id = -1; // set this value after inserting into DB
         this.courseTemplateId = courseTemplateId;
         this.weight = weight;
