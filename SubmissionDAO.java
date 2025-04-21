@@ -184,11 +184,11 @@ public class SubmissionDAO implements CrudDAO<Submission> {
         try (Connection connection = DBConnection.getConnection();
             PreparedStatement stmt = connection.prepareStatement(collaboratorQuery)) {
             stmt.setInt(1, id);
-            ResultSet collabRs = stmt.executeQuery();
-
-            while (collabRs.next()) {
-                int userId = collabRs.getInt("user_id");
-                if (userId > -1) collaboratorIds.add(userId);
+            try (ResultSet collabRs = stmt.executeQuery()) {
+                while (collabRs.next()) {
+                    int userId = collabRs.getInt("user_id");
+                    if (userId > -1) collaboratorIds.add(userId);
+                }
             }
         }
 
