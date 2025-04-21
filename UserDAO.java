@@ -58,9 +58,7 @@ public class UserDAO implements CrudDAO<User> {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
     
-            if (rs.next()) {
-                return buildFromResultSet(rs);
-            }
+            if (rs.next()) return buildFromResultSet(rs);
         } catch (SQLException e) {
             e.printStackTrace();
         }

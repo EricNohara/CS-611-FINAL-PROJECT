@@ -17,6 +17,14 @@ public class AssignmentTemplate {
         this.submissionTypes = submissionTypes;
     }
 
+    public AssignmentTemplate(int id, int courseTemplateId, double weight, Assignment.Type type, List<String> submissionTypes) {
+        this.id = id;
+        this.courseTemplateId = courseTemplateId;
+        this.weight = weight;
+        this.type = type;
+        this.submissionTypes = submissionTypes;
+    }
+
     // GETTERS
     public int getId() { return id; }
     public int getCourseTemplateId() { return courseTemplateId; }
