@@ -1,3 +1,4 @@
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +59,7 @@ public class UserDAO implements CrudDAO<User> {
             ResultSet rs = stmt.executeQuery();
     
             if (rs.next()) {
-                return buildUserFromResultSet(rs);
+                return buildFromResultSet(rs);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -76,7 +77,7 @@ public class UserDAO implements CrudDAO<User> {
             ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                users.add(buildUserFromResultSet(rs));
+                users.add(buildFromResultSet(rs));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -130,26 +131,8 @@ public class UserDAO implements CrudDAO<User> {
         }
     }
 
-    // retrieves user data from table and returns a new User object
-    public User readByEmail(String email) {
-        String query = "SELECT * FROM users WHERE email = ?";
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query)) {
-    
-            stmt.setString(1, email);
-            ResultSet rs = stmt.executeQuery();
-    
-            if (rs.next()) {
-                return buildUserFromResultSet(rs);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    // helper method to build a user from a generic DB row
-    private static User buildUserFromResultSet(ResultSet rs) throws SQLException {
+    @Override
+    public User buildFromResultSet(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         String name = rs.getString("name");
         String email = rs.getString("email");
@@ -170,5 +153,23 @@ public class UserDAO implements CrudDAO<User> {
             default:
                 throw new IllegalArgumentException("Unknown role: " + role);
         }
+    }
+
+    // retrieves user data from table and returns a new User object
+    public User readByEmail(String email) {
+        String query = "SELECT * FROM users WHERE email = ?";
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+    
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+    
+            if (rs.next()) {
+                return buildFromResultSet(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
