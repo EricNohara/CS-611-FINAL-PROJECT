@@ -16,19 +16,19 @@ public class Admin extends User implements AdminOperations {
     public User.Role getRole() { return User.Role.ADMIN; }
 
     @Override
-    public User getUser(int id) { return null; }
+    public User getUser(int id) { return UserDAO.getUserById(id); }
 
     @Override
-    public List<User> getAllUsers() { return null; }
+    public List<User> getAllUsers() { return UserDAO.getAllUsers(); }
 
     @Override
-    public void addUser(User user) {}
+    public void addUser(User user) { UserDAO.addUser(user); }
 
     @Override
-    public void deleteUser(User user) {}
+    public void deleteUser(User user) { UserDAO.deleteUser(user.getId()); }
 
     @Override
-    public void editUser(User user) {}
+    public void editUser(User user) { UserDAO.editUser(user); }
 
     // Student specific methods...
 }

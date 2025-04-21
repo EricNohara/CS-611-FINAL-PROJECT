@@ -1,7 +1,9 @@
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserDAO {
-    public static void createUser(User user) {
+    public static void addUser(User user) {
         String query = "INSERT INTO users (name, email, password_hash, role, created_at, last_updated) VALUES (?, ?, ?, ?, ?, ?)";
         Timestamp current = new Timestamp(System.currentTimeMillis());
 
@@ -28,8 +30,12 @@ public class UserDAO {
                     throw new SQLException("Creating user failed, no ID obtained.");
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            if (e.getErrorCode() == 19 && e.getMessage().contains("UNIQUE")) {
+                System.err.println("Email already exists");
+            } else {
+                System.err.println("Error adding user");
+            }
         }
     }
 
@@ -49,6 +55,41 @@ public class UserDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static User getUserById(int id) {
+        String query = "SELECT * FROM users WHERE id = ?";
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+    
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+    
+            if (rs.next()) {
+                return buildUserFromResultSet(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
+        String query = "SELECT * FROM users";
+
+        try (Connection connection = DBConnection.getConnection();
+            PreparedStatement stmt = connection.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                users.add(buildUserFromResultSet(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return users;
     }
 
     // helper method to build a user from a generic DB row
@@ -76,7 +117,7 @@ public class UserDAO {
     }
 
     // Update an existing user
-    public static void updateUser(User user) {
+    public static void editUser(User user) {
         String query = "UPDATE users SET name = ?, email = ?, password_hash = ?, role = ?, last_updated = ? WHERE id = ?";
         Timestamp current = new Timestamp(System.currentTimeMillis());
 
