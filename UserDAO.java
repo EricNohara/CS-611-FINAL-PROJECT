@@ -2,8 +2,17 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserDAO {
-    public static void addUser(User user) {
+public class UserDAO implements CrudDAO<User> {
+    // SINGLETON ACCESS
+    private static final UserDAO instance = new UserDAO();
+
+    private UserDAO() {}
+
+    public static UserDAO getInstance() { return instance; }
+
+    // ABSTRACT CRUD OPERATIONS
+    @Override
+    public void create(User user) {
         String query = "INSERT INTO users (name, email, password_hash, role, created_at, last_updated) VALUES (?, ?, ?, ?, ?, ?)";
         Timestamp current = new Timestamp(System.currentTimeMillis());
 
@@ -39,25 +48,8 @@ public class UserDAO {
         }
     }
 
-    // retrieves user data from table and returns a new User object
-    public static User getUserByEmail(String email) {
-        String query = "SELECT * FROM users WHERE email = ?";
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query)) {
-    
-            stmt.setString(1, email);
-            ResultSet rs = stmt.executeQuery();
-    
-            if (rs.next()) {
-                return buildUserFromResultSet(rs);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static User getUserById(int id) {
+    @Override
+    public User read(int id) {
         String query = "SELECT * FROM users WHERE id = ?";
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -74,7 +66,8 @@ public class UserDAO {
         return null;
     }
 
-    public static List<User> getAllUsers() {
+    @Override
+    public List<User> readAll() {
         List<User> users = new ArrayList<>();
         String query = "SELECT * FROM users";
 
@@ -92,32 +85,8 @@ public class UserDAO {
         return users;
     }
 
-    // helper method to build a user from a generic DB row
-    private static User buildUserFromResultSet(ResultSet rs) throws SQLException {
-        int id = rs.getInt("id");
-        String name = rs.getString("name");
-        String email = rs.getString("email");
-        String passwordHash = rs.getString("password_hash");
-        User.Role role = User.Role.values()[rs.getInt("role")];
-        Timestamp createdAt = rs.getTimestamp("created_at");
-        Timestamp lastUpdated = rs.getTimestamp("last_updated");
-    
-        switch (role) {
-            case STUDENT:
-                return new Student(id, name, email, passwordHash, createdAt, lastUpdated);
-            case GRADER:
-                return new Grader(id, name, email, passwordHash, createdAt, lastUpdated);
-            case TEACHER:
-                return new Teacher(id, name, email, passwordHash, createdAt, lastUpdated);
-            case ADMIN:
-                return Admin.getInstance(id, name, email, passwordHash, createdAt, lastUpdated); // return singleton Admin
-            default:
-                throw new IllegalArgumentException("Unknown role: " + role);
-        }
-    }
-
-    // Update an existing user
-    public static void editUser(User user) {
+    @Override
+    public void update(User user) {
         String query = "UPDATE users SET name = ?, email = ?, password_hash = ?, role = ?, last_updated = ? WHERE id = ?";
         Timestamp current = new Timestamp(System.currentTimeMillis());
 
@@ -143,8 +112,8 @@ public class UserDAO {
         }
     }
 
-    // Delete a user by ID
-    public static void deleteUser(int userId) {
+    @Override
+    public void delete(int userId) {
         String query = "DELETE FROM users WHERE id = ?";
 
         try (Connection connection = DBConnection.getConnection();
@@ -158,6 +127,48 @@ public class UserDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    // retrieves user data from table and returns a new User object
+    public User readByEmail(String email) {
+        String query = "SELECT * FROM users WHERE email = ?";
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+    
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+    
+            if (rs.next()) {
+                return buildUserFromResultSet(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // helper method to build a user from a generic DB row
+    private static User buildUserFromResultSet(ResultSet rs) throws SQLException {
+        int id = rs.getInt("id");
+        String name = rs.getString("name");
+        String email = rs.getString("email");
+        String passwordHash = rs.getString("password_hash");
+        User.Role role = User.Role.values()[rs.getInt("role")];
+        Timestamp createdAt = rs.getTimestamp("created_at");
+        Timestamp lastUpdated = rs.getTimestamp("last_updated");
+    
+        switch (role) {
+            case STUDENT:
+                return new Student(id, name, email, passwordHash, createdAt, lastUpdated);
+            case GRADER:
+                return new Grader(id, name, email, passwordHash, createdAt, lastUpdated);
+            case TEACHER:
+                return new Teacher(id, name, email, passwordHash, createdAt, lastUpdated);
+            case ADMIN:
+                return Admin.getInstance(id, name, email, passwordHash, createdAt, lastUpdated); // return singleton Admin
+            default:
+                throw new IllegalArgumentException("Unknown role: " + role);
         }
     }
 }

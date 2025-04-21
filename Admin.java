@@ -3,6 +3,7 @@ import java.util.List;
 
 public class Admin extends User implements AdminOperations {
     private static Admin instance;
+    private static UserDAO userDAO = UserDAO.getInstance();
 
     private Admin(int id, String name, String email, String passwordHash, Timestamp createdAt, Timestamp lastUpdated) {
         super(id, name, email, passwordHash, createdAt, lastUpdated);
@@ -31,19 +32,19 @@ public class Admin extends User implements AdminOperations {
     public User.Role getRole() { return User.Role.ADMIN; }
 
     @Override
-    public User getUser(int id) { return UserDAO.getUserById(id); }
+    public User getUser(int id) { return userDAO.read(id); }
 
     @Override
-    public List<User> getAllUsers() { return UserDAO.getAllUsers(); }
+    public List<User> getAllUsers() { return userDAO.readAll(); }
 
     @Override
-    public void addUser(User user) { UserDAO.addUser(user); }
+    public void addUser(User user) { userDAO.create(user); }
 
     @Override
-    public void deleteUser(User user) { UserDAO.deleteUser(user.getId()); }
+    public void deleteUser(User user) { userDAO.delete(user.getId()); }
 
     @Override
-    public void editUser(User user) { UserDAO.editUser(user); }
+    public void editUser(User user) { userDAO.update(user); }
 
     // Other specific methods...
 }
