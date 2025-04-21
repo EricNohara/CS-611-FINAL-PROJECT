@@ -7,6 +7,7 @@ public class Course {
     private String name;
     private boolean active;
     private final List<Assignment> assignments = new ArrayList<>();
+    private CourseTemplate courseTemplate;
 
     // Constructors
     public Course() {
@@ -14,9 +15,10 @@ public class Course {
         this.active = true;
     }
     
-    public Course(int courseTemplateId, String name) {
+    public Course(CourseTemplate courseTemplate, String name) {
         this.id = -1;
-        this.courseTemplateId = courseTemplateId;
+        this.courseTemplate = courseTemplate;
+        this.courseTemplateId = courseTemplate.getId();
         this.name = name;
         this.active = true;
     }
@@ -27,6 +29,10 @@ public class Course {
     
     public int getCourseTemplateId() { return courseTemplateId; }
     public void setCourseTemplateId(int courseTemplateId) { this.courseTemplateId = courseTemplateId; }
+
+    public CourseTemplate getCourseTemplate() { return courseTemplate; }
+    public void setCourseTemplate(CourseTemplate courseTemplate) { this.courseTemplate = courseTemplate; }
+    
     
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }

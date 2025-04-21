@@ -27,4 +27,6 @@ abstract class AbstractAssignment implements Assignment {
     @Override public Timestamp getDueDate() { return dueDate; }
     @Override public double getMaxPoints() { return maxPoints; }
     @Override public double getWeight() { return template.getWeight(); }
+    
+    public AssignmentTemplate getTemplate() { return template; }
 }
