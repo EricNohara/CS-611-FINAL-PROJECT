@@ -2,16 +2,31 @@ import java.sql.Timestamp;
 import java.util.List;
 
 public class Admin extends User implements AdminOperations {
-    public Admin(int id, String name, String email, String passwordHash, Timestamp createdAt, Timestamp lastUpdated) {
+    private static Admin instance;
+
+    private Admin(int id, String name, String email, String passwordHash, Timestamp createdAt, Timestamp lastUpdated) {
         super(id, name, email, passwordHash, createdAt, lastUpdated);
     }
 
-    public Admin(String name, String email, String passwordHash) {
+    private Admin(String name, String email, String passwordHash) {
         super(name, email, passwordHash);
     }
 
-    // ABSTRACT METHOD IMPLEMENTATIONS
+    // SINGLETON ACCESSORS
+    public static Admin getInstance(int id, String name, String email, String passwordHash, Timestamp createdAt, Timestamp lastUpdated) {
+        if (instance == null) instance = new Admin(id, name, email, passwordHash, createdAt, lastUpdated);
+        return instance;
+    }
 
+    public static Admin getInstance(String name, String email, String passwordHash) {
+        if (instance == null) instance = new Admin(name, email, passwordHash);
+        return instance;
+    }
+
+    // Reset (for logout or testing)
+    public static void resetInstance() { instance = null; }
+
+    // ABSTRACT METHOD IMPLEMENTATIONS
     @Override
     public User.Role getRole() { return User.Role.ADMIN; }
 
@@ -30,5 +45,5 @@ public class Admin extends User implements AdminOperations {
     @Override
     public void editUser(User user) { UserDAO.editUser(user); }
 
-    // Student specific methods...
+    // Other specific methods...
 }
