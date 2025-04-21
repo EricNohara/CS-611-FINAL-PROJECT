@@ -110,7 +110,7 @@ public class UserDAO {
             case TEACHER:
                 return new Teacher(id, name, email, passwordHash, createdAt, lastUpdated);
             case ADMIN:
-                return new Admin(id, name, email, passwordHash, createdAt, lastUpdated);
+                return Admin.getInstance(id, name, email, passwordHash, createdAt, lastUpdated); // return singleton Admin
             default:
                 throw new IllegalArgumentException("Unknown role: " + role);
         }

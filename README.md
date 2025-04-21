@@ -57,3 +57,5 @@ java -cp ".;lib/sqlite-jdbc-3.49.1.0.jar" UserDAOTest
 
 - [Java SQL Integration](https://docs.oracle.com/javase/8/docs/api/java/sql/package-summary.html)
 - [Try with Resources Statement](https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html)
+- [SQLite Error Codes](https://sqlite.org/rescode.html)
+- [SHA-256 Hashing with Salt](https://www.baeldung.com/java-password-hashing)

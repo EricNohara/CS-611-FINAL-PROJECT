@@ -46,6 +46,11 @@ public abstract class User {
     public void setId(int id) { this.id = id; }
     public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
 
+    // METHODS
+    public boolean login(String password) {
+        return Hasher.checkPassword(password, passwordHash);
+    }
+
     // ABSTRACT
     public abstract Role getRole();
 }
