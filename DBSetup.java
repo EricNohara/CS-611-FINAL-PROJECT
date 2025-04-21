@@ -19,7 +19,6 @@ public class DBSetup {
     private static final String createAssignmentTemplatesQuery = "CREATE TABLE IF NOT EXISTS assignment_templates (" +
                                                                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                                                                 "course_template_id INTEGER," +
-                                                                "count INTEGER," +
                                                                 "weight REAL," +
                                                                 "type INTEGER," +
                                                                 "submission_types TEXT," +
