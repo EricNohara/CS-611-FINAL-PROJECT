@@ -138,29 +138,16 @@ public class SubmissionDAO implements CrudDAO<Submission> {
 
     @Override
     public void delete(int id) {
-        String deleteSubmissionQuery = "DELETE FROM submissions WHERE id = ?";
-        String deleteUserSubmissionsQuery = "DELETE FROM user_submissions WHERE submission_id = ?";
+        String query = "DELETE FROM submissions WHERE id = ?";
 
-        try (Connection connection = DBConnection.getConnection()) {
-            connection.setAutoCommit(false); // start transaction'
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
 
-            try {
-                // Delete from user_submissions
-                try (PreparedStatement stmt = connection.prepareStatement(deleteUserSubmissionsQuery)) {
-                    stmt.setInt(1, id);
-                    stmt.executeUpdate();
-                }
-        
-                // Delete from submissions
-                try (PreparedStatement stmt = connection.prepareStatement(deleteSubmissionQuery)) {
-                    stmt.setInt(1, id);
-                    stmt.executeUpdate();
-                }
-        
-                connection.commit();
-            } catch (SQLException e) {
-                connection.rollback(); // rollback on any half deleted states
-                throw e; // rethrow to trigger the outer catch block
+            stmt.setInt(1, id);
+
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Deleting submission failed, no rows affected.");
             }
         } catch (SQLException e) {
             System.err.println("Error deleting submission: " + e.getMessage());
