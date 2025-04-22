@@ -29,7 +29,7 @@ Table assignment_templates {
   course_template_id int [ref: > course_templates.id]
   weight real
   type int // homework, quiz, text, ... enum value
-  submission_types json // all allowed file extensions
+  submission_types text // all allowed file extensions
 }
 
 Table user_courses {
@@ -58,7 +58,9 @@ Table assignments {
   max_points real
   course_id int [ref: > courses.id]
   submission_path text
-  assignment_template_id int [ref: > assignment_templates.id]
+  weight real
+  type int
+  submission_types text
 }
 
 // for group submissions
