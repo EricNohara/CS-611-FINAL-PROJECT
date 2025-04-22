@@ -59,20 +59,64 @@ public class CourseDAO implements CrudDAO<Course> {
     public List<Course> readAll() {
         List<Course> courses = new ArrayList<>();
         String query = "SELECT * FROM courses";
-
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
+        
+        Connection connection = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            connection = DBConnection.getConnection();
+            stmt = connection.prepareStatement(query);
+            rs = stmt.executeQuery();
 
             while (rs.next()) {
-                courses.add(buildFromResultSet(rs));
+                // Store all data from ResultSet locally before processing
+                int id = rs.getInt("id");
+                int courseTemplateId = rs.getInt("course_template_id");
+                String name = rs.getString("name");
+                boolean active = false;
+                
+                // Check if the active column exists before trying to access it
+                try {
+                    active = rs.getBoolean("active");
+                } catch (SQLException e) {
+                    // Column doesn't exist, use default value
+                    System.out.println("Active column not found, using default value false");
+                }
+                
+                // Create a new Course object
+                Course course = new Course();
+                course.setId(id);
+                course.setName(name);
+                course.setCourseTemplateId(courseTemplateId);
+                course.setActive(active);
+                
+                // Get course template separately
+                if (courseTemplateId > 0) {
+                    CourseTemplate template = getCourseTemplate(courseTemplateId);
+                    course.setCourseTemplate(template);
+                }
+                
+                // Add course to list
+                courses.add(course);
             }
         } catch (SQLException e) {
+            System.err.println("Error reading all courses: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            // Close resources in reverse order
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                // Don't close connection as it's a singleton
+            } catch (SQLException e) {
+                System.err.println("Error closing resources: " + e.getMessage());
+            }
         }
 
         return courses;
     }
+
 
     @Override
     public List<Course> readAllCondition(String columnName, Object value) {
