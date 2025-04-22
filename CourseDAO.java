@@ -75,6 +75,27 @@ public class CourseDAO implements CrudDAO<Course> {
     }
 
     @Override
+    public List<Course> readAllCondition(String columnName, Object value) {
+        String query = "SELECT * FROM courses WHERE " + columnName.trim() + " = ?";
+        List<Course> courses = new ArrayList<>();
+        
+        try (Connection connection = DBConnection.getConnection();
+            PreparedStatement stmt = connection.prepareStatement(query)) {
+
+            stmt.setObject(1, value);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                courses.add(buildFromResultSet(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error reading courses: " + e.getMessage());
+        }
+        
+        return courses;
+    }
+
+    @Override
     public void update(Course course) {
         String query = "UPDATE courses SET course_template_id = ?, name = ?, active = ? WHERE id = ?";
 
