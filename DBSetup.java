@@ -28,6 +28,7 @@ public class DBSetup {
                                                     "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                                                     "course_template_id INTEGER," +
                                                     "name TEXT NOT NULL," +
+                                                    "active BOOLEAN DEFAULT 1," +
                                                     "FOREIGN KEY (course_template_id) REFERENCES course_templates(id) ON DELETE SET NULL);";
 
     private static final String createUserCoursesQuery = "CREATE TABLE IF NOT EXISTS user_courses (" +
