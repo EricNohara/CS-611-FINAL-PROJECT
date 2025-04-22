@@ -479,40 +479,30 @@ public class CourseDAO implements CrudDAO<Course> {
     
     // ASSIGNMENT MANAGEMENT METHODS
     public void addAssignmentToCourse(Course course, Assignment assignment) {
-        String query = "INSERT INTO assignments (id, name, due_date, max_points, assignment_template_id, course_id, assignment_type) " +
-                      "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO assignments (name, due_date, max_points, assignment_template_id, course_id) " +
+                      "VALUES (?, ?, ?, ?, ?)";
 
         try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query)) {
+             PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 
-            stmt.setInt(1, assignment.getId());
-            stmt.setString(2, assignment.getName());
-            stmt.setTimestamp(3, assignment.getDueDate());
-            stmt.setDouble(4, assignment.getMaxPoints());
+            stmt.setString(1, assignment.getName());
+            stmt.setTimestamp(2, assignment.getDueDate());
+            stmt.setDouble(3, assignment.getMaxPoints());
+            stmt.setInt(4, assignment.getTemplate().getId());
+            stmt.setInt(5, course.getId());
+
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) throw new SQLException("Creating assignment failed, no rows affected.");
             
-            // For now, we'll use a placeholder for the template ID
-            // In a real implementation, you'd need to get the actual template ID 
-            // or create a method in AbstractAssignment to access it
-            stmt.setInt(5, 1); 
-            
-            stmt.setInt(6, course.getId());
-            
-            // Get assignment type based on class
-            Assignment.Type type;
-            if (assignment instanceof Homework) {
-                type = Assignment.Type.HOMEWORK;
-            } else if (assignment instanceof Quiz) {
-                type = Assignment.Type.QUIZ;
-            } else if (assignment instanceof Exam) {
-                type = Assignment.Type.EXAM;
-            } else if (assignment instanceof Project) {
-                type = Assignment.Type.PROJECT;
-            } else {
-                throw new IllegalArgumentException("Unknown assignment type");
+            // Get the generated ID
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    int id = generatedKeys.getInt(1);
+                    assignment.setId(id);
+                } else {
+                    throw new SQLException("Creating assignment failed, no ID obtained.");
+                }
             }
-            stmt.setInt(7, type.ordinal());
-
-            stmt.executeUpdate();
             
             // Add assignment to course's list
             course.addAssignment(assignment);
@@ -525,7 +515,7 @@ public class CourseDAO implements CrudDAO<Course> {
     public List<Assignment> getAssignmentsForCourse(int courseId) {
         List<Assignment> assignments = new ArrayList<>();
         
-        String query = "SELECT a.*, at.weight, at.type as template_type FROM assignments a " +
+        String query = "SELECT a.*, at.type as template_type FROM assignments a " +
                        "JOIN assignment_templates at ON a.assignment_template_id = at.id " +
                        "WHERE a.course_id = ?";
 
@@ -536,37 +526,26 @@ public class CourseDAO implements CrudDAO<Course> {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                assignments.add(buildAssignmentFromResultSet(rs));
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                Timestamp dueDate = rs.getTimestamp("due_date");
+                double maxPoints = rs.getDouble("max_points");
+                int templateId = rs.getInt("assignment_template_id");
+                int typeOrdinal = rs.getInt("template_type");
+                Assignment.Type type = Assignment.Type.values()[typeOrdinal];
+                
+                // Get the assignment template
+                AssignmentTemplateDAO templateDAO = AssignmentTemplateDAO.getInstance();
+                AssignmentTemplate template = templateDAO.read(templateId);
+                
+                // Create appropriate assignment using the factory
+                Assignment assignment = AssignmentFactory.create(type, id, name, dueDate, maxPoints, template, courseId);
+                assignments.add(assignment);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return assignments;
-    }
-    
-    // Helper method to build an assignment from a result set
-    private Assignment buildAssignmentFromResultSet(ResultSet rs) throws SQLException {
-        String id = rs.getString("id");
-        String title = rs.getString("name");
-        Timestamp dueDate = rs.getTimestamp("due_date");
-        double maxPoints = rs.getDouble("max_points");
-        int templateId = rs.getInt("assignment_template_id");
-        int assignmentTypeOrdinal = rs.getInt("assignment_type");
-        
-        // Get assignment type
-        Assignment.Type type = Assignment.Type.values()[assignmentTypeOrdinal];
-        
-        // Create assignment template
-        double weight = rs.getDouble("weight");
-        Assignment.Type templateType = Assignment.Type.values()[rs.getInt("template_type")];
-        
-        // For simplicity, we'll create a minimal template
-        List<String> submissionTypes = new ArrayList<>(); // In a real app, would fetch from DB
-        AssignmentTemplate template = new AssignmentTemplate(rs.getInt("course_id"), weight, templateType, submissionTypes);
-        template.setId(templateId);
-        
-        // Create appropriate assignment based on type
-        return AssignmentFactory.create(type, id, title, dueDate, maxPoints, template);
     }
 }
