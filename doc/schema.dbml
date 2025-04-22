@@ -27,7 +27,6 @@ Table course_templates {
 Table assignment_templates {
   id int [primary key]
   course_template_id int [ref: > course_templates.id]
-  count int
   weight real
   type int // homework, quiz, text, ... enum value
   submission_types json // all allowed file extensions
@@ -56,6 +55,7 @@ Table assignments {
   id int [primary key]
   name text
   due_date timestamp
+  max_points int
   assignment_template_id int [ref: > assignment_templates.id]
 }
 
