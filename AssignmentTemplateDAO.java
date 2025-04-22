@@ -56,6 +56,24 @@ public class AssignmentTemplateDAO implements CrudDAO<AssignmentTemplate> {
         }
         return null;
     }
+
+    @Override
+    public List<AssignmentTemplate> readAllCondition(String columnName, Object value) {
+        String query = "SELECT * FROM assignment_templates WHERE " + columnName.trim() + " = ?";
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+    
+            stmt.setObject(1, value);
+            ResultSet rs = stmt.executeQuery();
+            List<AssignmentTemplate> templates = new ArrayList<>();
+    
+            while (rs.next()) templates.add(buildFromResultSet(rs));
+            return templates;
+        } catch (SQLException e) {
+            System.err.println("Error reading assignment template: " + e.getMessage());
+        }
+        return null;
+    }
     
     @Override
     public List<AssignmentTemplate> readAll() {
