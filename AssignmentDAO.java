@@ -48,6 +48,24 @@ public class AssignmentDAO implements CrudDAO<Assignment> {
         }
         return null;
     }
+
+    @Override
+    public List<Assignment> readAllCondition(String columnName, Object value) {
+        String query = "SELECT * FROM assignments WHERE " + columnName.trim() + " = ?";
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+    
+            stmt.setObject(1, value);
+            ResultSet rs = stmt.executeQuery();
+            List<Assignment> assignments = new ArrayList<>();
+    
+            while (rs.next()) assignments.add(buildFromResultSet(rs));
+            return assignments;
+        } catch (SQLException e) {
+            System.err.println("Error reading assignments: " + e.getMessage());
+        }
+        return null;
+    }
     
     @Override
     public List<Assignment> readAll() {

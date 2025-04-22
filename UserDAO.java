@@ -66,6 +66,24 @@ public class UserDAO implements CrudDAO<User> {
     }
 
     @Override
+    public List<User> readAllCondition(String columnName, Object value) {
+        String query = "SELECT * FROM assignment_templates WHERE " + columnName.trim() + " = ?";
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+    
+            stmt.setObject(1, value);
+            ResultSet rs = stmt.executeQuery();
+            List<User> users = new ArrayList<>();
+    
+            while (rs.next()) users.add(buildFromResultSet(rs));
+            return users;
+        } catch (SQLException e) {
+            System.err.println("Error reading users: " + e.getMessage());
+        }
+        return null;
+    }
+
+    @Override
     public List<User> readAll() {
         List<User> users = new ArrayList<>();
         String query = "SELECT * FROM users";

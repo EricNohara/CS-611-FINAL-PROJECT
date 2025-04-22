@@ -11,6 +11,12 @@ public class CourseTemplate {
         this.assignmentTemplates = assignmentTemplates;
     }
 
+    public CourseTemplate(int id, String name, List<AssignmentTemplate> assignmentTemplates) {
+        this.id = id;
+        this.name = name;
+        this.assignmentTemplates = assignmentTemplates;
+    }
+
     // GETTERS
     public int getId() { return id; } 
     public String getName() { return name; }

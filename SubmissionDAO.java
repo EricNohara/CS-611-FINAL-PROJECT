@@ -16,37 +16,42 @@ public class SubmissionDAO implements CrudDAO<Submission> {
         String submissionQuery = "INSERT INTO submissions (assignment_id, grader_id, filepath, submitted_at, grade, status) VALUES (?, ?, ?, ?, ?, ?)";
         String userSubmissionsQuery = "INSERT INTO user_submissions (user_id, submission_id) VALUES (?, ?)";
 
-        try (Connection connection = DBConnection.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(submissionQuery, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection connection = DBConnection.getConnection()) {
+            connection.setAutoCommit(false); // BEGIN TRANSACTION
 
-            stmt.setInt(1, submission.getAssignmentId());
-            stmt.setInt(2, submission.getGraderId());
-            stmt.setString(3, submission.getFilepath());
-            stmt.setTimestamp(4, submission.getSubmittedAt()); // store role enum value
-            stmt.setDouble(5, submission.getGrade());
-            stmt.setInt(6, submission.getStatus().ordinal());
+            try (PreparedStatement stmt = connection.prepareStatement(submissionQuery, Statement.RETURN_GENERATED_KEYS)) {
+                stmt.setInt(1, submission.getAssignmentId());
+                stmt.setInt(2, submission.getGraderId());
+                stmt.setString(3, submission.getFilepath());
+                stmt.setTimestamp(4, submission.getSubmittedAt());
+                stmt.setDouble(5, submission.getGrade());
+                stmt.setInt(6, submission.getStatus().ordinal());
 
-            int affectedRows = stmt.executeUpdate();
-            if (affectedRows == 0) throw new SQLException("Creating submission failed, no rows affected.");
+                int affectedRows = stmt.executeUpdate();
+                if (affectedRows == 0) throw new SQLException("Creating submission failed, no rows affected.");
 
-            // update relevant fields in User object
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    int submissionId = generatedKeys.getInt(1);
-                    submission.setId(submissionId); // set the generated id here
+                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        int submissionId = generatedKeys.getInt(1);
+                        submission.setId(submissionId);
 
-                    // insert collaborators into user_submissions table
-                    try (PreparedStatement userSubStmt = connection.prepareStatement(userSubmissionsQuery)) {
-                        for (Integer collaborator_id : submission.getCollaboratorIds()) {
-                            userSubStmt.setInt(1, collaborator_id);
-                            userSubStmt.setInt(2, submissionId);
-                            userSubStmt.addBatch();
+                        try (PreparedStatement userSubStmt = connection.prepareStatement(userSubmissionsQuery)) {
+                            for (Integer collaborator_id : submission.getCollaboratorIds()) {
+                                userSubStmt.setInt(1, collaborator_id);
+                                userSubStmt.setInt(2, submissionId);
+                                userSubStmt.addBatch();
+                            }
+                            userSubStmt.executeBatch();
                         }
-                        userSubStmt.executeBatch();
+                    } else {
+                        throw new SQLException("Creating submission failed, no ID obtained.");
                     }
-                } else {
-                    throw new SQLException("Creating user failed, no ID obtained.");
                 }
+
+                connection.commit(); // COMMIT if everything succeeds
+            } catch (SQLException e) {
+                connection.rollback(); // ROLLBACK on any error
+                throw e;
             }
         } catch (SQLException e) {
             System.err.println("Error creating submission: " + e.getMessage());
@@ -67,6 +72,24 @@ public class SubmissionDAO implements CrudDAO<Submission> {
             }
         } catch (SQLException e) {
             System.out.println("Error reading submission: " + e.getMessage());
+        }
+        return null;
+    }
+
+    @Override
+    public List<Submission> readAllCondition(String columnName, Object value) {
+        String query = "SELECT * FROM assignment_templates WHERE " + columnName.trim() + " = ?";
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+    
+            stmt.setObject(1, value);
+            ResultSet rs = stmt.executeQuery();
+            List<Submission> submissions = new ArrayList<>();
+    
+            while (rs.next()) submissions.add(buildFromResultSet(rs));
+            return submissions;
+        } catch (SQLException e) {
+            System.err.println("Error reading submissions: " + e.getMessage());
         }
         return null;
     }
