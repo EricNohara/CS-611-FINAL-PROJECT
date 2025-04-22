@@ -55,7 +55,9 @@ Table assignments {
   id int [primary key]
   name text
   due_date timestamp
-  max_points int
+  max_points real
+  course_id int [ref: > courses.id]
+  submission_path text
   assignment_template_id int [ref: > assignment_templates.id]
 }
 
