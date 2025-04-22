@@ -485,8 +485,8 @@ public class CourseDAO implements CrudDAO<Course> {
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
 
-            stmt.setString(1, assignment.getId());
-            stmt.setString(2, assignment.getTitle());
+            stmt.setInt(1, assignment.getId());
+            stmt.setString(2, assignment.getName());
             stmt.setTimestamp(3, assignment.getDueDate());
             stmt.setDouble(4, assignment.getMaxPoints());
             

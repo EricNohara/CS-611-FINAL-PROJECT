@@ -59,9 +59,11 @@ public class DBSetup {
                                                         "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                                                         "name TEXT NOT NULL," +
                                                         "due_date TIMESTAMP NOT NULL," +
-                                                        "max_points INTEGER NOT NULL," +
+                                                        "max_points REAL NOT NULL," +
                                                         "assignment_template_id INTEGER," +
-                                                        "FOREIGN KEY (assignment_template_id) REFERENCES assignment_templates(id));";
+                                                        "course_id INTEGER NOT NULL," +
+                                                        "FOREIGN KEY (assignment_template_id) REFERENCES assignment_templates(id)," +
+                                                        "FOREIGN KEY (course_id) REFERENCES courses(id));";
 
     private static final String[] createTableQueries = {
         createUsersQuery, 
