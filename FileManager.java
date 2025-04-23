@@ -6,14 +6,14 @@ public class FileManager {
     // save a file to the upload directory
     public static boolean saveFile(File fileToUpload, String filePath) {
         Path path = Paths.get(filePath);
+        Path parentDir = path.getParent(); // extract the parent directory
     
         try {
-            if (!Files.exists(path)) Files.createDirectories(path);
+            if (!Files.exists(parentDir)) Files.createDirectories(parentDir); // create directories as needed
     
-            Path destination = path.resolve(fileToUpload.getName());
-            Files.copy(fileToUpload.toPath(), destination, StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(fileToUpload.toPath(), path, StandardCopyOption.REPLACE_EXISTING);
     
-            System.out.println("File saved to: " + destination.toAbsolutePath());
+            System.out.println("File saved to: " + path.toAbsolutePath());
             return true;
         } catch (IOException e) {
             System.err.println("Failed to save file: " + e.getMessage());

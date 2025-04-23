@@ -4,6 +4,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class CourseTemplateDAO implements CrudDAO<CourseTemplate> {
+    // SINGLETON ACCESS
+    private static final CourseTemplateDAO instance = new CourseTemplateDAO();
+
+    private CourseTemplateDAO() {}
+
+    public static CourseTemplateDAO getInstance() { return instance; }
+
     // ABSTRACT CRUD OPERATION IMPLEMENTATIONS
     @Override
     public void create(CourseTemplate template) {

@@ -204,10 +204,8 @@ public class CourseDAO implements CrudDAO<Course> {
         course.setCourseTemplate(template);
         
         // Load assignments for this course
-        List<Assignment> assignments = getAssignmentsForCourse(id);
-        for (Assignment assignment : assignments) {
-            course.addAssignment(assignment);
-        }
+        AssignmentDAO assignmentDAO = AssignmentDAO.getInstance();
+        course.setAssignments(assignmentDAO.readAllCondition("course_id", id));
         
         return course;
     }
@@ -575,42 +573,5 @@ public class CourseDAO implements CrudDAO<Course> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-    
-    public List<Assignment> getAssignmentsForCourse(int courseId) {
-        List<Assignment> assignments = new ArrayList<>();
-        
-        String query = "SELECT a.*, at.type as template_type FROM assignments a " +
-                       "JOIN assignment_templates at ON a.assignment_template_id = at.id " +
-                       "WHERE a.course_id = ?";
-
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query)) {
-
-            stmt.setInt(1, courseId);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
-                Timestamp dueDate = rs.getTimestamp("due_date");
-                double maxPoints = rs.getDouble("max_points");
-                int templateId = rs.getInt("assignment_template_id");
-                int typeOrdinal = rs.getInt("template_type");
-                Assignment.Type type = Assignment.Type.values()[typeOrdinal];
-                
-                // Get the assignment template
-                AssignmentTemplateDAO templateDAO = AssignmentTemplateDAO.getInstance();
-                AssignmentTemplate template = templateDAO.read(templateId);
-                
-                // Create appropriate assignment using the factory
-                Assignment assignment = AssignmentFactory.create(type, id, name, dueDate, maxPoints, template, courseId);
-                assignments.add(assignment);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return assignments;
     }
 }

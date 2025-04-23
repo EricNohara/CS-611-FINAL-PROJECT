@@ -6,7 +6,7 @@ public class Course {
     private int courseTemplateId;
     private String name;
     private boolean active;
-    private final List<Assignment> assignments = new ArrayList<>();
+    private List<Assignment> assignments = new ArrayList<>();
     private CourseTemplate courseTemplate;
 
     // Constructors
@@ -41,6 +41,7 @@ public class Course {
     public void setActive(boolean active) { this.active = active; }
     
     public List<Assignment> getAssignments() { return Collections.unmodifiableList(assignments); }
+    public void setAssignments(List<Assignment> assignments) { this.assignments = assignments; }
     
     // Assignment methods
     public void addAssignment(Assignment a) { assignments.add(a); }

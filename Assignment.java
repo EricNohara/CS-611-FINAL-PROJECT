@@ -25,6 +25,20 @@ public class Assignment {
         this.courseId = courseId;
     }
 
+    public Assignment(String name, Timestamp dueDate, double maxPoints, AssignmentTemplate template, int courseId) {
+        Objects.requireNonNull(id); Objects.requireNonNull(name);
+        Objects.requireNonNull(dueDate);
+
+        if (maxPoints <= 0) throw new IllegalArgumentException("maxPoints ≤ 0");
+
+        this.id = -1;
+        this.name = name;
+        this.dueDate = dueDate;
+        this.maxPoints = maxPoints;
+        this.template = template;
+        this.courseId = courseId;
+    }
+
     /** Returns the contribution earnedPoints / maxPoints · weight */
     public double contribution(double earnedPoints) {
         if (earnedPoints < 0.0 || earnedPoints > this.maxPoints) {

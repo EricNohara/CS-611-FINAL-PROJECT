@@ -3,6 +3,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AssignmentDAO implements CrudDAO<Assignment> {
+    // SINGLETON ACCESS
+    private static final AssignmentDAO instance = new AssignmentDAO();
+
+    private AssignmentDAO() {}
+
+    public static AssignmentDAO getInstance() { return instance; }
+
     // ABSTRACT CRUD OPERATIONS IMPLEMENTATIONS
     @Override
     public void create(Assignment assignment) {
