@@ -343,7 +343,7 @@ public class AdminDashboard extends JFrame {
         
         // Get course templates from database
         try {
-            CourseTemplateDAO templateDAO = new CourseTemplateDAO();
+            CourseTemplateDAO templateDAO = CourseTemplateDAO.getInstance();
             List<CourseTemplate> templates = templateDAO.readAll();
             for (CourseTemplate template : templates) {
                 templateComboBox.addItem(new CourseTemplateItem(template.getId(), template.getName()));
@@ -404,7 +404,7 @@ public class AdminDashboard extends JFrame {
                 
                 if (templateId != -1) {
                     // Get the template from database
-                    CourseTemplateDAO templateDAO = new CourseTemplateDAO();
+                    CourseTemplateDAO templateDAO = CourseTemplateDAO.getInstance();
                     CourseTemplate template = templateDAO.read(templateId);
                     course.setCourseTemplate(template);
                     course.setCourseTemplateId(templateId);
@@ -509,7 +509,7 @@ public class AdminDashboard extends JFrame {
             templateComboBox.addItem(new CourseTemplateItem(-1, "None"));
             
             // Get course templates from database
-            CourseTemplateDAO templateDAO = new CourseTemplateDAO();
+            CourseTemplateDAO templateDAO = CourseTemplateDAO.getInstance();
             List<CourseTemplate> templates = templateDAO.readAll();
             int selectedIndex = 0;
             
@@ -765,7 +765,8 @@ public class AdminDashboard extends JFrame {
             assignmentsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
             
             // Get assignments for this course
-            List<Assignment> assignments = courseDAO.getAssignmentsForCourse(course.getId());
+            AssignmentDAO assignmentDAO = AssignmentDAO.getInstance();
+            List<Assignment> assignments = assignmentDAO.readAllCondition("course_id", course.getId());
             
             // Create table for assignments
             String[] assignmentColumns = {"ID", "Name", "Type", "Due Date", "Max Points"};

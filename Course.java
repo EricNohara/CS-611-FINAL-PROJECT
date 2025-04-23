@@ -62,14 +62,14 @@ public class Course {
                 .sum();
     }
 
-    public Map<Assignment.Type, List<Assignment>> byType() {
-        return assignments.stream().collect(Collectors.groupingBy(a -> a.getClass()
-                                                              .getSimpleName()
-                                                              .toUpperCase()
-                                                              .contains("EXAM")
-                                                              ? Assignment.Type.EXAM
-                                                              : a instanceof Quiz ? Assignment.Type.QUIZ
-                                                                                  : a instanceof Project ? Assignment.Type.PROJECT
-                                                                                                         : Assignment.Type.HOMEWORK));
-    }
+    // public Map<Assignment.Type, List<Assignment>> byType() {
+    //     return assignments.stream().collect(Collectors.groupingBy(a -> a.getClass()
+    //                                                           .getSimpleName()
+    //                                                           .toUpperCase()
+    //                                                           .contains("EXAM")
+    //                                                           ? Assignment.Type.EXAM
+    //                                                           : a instanceof Quiz ? Assignment.Type.QUIZ
+    //                                                                               : a instanceof Project ? Assignment.Type.PROJECT
+    //                                                                                                      : Assignment.Type.HOMEWORK));
+    // }
 }

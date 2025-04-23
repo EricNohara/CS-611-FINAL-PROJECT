@@ -24,13 +24,13 @@ public class Assignment {
     private Assignment.Type type;
     private List<String> submissionTypes;
 
-    public Assignment(int id, String name, Timestamp dueDate, double maxPoints, AssignmentTemplate template, int courseId) {
+    public Assignment(String name, Timestamp dueDate, double maxPoints, AssignmentTemplate template, int courseId) {
         Objects.requireNonNull(id); Objects.requireNonNull(name);
         Objects.requireNonNull(dueDate);
 
         if (maxPoints <= 0) throw new IllegalArgumentException("maxPoints ≤ 0");
 
-        this.id = id;
+        this.id = -1;
         this.name = name;
         this.dueDate = dueDate;
         this.maxPoints = maxPoints;
@@ -41,6 +41,7 @@ public class Assignment {
             this.submissionTypes = template.getSubmissionTypes();
         }
     }
+
     public Assignment(int id, String name, Timestamp dueDate, int maxPoints, int courseId,
                       List<String> submissionPath, double weight, Type type, List<String> submissionTypes) {
         this.id = id;
@@ -52,21 +53,6 @@ public class Assignment {
         this.weight = weight;
         this.type = type;
         this.submissionTypes = submissionTypes;
-    }
-
-
-    public Assignment(String name, Timestamp dueDate, double maxPoints, AssignmentTemplate template, int courseId) {
-        Objects.requireNonNull(id); Objects.requireNonNull(name);
-        Objects.requireNonNull(dueDate);
-
-        if (maxPoints <= 0) throw new IllegalArgumentException("maxPoints ≤ 0");
-
-        this.id = -1;
-        this.name = name;
-        this.dueDate = dueDate;
-        this.maxPoints = maxPoints;
-        this.template = template;
-        this.courseId = courseId;
     }
 
     /** Returns the contribution earnedPoints / maxPoints · weight */
@@ -84,8 +70,6 @@ public class Assignment {
     public Timestamp getDueDate() { return dueDate; }
     public double getMaxPoints() { return maxPoints; }
     public double getWeight() { return this.weight; }
-    //public AssignmentTemplate getTemplate() { return template; }
-
     public List<String> getSubmission_path() {return submission_path;}
     public int getCourseId() { return this.courseId; }
     public Assignment.Type getType() { return this.type; }
@@ -97,11 +81,9 @@ public class Assignment {
     public void setName(String name) { this.name = name; }
     public void setDueDate(Timestamp dueDate) { this.dueDate = dueDate; }
     public void setMaxPoints(double maxPoints) { this.maxPoints = maxPoints; }
-    //public void setTemplate(AssignmentTemplate template) { this.template = template; }
     public void setSubmission_path(List<String> submission_path) {this.submission_path = submission_path;}
     public void setWeight(double weight) {this.weight = weight;}
     public void setCourseId(int courseId) { this.courseId = courseId; }
     public void setType(Assignment.Type type) { this.type = type; }
     public void setSubmissionTypes(List<String> submissionTypes) { this.submissionTypes = submissionTypes; }
-
 }
