@@ -553,7 +553,7 @@ public class CourseDAO implements CrudDAO<Course> {
             stmt.setString(1, assignment.getName());
             stmt.setTimestamp(2, assignment.getDueDate());
             stmt.setDouble(3, assignment.getMaxPoints());
-            stmt.setInt(4, assignment.getTemplate().getId());
+            stmt.setInt(4, assignment.getId());
             stmt.setInt(5, course.getId());
 
             int affectedRows = stmt.executeUpdate();

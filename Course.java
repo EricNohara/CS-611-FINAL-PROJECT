@@ -18,7 +18,10 @@ public class Course {
     public Course(CourseTemplate courseTemplate, String name) {
         this.id = -1;
         this.courseTemplate = courseTemplate;
-        this.courseTemplateId = courseTemplate.getId();
+        if (courseTemplate != null) {
+            this.courseTemplateId = courseTemplate.getId();
+        }
+
         this.name = name;
         this.active = true;
     }
@@ -27,8 +30,13 @@ public class Course {
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     
-    public int getCourseTemplateId() { return courseTemplateId; }
-    public void setCourseTemplateId(int courseTemplateId) { this.courseTemplateId = courseTemplateId; }
+    public int getCourseTemplateId() {
+        if(courseTemplate == null) {
+            return -1;
+        }
+        return courseTemplateId;
+    }
+    public void setCourseTemplateId(int courseTemplateId) {this.courseTemplateId = courseTemplateId;}
 
     public CourseTemplate getCourseTemplate() { return courseTemplate; }
     public void setCourseTemplate(CourseTemplate courseTemplate) { this.courseTemplate = courseTemplate; }
