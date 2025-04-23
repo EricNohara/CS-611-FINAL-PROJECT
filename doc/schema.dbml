@@ -17,6 +17,7 @@ Table courses {
   id int [primary key]
   course_template_id int [ref: > course_templates.id]
   name text
+  active bool
 }
 
 Table course_templates {

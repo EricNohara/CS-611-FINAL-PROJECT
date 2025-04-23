@@ -93,7 +93,8 @@ public class CourseDAO implements CrudDAO<Course> {
                 
                 // Get course template separately
                 if (courseTemplateId > 0) {
-                    CourseTemplate template = getCourseTemplate(courseTemplateId);
+                    CourseTemplateDAO courseTemplateDAO = CourseTemplateDAO.getInstance();
+                    CourseTemplate template = courseTemplateDAO.read(courseTemplateId);
                     course.setCourseTemplate(template);
                 }
                 
@@ -161,14 +162,7 @@ public class CourseDAO implements CrudDAO<Course> {
     }
 
     @Override
-    public void delete(int courseId) {
-        // First delete from user_courses (junction table)
-        deleteUserCoursesRelations(courseId);
-        
-        // Delete assignments related to this course
-        deleteAssignmentsForCourse(courseId);
-        
-        // Then delete the course
+    public void delete(int courseId) {       
         String query = "DELETE FROM courses WHERE id = ?";
 
         try (Connection connection = DBConnection.getConnection();
@@ -185,7 +179,6 @@ public class CourseDAO implements CrudDAO<Course> {
         }
     }
 
-    // IMPLEMENT THE REQUIRED ABSTRACT METHOD
     @Override
     public Course buildFromResultSet(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
@@ -200,44 +193,15 @@ public class CourseDAO implements CrudDAO<Course> {
         course.setActive(active);
         
         // Set course template
-        CourseTemplate template = getCourseTemplate(templateId);
+        CourseTemplateDAO courseTemplateDAO = CourseTemplateDAO.getInstance();
+        CourseTemplate template = courseTemplateDAO.read(templateId);
         course.setCourseTemplate(template);
         
         // Load assignments for this course
-        List<Assignment> assignments = getAssignmentsForCourse(id);
-        for (Assignment assignment : assignments) {
-            course.addAssignment(assignment);
-        }
+        AssignmentDAO assignmentDAO = AssignmentDAO.getInstance();
+        course.setAssignments(assignmentDAO.readAllCondition("course_id", id));
         
         return course;
-    }
-
-    // Helper method to delete user_courses relations
-    private void deleteUserCoursesRelations(int courseId) {
-        String query = "DELETE FROM user_courses WHERE course_id = ?";
-
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query)) {
-
-            stmt.setInt(1, courseId);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    // Helper method to delete assignments for a course
-    private void deleteAssignmentsForCourse(int courseId) {
-        String query = "DELETE FROM assignments WHERE course_id = ?";
-
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query)) {
-
-            stmt.setInt(1, courseId);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     // USER-COURSE RELATIONSHIP METHODS
@@ -266,133 +230,6 @@ public class CourseDAO implements CrudDAO<Course> {
             stmt.setInt(2, courseId);
 
             stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // COURSE TEMPLATE METHODS
-    public CourseTemplate getCourseTemplate(int templateId) {
-        String query = "SELECT * FROM course_templates WHERE id = ?";
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query)) {
-    
-            stmt.setInt(1, templateId);
-            ResultSet rs = stmt.executeQuery();
-    
-            if (rs.next()) {
-                String name = rs.getString("name");
-                
-                // Get assignment templates for this course template
-                List<AssignmentTemplate> assignmentTemplates = getAssignmentTemplatesForCourseTemplate(templateId);
-                
-                // Create and return course template
-                CourseTemplate template = new CourseTemplate(name, assignmentTemplates);
-                template.setId(templateId);
-                
-                return template;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-    
-    private List<AssignmentTemplate> getAssignmentTemplatesForCourseTemplate(int courseTemplateId) {
-        List<AssignmentTemplate> templates = new ArrayList<>();
-        
-        String query = "SELECT * FROM assignment_templates WHERE course_template_id = ?";
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query)) {
-    
-            stmt.setInt(1, courseTemplateId);
-            ResultSet rs = stmt.executeQuery();
-    
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                double weight = rs.getDouble("weight");
-                int typeOrdinal = rs.getInt("type");
-                Assignment.Type type = Assignment.Type.values()[typeOrdinal];
-                
-                // Parse submission types (stored as comma-separated string in DB)
-                String submissionTypesStr = rs.getString("submission_types");
-                List<String> submissionTypes = new ArrayList<>();
-                if (submissionTypesStr != null && !submissionTypesStr.isEmpty()) {
-                    String[] types = submissionTypesStr.split(",");
-                    for (String t : types) {
-                        submissionTypes.add(t.trim());
-                    }
-                }
-                
-                AssignmentTemplate template = new AssignmentTemplate(courseTemplateId, weight, type, submissionTypes);
-                template.setId(id);
-                
-                templates.add(template);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        
-        return templates;
-    }
-    
-    public void createCourseTemplate(CourseTemplate template) {
-        String query = "INSERT INTO course_templates (name) VALUES (?)";
-        
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            
-            stmt.setString(1, template.getName());
-            
-            int affectedRows = stmt.executeUpdate();
-            if (affectedRows == 0) throw new SQLException("Creating course template failed, no rows affected.");
-            
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    template.setId(generatedKeys.getInt(1));
-                    
-                    // Now save assignment templates
-                    saveAssignmentTemplates(template);
-                } else {
-                    throw new SQLException("Creating course template failed, no ID obtained.");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    private void saveAssignmentTemplates(CourseTemplate template) {
-        String query = "INSERT INTO assignment_templates (course_template_id, weight, type, submission_types) VALUES (?, ?, ?, ?)";
-        
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            
-            for (AssignmentTemplate at : template.getAssignmentTemplates()) {
-                stmt.setInt(1, template.getId());
-                stmt.setDouble(2, at.getWeight());
-                stmt.setInt(3, at.getType().ordinal());
-                
-                // Convert submission types list to comma-separated string
-                StringBuilder sb = new StringBuilder();
-                List<String> types = at.getSubmissionTypes();
-                for (int i = 0; i < types.size(); i++) {
-                    sb.append(types.get(i));
-                    if (i < types.size() - 1) {
-                        sb.append(",");
-                    }
-                }
-                stmt.setString(4, sb.toString());
-                
-                stmt.executeUpdate();
-                
-                // Get generated key
-                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        at.setId(generatedKeys.getInt(1));
-                    }
-                }
-            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -575,42 +412,5 @@ public class CourseDAO implements CrudDAO<Course> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-    
-    public List<Assignment> getAssignmentsForCourse(int courseId) {
-        List<Assignment> assignments = new ArrayList<>();
-        
-        String query = "SELECT a.*, at.type as template_type FROM assignments a " +
-                       "JOIN assignment_templates at ON a.assignment_template_id = at.id " +
-                       "WHERE a.course_id = ?";
-
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query)) {
-
-            stmt.setInt(1, courseId);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
-                Timestamp dueDate = rs.getTimestamp("due_date");
-                double maxPoints = rs.getDouble("max_points");
-                int templateId = rs.getInt("assignment_template_id");
-                int typeOrdinal = rs.getInt("template_type");
-                Assignment.Type type = Assignment.Type.values()[typeOrdinal];
-                
-                // Get the assignment template
-                AssignmentTemplateDAO templateDAO = AssignmentTemplateDAO.getInstance();
-                AssignmentTemplate template = templateDAO.read(templateId);
-                
-                // Create appropriate assignment using the factory
-                Assignment assignment = AssignmentFactory.create(type, id, name, dueDate, maxPoints, template, courseId);
-                assignments.add(assignment);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return assignments;
     }
 }
