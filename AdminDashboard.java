@@ -780,7 +780,7 @@ public class AdminDashboard extends JFrame {
                 assignmentModel.addRow(new Object[]{
                     assignment.getId(),
                     assignment.getName(),
-                    assignment.getTemplate().getType(),
+                    assignment.getType(),
                     assignment.getDueDate(),
                     assignment.getMaxPoints()
                 });
