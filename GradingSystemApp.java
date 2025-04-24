@@ -1,6 +1,12 @@
 import java.util.*;
 import javax.swing.*;
 
+import db.DBSetup;
+import db.UserDAO;
+import model.Admin;
+import model.User;
+import utils.Hasher;
+
 // Main application class
 public class GradingSystemApp {
     public static void main(String[] args) {

@@ -1,4 +1,18 @@
 import javax.swing.*;
+
+import db.AssignmentDAO;
+import db.AssignmentTemplateDAO;
+import db.CourseDAO;
+import db.CourseTemplateDAO;
+import db.DBSetup;
+import db.UserDAO;
+import model.Assignment;
+import model.AssignmentTemplate;
+import model.Course;
+import model.CourseTemplate;
+import model.Student;
+import model.Submission;
+
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -6,6 +20,8 @@ import java.util.List;
 
 public class SubmissionFileTest {
     public static void main(String[] args) {
+        DBSetup.createTables();
+
         // Create dummy user
         UserDAO userDAO = UserDAO.getInstance();
         Student student = new Student("Eric N>L", "wefdsf@gmail.com", "asdfsfdsf");

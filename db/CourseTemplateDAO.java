@@ -1,7 +1,11 @@
+package db;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import model.AssignmentTemplate;
+import model.CourseTemplate;
 
 public class CourseTemplateDAO implements CrudDAO<CourseTemplate> {
     // SINGLETON ACCESS

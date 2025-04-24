@@ -1,5 +1,19 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+
+import db.AssignmentDAO;
+import db.CourseDAO;
+import db.CourseTemplateDAO;
+import model.Admin;
+import model.Assignment;
+import model.Course;
+import model.CourseTemplate;
+import model.Grader;
+import model.Student;
+import model.Teacher;
+import model.User;
+import utils.Hasher;
+
 import java.awt.*;
 import java.sql.Timestamp;
 import java.util.List;

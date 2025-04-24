@@ -1,3 +1,4 @@
+package model;
 import java.sql.Timestamp;
 
 public class Teacher extends User implements SubmissionGrader, CourseManager {

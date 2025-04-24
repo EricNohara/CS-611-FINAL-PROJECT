@@ -1,6 +1,13 @@
 import java.io.File;
 import java.util.stream.Collectors;
 
+import db.AssignmentDAO;
+import db.CourseDAO;
+import model.Assignment;
+import model.Course;
+import model.Submission;
+import utils.FileManager;
+
 public class SubmissionFileManager {
     public static final String BASE_PATH = "data/courses";
 

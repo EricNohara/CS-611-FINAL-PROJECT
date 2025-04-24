@@ -1,3 +1,4 @@
+package model;
 public interface CourseManager {
     // adding + removing users to courses
     void addUser(User user, Course course);

@@ -1,4 +1,7 @@
+package model;
 import java.sql.Timestamp;
+
+import utils.Hasher;
 
 public abstract class User {
     public enum Role {
