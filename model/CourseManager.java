@@ -6,17 +6,17 @@ public interface CourseManager {
     void removeUserFromCourse(User user, Course course);
 
     // create + edit + delete course templates
-    CourseTemplate createCourseTemplate();
-    CourseTemplate editCourseTemplate(CourseTemplate template);
+    void createCourseTemplate(CourseTemplate template);
+    void editCourseTemplate(CourseTemplate template);
     void deleteCourseTemplate(CourseTemplate template);
 
     // create + edit + delete actual courses
-    Course createCourse(CourseTemplate template);
-    Course editCourse(Course course);
+    void createCourse(Course course);
+    void editCourse(Course course);
     void deleteCourse(Course course);
 
     // create + edit + delete assignments
-    Assignment createAssignment(Course course, AssignmentTemplate template);
-    Assignment editAssignment(Assignment assignment);
+    void createAssignment(Assignment assignment);
+    void editAssignment(Assignment assignment);
     void deleteAssignment(Assignment assignment);
 }

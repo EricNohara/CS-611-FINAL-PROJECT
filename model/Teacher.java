@@ -2,11 +2,16 @@ package model;
 import java.sql.Timestamp;
 
 import db.AssignmentDAO;
+import db.CourseDAO;
+import db.CourseTemplateDAO;
 import db.SubmissionDAO;
 import db.UserCourseDAO;
 
 public class Teacher extends User implements SubmissionGrader, CourseManager {
     private static UserCourseDAO userCourseDAO = UserCourseDAO.getInstance();
+    private static CourseTemplateDAO courseTemplateDAO = CourseTemplateDAO.getInstance();
+    private static CourseDAO courseDAO = CourseDAO.getInstance();
+    private static AssignmentDAO assignmentDAO = AssignmentDAO.getInstance();
 
     public Teacher(int id, String name, String email, String passwordHash, Timestamp createdAt, Timestamp lastUpdated) {
         super(id, name, email, passwordHash, createdAt, lastUpdated);
@@ -56,29 +61,47 @@ public class Teacher extends User implements SubmissionGrader, CourseManager {
     }
 
     @Override
-    public CourseTemplate createCourseTemplate() { return null; }
+    public void createCourseTemplate(CourseTemplate template) {
+        courseTemplateDAO.create(template);
+    }
 
     @Override
-    public CourseTemplate editCourseTemplate(CourseTemplate template) { return null; }
+    public void editCourseTemplate(CourseTemplate template) {
+        courseTemplateDAO.update(template);
+    }
 
     @Override
-    public void deleteCourseTemplate(CourseTemplate template) {}
+    public void deleteCourseTemplate(CourseTemplate template) {
+        courseTemplateDAO.delete(template.getId());
+    }
 
     @Override
-    public Course createCourse(CourseTemplate template) { return null; }
+    public void createCourse(Course course) {
+        courseDAO.create(course);
+    }
 
     @Override
-    public Course editCourse(Course course) { return null; }
+    public void editCourse(Course course) {
+        courseDAO.update(course);
+    }
 
     @Override
-    public void deleteCourse(Course course) {}
+    public void deleteCourse(Course course) {
+        courseDAO.delete(course.getId());
+    }
 
     @Override
-    public Assignment createAssignment(Course course, AssignmentTemplate template) { return null; }
+    public void createAssignment(Assignment assignment) {
+        assignmentDAO.create(assignment);
+    }
 
     @Override
-    public Assignment editAssignment(Assignment assignment) { return null; }
+    public void editAssignment(Assignment assignment) {
+        assignmentDAO.update(assignment);
+    }
 
     @Override
-    public void deleteAssignment(Assignment assignment) {}
+    public void deleteAssignment(Assignment assignment) {
+        assignmentDAO.delete(assignment.getId());
+    }
 }
