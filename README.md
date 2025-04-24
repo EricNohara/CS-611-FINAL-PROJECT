@@ -48,7 +48,7 @@
 
 ```
 javac -cp ".;lib/sqlite-jdbc-3.49.1.0.jar" -d out *.java db/*.java model/*.java utils/*.java
-java -cp ".;lib/sqlite-jdbc-3.49.1.0.jar" Main
+java -cp "out;lib/sqlite-jdbc-3.49.1.0.jar" Main
 del /s /q out\*.class
 ```
 

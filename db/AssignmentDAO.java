@@ -17,7 +17,7 @@ public class AssignmentDAO implements CrudDAO<Assignment> {
     // ABSTRACT CRUD OPERATIONS IMPLEMENTATIONS
     @Override
     public void create(Assignment assignment) {
-        String query = "INSERT INTO assignments (name, due_date, max_points, course_id,  submission_path , weight, type,submission_types) VALUES (?, ?, ?, ?, ?,?,?,?)";
+        String query = "INSERT INTO assignments (name, due_date, max_points, course_id, weight, type,submission_types) VALUES (?, ?, ?, ?,?,?,?)";
 
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -26,10 +26,9 @@ public class AssignmentDAO implements CrudDAO<Assignment> {
             stmt.setTimestamp(2, assignment.getDueDate());
             stmt.setDouble(3, assignment.getMaxPoints());
             stmt.setInt(4, assignment.getCourseId());
-            stmt.setString(5,String.join(",", assignment.getSubmission_path()));
-            stmt.setDouble(6,assignment.getWeight());
-            stmt.setInt(7,assignment.getType().toInt());
-            stmt.setString(8,String.join(",", assignment.getSubmissionTypes()));
+            stmt.setDouble(5,assignment.getWeight());
+            stmt.setInt(6,assignment.getType().toInt());
+            stmt.setString(7,String.join(",", assignment.getSubmissionTypes()));
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) throw new SQLException("Creating assignment failed, no rows affected.");
@@ -100,7 +99,7 @@ public class AssignmentDAO implements CrudDAO<Assignment> {
 
     @Override
     public void update(Assignment assignment) {
-        String query = "UPDATE assignments SET name = ?, due_date = ?, max_points = ?, course_id = ?, submission_path = ?, weight = ?, type = ?, submission_types = ? WHERE id = ?";
+        String query = "UPDATE assignments SET name = ?, due_date = ?, max_points = ?, course_id = ?, weight = ?, type = ?, submission_types = ? WHERE id = ?";
 
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -109,11 +108,10 @@ public class AssignmentDAO implements CrudDAO<Assignment> {
             stmt.setTimestamp(2, assignment.getDueDate());
             stmt.setDouble(3, assignment.getMaxPoints());
             stmt.setInt(4, assignment.getCourseId());
-            stmt.setString(5, String.join(",", assignment.getSubmission_path()));
-            stmt.setDouble(6, assignment.getWeight());
-            stmt.setInt(7, assignment.getType().toInt());
-            stmt.setString(8, String.join(",", assignment.getSubmissionTypes()));
-            stmt.setInt(9, assignment.getId());
+            stmt.setDouble(5, assignment.getWeight());
+            stmt.setInt(6, assignment.getType().toInt());
+            stmt.setString(7, String.join(",", assignment.getSubmissionTypes()));
+            stmt.setInt(8, assignment.getId());
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
@@ -150,16 +148,14 @@ public class AssignmentDAO implements CrudDAO<Assignment> {
         Timestamp dueDate = rs.getTimestamp("due_date");
         int maxPoints = rs.getInt("max_points");
         int courseId = rs.getInt("course_id");
-        String submissionPathRaw = rs.getString("submission_path");
         double weight = rs.getDouble("weight");
         int typeInt = rs.getInt("type");
         String submissionTypesRaw = rs.getString("submission_types");
 
-        List<String> submissionPath = Arrays.asList(submissionPathRaw.split(","));
         List<String> submissionTypes = Arrays.asList(submissionTypesRaw.split(","));
         Assignment.Type type = Assignment.Type.fromInt(typeInt);
 
-        return new Assignment(id, name, dueDate, maxPoints, courseId, submissionPath, weight, type, submissionTypes);
+        return new Assignment(id, name, dueDate, maxPoints, courseId, weight, type, submissionTypes);
     }
 
 }

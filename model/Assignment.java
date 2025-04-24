@@ -20,7 +20,6 @@ public class Assignment {
     private Timestamp dueDate;
     private double    maxPoints;
     private int courseId;
-    private List<String> submission_path;
     private double weight;
     private Assignment.Type type;
     private List<String> submissionTypes;
@@ -43,14 +42,12 @@ public class Assignment {
         }
     }
 
-    public Assignment(int id, String name, Timestamp dueDate, int maxPoints, int courseId,
-                      List<String> submissionPath, double weight, Type type, List<String> submissionTypes) {
+    public Assignment(int id, String name, Timestamp dueDate, int maxPoints, int courseId, double weight, Type type, List<String> submissionTypes) {
         this.id = id;
         this.name = name;
         this.dueDate = dueDate;
         this.maxPoints = maxPoints;
         this.courseId = courseId;
-        this.submission_path = submissionPath;
         this.weight = weight;
         this.type = type;
         this.submissionTypes = submissionTypes;
@@ -71,7 +68,6 @@ public class Assignment {
     public Timestamp getDueDate() { return dueDate; }
     public double getMaxPoints() { return maxPoints; }
     public double getWeight() { return this.weight; }
-    public List<String> getSubmission_path() {return submission_path;}
     public int getCourseId() { return this.courseId; }
     public Assignment.Type getType() { return this.type; }
     public List<String> getSubmissionTypes() { return this.submissionTypes; }
@@ -82,7 +78,6 @@ public class Assignment {
     public void setName(String name) { this.name = name; }
     public void setDueDate(Timestamp dueDate) { this.dueDate = dueDate; }
     public void setMaxPoints(double maxPoints) { this.maxPoints = maxPoints; }
-    public void setSubmission_path(List<String> submission_path) {this.submission_path = submission_path;}
     public void setWeight(double weight) {this.weight = weight;}
     public void setCourseId(int courseId) { this.courseId = courseId; }
     public void setType(Assignment.Type type) { this.type = type; }
