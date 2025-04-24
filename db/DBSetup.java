@@ -35,6 +35,8 @@ public class DBSetup {
     private static final String createUserCoursesQuery = "CREATE TABLE IF NOT EXISTS user_courses (" +
                                                         "user_id INTEGER," +
                                                         "course_id INTEGER," +
+                                                        "status INTEGER NOT NULL," +
+                                                        "role INTEGER NOT NULL," +
                                                         "PRIMARY KEY (user_id, course_id)," +
                                                         "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE," +
                                                         "FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE);";

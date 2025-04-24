@@ -36,6 +36,8 @@ Table assignment_templates {
 Table user_courses {
   user_id int [ref: > users.id]
   course_id int [ref: > courses.id]
+  status int
+  role int
 
   indexes {
     (user_id, course_id) [pk]
@@ -48,6 +50,7 @@ Table submissions {
   grader_id int [ref: > users.id]
   filepath text
   submitted_at timestamp
+  points_earned real
   grade real
   status int // late, graded, ungraded, ... enum value
 }
@@ -58,7 +61,6 @@ Table assignments {
   due_date timestamp
   max_points real
   course_id int [ref: > courses.id]
-  submission_path text
   weight real
   type int
   submission_types text
