@@ -1,8 +1,8 @@
 package model;
 public interface CourseManager {
     // adding + removing users to courses
-    void addUser(User user, Course course);
-    void removeUser(User user, Course course);
+    void addUserToCourse(User user, Course course);
+    void removeUserFromCourse(User user, Course course);
 
     // create + edit + delete course templates
     CourseTemplate createCourseTemplate();
@@ -15,7 +15,7 @@ public interface CourseManager {
     void deleteCourse(Course course);
 
     // create + edit + delete assignments
-    Assignment createAssignment(Course course);
-    Assignment editAddAssignment(Assignment assignment);
+    Assignment createAssignment(Course course, AssignmentTemplate template);
+    Assignment editAssignment(Assignment assignment);
     void deleteAssignment(Assignment assignment);
 }

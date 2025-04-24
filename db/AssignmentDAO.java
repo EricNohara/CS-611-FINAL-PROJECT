@@ -146,7 +146,7 @@ public class AssignmentDAO implements CrudDAO<Assignment> {
         int id = rs.getInt("id");
         String name = rs.getString("name");
         Timestamp dueDate = rs.getTimestamp("due_date");
-        int maxPoints = rs.getInt("max_points");
+        double maxPoints = rs.getDouble("max_points");
         int courseId = rs.getInt("course_id");
         double weight = rs.getDouble("weight");
         int typeInt = rs.getInt("type");

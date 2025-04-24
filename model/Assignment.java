@@ -42,7 +42,7 @@ public class Assignment {
         }
     }
 
-    public Assignment(int id, String name, Timestamp dueDate, int maxPoints, int courseId, double weight, Type type, List<String> submissionTypes) {
+    public Assignment(int id, String name, Timestamp dueDate, double maxPoints, int courseId, double weight, Type type, List<String> submissionTypes) {
         this.id = id;
         this.name = name;
         this.dueDate = dueDate;

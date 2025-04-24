@@ -209,38 +209,7 @@ public class CourseDAO implements CrudDAO<Course> {
         
         return course;
     }
-
-    // USER-COURSE RELATIONSHIP METHODS
-    public void addUserToCourse(int userId, int courseId) {
-        String query = "INSERT INTO user_courses (user_id, course_id) VALUES (?, ?)";
-
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query)) {
-
-            stmt.setInt(1, userId);
-            stmt.setInt(2, courseId);
-
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void removeUserFromCourse(int userId, int courseId) {
-        String query = "DELETE FROM user_courses WHERE user_id = ? AND course_id = ?";
-
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query)) {
-
-            stmt.setInt(1, userId);
-            stmt.setInt(2, courseId);
-
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
+    
     // DASHBOARD DATA METHODS
     public List<Course> getCoursesForTeacher(int teacherId) {
         List<Course> courses = new ArrayList<>();

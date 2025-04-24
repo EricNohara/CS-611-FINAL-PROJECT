@@ -16,7 +16,7 @@ public class SubmissionDAO implements CrudDAO<Submission> {
     // ABSTRACT CRUD OPERATIONS
     @Override
     public void create(Submission submission) {
-        String submissionQuery = "INSERT INTO submissions (assignment_id, grader_id, filepath, submitted_at, grade, status) VALUES (?, ?, ?, ?, ?, ?)";
+        String submissionQuery = "INSERT INTO submissions (assignment_id, grader_id, filepath, submitted_at, points_earned, grade, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
         String userSubmissionsQuery = "INSERT INTO user_submissions (user_id, submission_id) VALUES (?, ?)";
 
         try (Connection connection = DBConnection.getConnection()) {
@@ -27,8 +27,9 @@ public class SubmissionDAO implements CrudDAO<Submission> {
                 stmt.setInt(2, submission.getGraderId());
                 stmt.setString(3, submission.getFilepath());
                 stmt.setTimestamp(4, submission.getSubmittedAt());
-                stmt.setDouble(5, submission.getGrade());
-                stmt.setInt(6, submission.getStatus().ordinal());
+                stmt.setDouble(5, submission.getPointsEarned());
+                stmt.setDouble(6, submission.getGrade());
+                stmt.setInt(7, submission.getStatus().ordinal());
 
                 int affectedRows = stmt.executeUpdate();
                 if (affectedRows == 0) throw new SQLException("Creating submission failed, no rows affected.");
@@ -116,7 +117,7 @@ public class SubmissionDAO implements CrudDAO<Submission> {
 
     @Override
     public void update(Submission submission) {
-        String updateSubmissionQuery = "UPDATE submissions SET grader_id = ?, filepath = ?, submitted_at = ?, grade = ?, status = ? WHERE id = ?";
+        String updateSubmissionQuery = "UPDATE submissions SET grader_id = ?, filepath = ?, submitted_at = ?, earned_points = ?, grade = ?, status = ? WHERE id = ?";
         String deleteUserSubmissionsQuery = "DELETE FROM user_submissions WHERE submission_id = ?";
         String addUserSubmissionsQuery = "INSERT INTO user_submissions (user_id, submission_id) VALUES (?, ?)";
 
@@ -129,9 +130,10 @@ public class SubmissionDAO implements CrudDAO<Submission> {
                     stmt.setInt(1, submission.getGraderId());
                     stmt.setString(2, submission.getFilepath());
                     stmt.setTimestamp(3, submission.getSubmittedAt());
-                    stmt.setDouble(4, submission.getGrade());
-                    stmt.setInt(5, submission.getStatus().ordinal());
-                    stmt.setInt(6, submission.getId());
+                    stmt.setDouble(4, submission.getPointsEarned());
+                    stmt.setDouble(5, submission.getGrade());
+                    stmt.setInt(6, submission.getStatus().ordinal());
+                    stmt.setInt(7, submission.getId());
 
                     stmt.executeUpdate();
                 }
@@ -187,6 +189,7 @@ public class SubmissionDAO implements CrudDAO<Submission> {
         int graderId = rs.getInt("grader_id");
         String filepath = rs.getString("filepath");
         Timestamp submittedAt = rs.getTimestamp("submitted_at");
+        double pointsEarned = rs.getDouble("points_earned");
         double grade = rs.getDouble("grade");
         Submission.Status status = Submission.Status.values()[rs.getInt("status")];
     
@@ -205,6 +208,6 @@ public class SubmissionDAO implements CrudDAO<Submission> {
             }
         }
 
-        return new Submission(id, assignmentId, graderId, filepath, submittedAt, grade, status, collaboratorIds);
+        return new Submission(id, assignmentId, graderId, filepath, submittedAt, pointsEarned, grade, status, collaboratorIds);
     }
 }

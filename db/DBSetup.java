@@ -45,8 +45,9 @@ public class DBSetup {
                                                         "grader_id INTEGER," +
                                                         "filepath TEXT NOT NULL," +
                                                         "submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL," +
+                                                        "points_earned REAL," +
                                                         "grade REAL," +
-                                                        "status INTEGER," +
+                                                        "status INTEGER NOT NULL," +
                                                         "FOREIGN KEY (grader_id) REFERENCES users(id) ON DELETE SET NULL," +
                                                         "FOREIGN KEY (assignment_id) REFERENCES assignments(id) ON DELETE CASCADE);";
 
@@ -61,7 +62,7 @@ public class DBSetup {
                                                         "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                                                         "name TEXT NOT NULL," +
                                                         "due_date TIMESTAMP NOT NULL," +
-                                                        "max_points INTEGER NOT NULL," +
+                                                        "max_points REAL NOT NULL," +
                                                         "assignment_template_id INTEGER," +
                                                         "course_id INTEGER NOT NULL," +
                                                         "weight REAL NOT NULL," +

@@ -12,6 +12,7 @@ public class Submission {
     private int grader_id;
     private String filepath;
     private Timestamp submitted_at;
+    private double pointsEarned;
     private double grade;
     private Status status;
     private List<Integer> collaboratorIds;
@@ -22,17 +23,19 @@ public class Submission {
         this.grader_id = -1;
         this.filepath = filepath;
         this.submitted_at = new Timestamp(System.currentTimeMillis());
+        this.pointsEarned = -1.0;
         this.grade = -1.0;
         this.status = status;
         this.collaboratorIds = collaboratorIds;
     }
 
-    public Submission(int id, int assignment_id, int grader_id, String filepath, Timestamp submittedAt, double grade, Status status, List<Integer> collaboratorIds) {
+    public Submission(int id, int assignment_id, int grader_id, String filepath, Timestamp submittedAt, double pointsEarned, double grade, Status status, List<Integer> collaboratorIds) {
         this.id = id;
         this.assignment_id = assignment_id;
         this.grader_id = grader_id;
         this.filepath = filepath;
         this.submitted_at = submittedAt;
+        this.pointsEarned = pointsEarned;
         this.grade = grade;
         this.status = status;
         this.collaboratorIds = collaboratorIds;
@@ -44,6 +47,7 @@ public class Submission {
     public int getGraderId() { return grader_id; }
     public String getFilepath() { return filepath; }
     public Timestamp getSubmittedAt() { return submitted_at; }
+    public double getPointsEarned() { return this.pointsEarned; }
     public double getGrade() { return grade; }
     public Status getStatus() { return status; }
     public List<Integer> getCollaboratorIds() { return collaboratorIds; }
@@ -54,6 +58,7 @@ public class Submission {
     public void setGraderId(int grader_id) { this.grader_id = grader_id; }
     public void setFilepath(String filepath) { this.filepath = filepath; }
     public void setSubmittedAt(Timestamp submitted_at) { this.submitted_at = submitted_at; }
+    public void setPointsEarned(double pointsEarned) { this.pointsEarned = pointsEarned; }
     public void setGrade(double grade) { this.grade = grade; }
     public void setStatus(Status status) { this.status = status; }
     public void setCollaborators(List<Integer> collaboratorIds) { this.collaboratorIds = collaboratorIds; }
