@@ -3,8 +3,11 @@ import java.sql.Timestamp;
 
 import db.AssignmentDAO;
 import db.SubmissionDAO;
+import db.UserCourseDAO;
 
 public class Teacher extends User implements SubmissionGrader, CourseManager {
+    private static UserCourseDAO userCourseDAO = UserCourseDAO.getInstance();
+
     public Teacher(int id, String name, String email, String passwordHash, Timestamp createdAt, Timestamp lastUpdated) {
         super(id, name, email, passwordHash, createdAt, lastUpdated);
     }
@@ -35,10 +38,22 @@ public class Teacher extends User implements SubmissionGrader, CourseManager {
     }
 
     @Override
-    public void addUserToCourse(User user, Course course) {}
+    public void addUserToCourse(User user, Course course) {
+        UserCourse userCourse = new UserCourse(user.getId(), course.getId());
+        userCourseDAO.create(userCourse);
+    }
 
     @Override
-    public void removeUserFromCourse(User user, Course course) {}
+    public void setUserStatus(User user, Course course, UserCourse.Status status) {
+        UserCourse userCourse = userCourseDAO.read(user.getId(), course.getId());
+        userCourse.setStatus(status);
+        userCourseDAO.update(userCourse);
+    }
+
+    @Override
+    public void removeUserFromCourse(User user, Course course) {
+        userCourseDAO.delete(user.getId(), course.getId());
+    }
 
     @Override
     public CourseTemplate createCourseTemplate() { return null; }

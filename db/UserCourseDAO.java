@@ -36,17 +36,18 @@ public class UserCourseDAO implements CrudDAO<UserCourse> {
     }
     
     @Override
-    public UserCourse read(int id) {
-        String query = "SELECT * FROM user_courses WHERE id = ?";
+    public UserCourse read(int id) { return null; }
+
+    public UserCourse read(int userId, int courseId) {
+        String query = "SELECT * FROM user_courses WHERE user_id = ? AND course_id = ?";
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
     
-            stmt.setInt(1, id);
+            stmt.setInt(1, userId);
+            stmt.setInt(2, courseId);
             ResultSet rs = stmt.executeQuery();
     
-            if (rs.next()) {
-                return buildFromResultSet(rs);
-            }
+            if (rs.next()) return buildFromResultSet(rs);
         } catch (SQLException e) {
             e.printStackTrace();
         }

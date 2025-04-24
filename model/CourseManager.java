@@ -2,6 +2,7 @@ package model;
 public interface CourseManager {
     // adding + removing users to courses
     void addUserToCourse(User user, Course course);
+    void setUserStatus(User user, Course course, UserCourse.Status status);
     void removeUserFromCourse(User user, Course course);
 
     // create + edit + delete course templates
