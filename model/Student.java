@@ -1,7 +1,11 @@
 package model;
 import java.sql.Timestamp;
 
-public class Student extends User {
+import utils.SubmissionFileManager;
+
+import java.io.File;
+
+public class Student extends User implements SubmissionUploader {
     public Student(int id, String name, String email, String passwordHash, Timestamp createdAt, Timestamp lastUpdated) {
         super(id, name, email, passwordHash, createdAt, lastUpdated);
     }
@@ -12,6 +16,11 @@ public class Student extends User {
 
     @Override
     public User.Role getRole() { return User.Role.STUDENT; }
+
+    @Override
+    public boolean uploadSubmission(File file, Submission submission) {
+        return SubmissionFileManager.uploadSubmission(file, submission);
+    }
 
     // Student specific methods...
 }
