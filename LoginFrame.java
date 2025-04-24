@@ -143,29 +143,29 @@ public class LoginFrame extends JFrame {
     private void openUserDashboard(User user) {
         // Open appropriate window based on user role
         switch (user.getRole()) {
-            case STUDENT:
-                // Open student dashboard
-                SwingUtilities.invokeLater(() -> {
-                    StudentDashboard dashboard = new StudentDashboard((Student) user);
-                    dashboard.setVisible(true);
-                });
-                break;
+            // case STUDENT:
+            //     // Open student dashboard
+            //     SwingUtilities.invokeLater(() -> {
+            //         StudentDashboard dashboard = new StudentDashboard((Student) user);
+            //         dashboard.setVisible(true);
+            //     });
+            //     break;
                 
-            case GRADER:
-                // Open grader dashboard
-                SwingUtilities.invokeLater(() -> {
-                    GraderDashboard dashboard = new GraderDashboard((Grader) user);
-                    dashboard.setVisible(true);
-                });
-                break;
+            // case GRADER:
+            //     // Open grader dashboard
+            //     SwingUtilities.invokeLater(() -> {
+            //         GraderDashboard dashboard = new GraderDashboard((Grader) user);
+            //         dashboard.setVisible(true);
+            //     });
+            //     break;
                 
-            case TEACHER:
-                // Open teacher dashboard
-                SwingUtilities.invokeLater(() -> {
-                    TeacherDashboard dashboard = new TeacherDashboard((Teacher) user);
-                    dashboard.setVisible(true);
-                });
-                break;
+            // case TEACHER:
+            //     // Open teacher dashboard
+            //     SwingUtilities.invokeLater(() -> {
+            //         TeacherDashboard dashboard = new TeacherDashboard((Teacher) user);
+            //         dashboard.setVisible(true);
+            //     });
+            //     break;
                 
             case ADMIN:
                 // Open admin dashboard

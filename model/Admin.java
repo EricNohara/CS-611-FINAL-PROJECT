@@ -27,9 +27,6 @@ public class Admin extends User implements AdminOperations {
         return instance;
     }
 
-    // Reset (for logout or testing)
-    public static void resetInstance() { instance = null; }
-
     // ABSTRACT METHOD IMPLEMENTATIONS
     @Override
     public User.Role getRole() { return User.Role.ADMIN; }

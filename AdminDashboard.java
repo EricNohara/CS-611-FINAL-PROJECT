@@ -1023,7 +1023,7 @@ public class AdminDashboard extends JFrame {
         panel.add(new JLabel("Role:"), gbc);
         
         gbc.gridx = 1;
-        String[] roles = {"STUDENT", "GRADER", "TEACHER", "ADMIN"};
+        String[] roles = {"STUDENT", "GRADER", "TEACHER"};
         JComboBox<String> roleComboBox = new JComboBox<>(roles);
         panel.add(roleComboBox, gbc);
         
@@ -1072,9 +1072,6 @@ public class AdminDashboard extends JFrame {
                         break;
                     case TEACHER:
                         newUser = new Teacher(name, email, passwordHash);
-                        break;
-                    case ADMIN:
-                        newUser = Admin.getInstance(name, email, passwordHash);
                         break;
                 }
                 
@@ -1397,10 +1394,7 @@ public class AdminDashboard extends JFrame {
             "Confirm Logout", 
             JOptionPane.YES_NO_OPTION);
             
-        if (confirm == JOptionPane.YES_OPTION) {
-            // Reset the Admin singleton instance
-            Admin.resetInstance();
-            
+        if (confirm == JOptionPane.YES_OPTION) {           
             // Close current window and open login window
             dispose();
             SwingUtilities.invokeLater(() -> {

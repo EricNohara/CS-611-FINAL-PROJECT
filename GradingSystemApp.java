@@ -9,7 +9,7 @@ import utils.Hasher;
 
 // Main application class
 public class GradingSystemApp {
-    public static void main(String[] args) {
+    public void run() {
         // Initialize database
         DBSetup.createTables();
         
