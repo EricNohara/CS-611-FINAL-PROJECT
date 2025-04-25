@@ -1,3 +1,4 @@
+package ui.dashboard;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
@@ -12,6 +13,8 @@ import model.Grader;
 import model.Student;
 import model.Teacher;
 import model.User;
+import ui.LoginFrame;
+import ui.utils.TemplateItem;
 import utils.Hasher;
 
 import java.awt.*;
@@ -351,16 +354,16 @@ public class AdminDashboard extends JFrame {
         panel.add(new JLabel("Course Template:"), gbc);
         
         gbc.gridx = 1;
-        JComboBox<CourseTemplateItem> templateComboBox = new JComboBox<>();
+        JComboBox<TemplateItem> templateComboBox = new JComboBox<>();
         // Add a "None" option
-        templateComboBox.addItem(new CourseTemplateItem(-1, "None"));
+        templateComboBox.addItem(new TemplateItem(-1, "None"));
         
         // Get course templates from database
         try {
             CourseTemplateDAO templateDAO = CourseTemplateDAO.getInstance();
             List<CourseTemplate> templates = templateDAO.readAll();
             for (CourseTemplate template : templates) {
-                templateComboBox.addItem(new CourseTemplateItem(template.getId(), template.getName()));
+                templateComboBox.addItem(new TemplateItem(template.getId(), template.getName()));
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(dialog, 
@@ -408,7 +411,7 @@ public class AdminDashboard extends JFrame {
             
             try {
                 // Get selected template
-                CourseTemplateItem selectedTemplate = (CourseTemplateItem) templateComboBox.getSelectedItem();
+                TemplateItem selectedTemplate = (TemplateItem) templateComboBox.getSelectedItem();
                 int templateId = selectedTemplate.getId();
                 
                 // Create course object
@@ -518,9 +521,9 @@ public class AdminDashboard extends JFrame {
             panel.add(new JLabel("Course Template:"), gbc);
             
             gbc.gridx = 1;
-            JComboBox<CourseTemplateItem> templateComboBox = new JComboBox<>();
+            JComboBox<TemplateItem> templateComboBox = new JComboBox<>();
             // Add a "None" option
-            templateComboBox.addItem(new CourseTemplateItem(-1, "None"));
+            templateComboBox.addItem(new TemplateItem(-1, "None"));
             
             // Get course templates from database
             CourseTemplateDAO templateDAO = CourseTemplateDAO.getInstance();
@@ -529,7 +532,7 @@ public class AdminDashboard extends JFrame {
             
             for (int i = 0; i < templates.size(); i++) {
                 CourseTemplate template = templates.get(i);
-                templateComboBox.addItem(new CourseTemplateItem(template.getId(), template.getName()));
+                templateComboBox.addItem(new TemplateItem(template.getId(), template.getName()));
                 
                 if (course.getCourseTemplateId() == template.getId()) {
                     selectedIndex = i + 1; // +1 because of the "None" option
@@ -576,7 +579,7 @@ public class AdminDashboard extends JFrame {
                 
                 try {
                     // Get selected template
-                    CourseTemplateItem selectedTemplate = (CourseTemplateItem) templateComboBox.getSelectedItem();
+                    TemplateItem selectedTemplate = (TemplateItem) templateComboBox.getSelectedItem();
                     int templateId = selectedTemplate.getId();
                     
                     // Update course object
@@ -1400,29 +1403,6 @@ public class AdminDashboard extends JFrame {
             SwingUtilities.invokeLater(() -> {
                 new LoginFrame().setVisible(true);
             });
-        }
-    }
-
-    private class CourseTemplateItem {
-        private int id;
-        private String name;
-        
-        public CourseTemplateItem(int id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-        
-        public int getId() {
-            return id;
-        }
-        
-        public String getName() {
-            return name;
-        }
-        
-        @Override
-        public String toString() {
-            return name;
         }
     }
 }

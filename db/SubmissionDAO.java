@@ -117,7 +117,7 @@ public class SubmissionDAO implements CrudDAO<Submission> {
 
     @Override
     public void update(Submission submission) {
-        String updateSubmissionQuery = "UPDATE submissions SET grader_id = ?, filepath = ?, submitted_at = ?, earned_points = ?, grade = ?, status = ? WHERE id = ?";
+        String updateSubmissionQuery = "UPDATE submissions SET grader_id = ?, filepath = ?, submitted_at = ?, points_earned = ?, grade = ?, status = ? WHERE id = ?";
         String deleteUserSubmissionsQuery = "DELETE FROM user_submissions WHERE submission_id = ?";
         String addUserSubmissionsQuery = "INSERT INTO user_submissions (user_id, submission_id) VALUES (?, ?)";
 

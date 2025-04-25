@@ -25,7 +25,7 @@ public class UserCourseDAO implements CrudDAO<UserCourse> {
 
             stmt.setInt(1, userCourse.getUserId());
             stmt.setInt(2, userCourse.getCourseId());
-            stmt.setInt(3, userCourse.getRole().ordinal());
+            stmt.setInt(3, userCourse.getStatus().ordinal());
             stmt.setInt(4, userCourse.getRole().ordinal());
 
             int affectedRows = stmt.executeUpdate();
@@ -96,12 +96,10 @@ public class UserCourseDAO implements CrudDAO<UserCourse> {
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
 
-            stmt.setInt(1, userCourse.getUserId());
-            stmt.setInt(2, userCourse.getCourseId());
-            stmt.setInt(3, userCourse.getRole().ordinal());
-            stmt.setInt(4, userCourse.getRole().ordinal());
-            stmt.setInt(5, userCourse.getUserId());
-            stmt.setInt(6, userCourse.getCourseId());
+            stmt.setInt(1, userCourse.getStatus().ordinal());
+            stmt.setInt(2, userCourse.getRole().ordinal());
+            stmt.setInt(3, userCourse.getUserId());
+            stmt.setInt(4, userCourse.getCourseId());
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) throw new SQLException("Updating user course relationship failed, no rows affected.");
