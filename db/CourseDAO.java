@@ -214,24 +214,36 @@ public class CourseDAO implements CrudDAO<Course> {
     public List<Course> getCoursesForTeacher(int teacherId) {
         List<Course> courses = new ArrayList<>();
         
-        String query = "SELECT c.* FROM courses c " +
-                       "JOIN user_courses uc ON c.id = uc.course_id " +
-                       "WHERE uc.user_id = ?";
+        String query = "SELECT id, course_template_id, name, active FROM courses c "
+               + "JOIN user_courses uc ON c.id = uc.course_id "
+               + "WHERE uc.user_id = ?";
 
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query)) {
-
-            stmt.setInt(1, teacherId);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                courses.add(buildFromResultSet(rs));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return courses;
+               try (Connection con = DBConnection.getConnection();
+               PreparedStatement ps = con.prepareStatement(query)) {
+      
+              ps.setInt(1, teacherId);
+              try (ResultSet rs = ps.executeQuery()) {
+                  while (rs.next()) {
+                      // Grab primitive columns only
+                      Course c = new Course();
+                      c.setId(rs.getInt("id"));
+                      c.setCourseTemplateId(rs.getInt("course_template_id"));
+                      c.setName(rs.getString("name"));
+                      c.setActive(rs.getBoolean("active"));
+                      courses.add(c);
+                  }
+              }
+          } catch (SQLException ex) { ex.printStackTrace(); }
+      
+          CourseTemplateDAO tplDAO = CourseTemplateDAO.getInstance();
+          AssignmentDAO     asnDAO = AssignmentDAO.getInstance();
+      
+          for (Course c : courses) {
+              if (c.getCourseTemplateId() > 0)
+                  c.setCourseTemplate(tplDAO.read(c.getCourseTemplateId()));
+              c.setAssignments(asnDAO.readAllCondition("course_id", c.getId()));
+          }
+          return courses;
     }
     
     public List<Course> getCoursesForStudent(int studentId) {
@@ -245,15 +257,15 @@ public class CourseDAO implements CrudDAO<Course> {
              PreparedStatement stmt = connection.prepareStatement(query)) {
 
             stmt.setInt(1, studentId);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                courses.add(buildFromResultSet(rs));
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    courses.add(buildFromResultSet(rs));  
+                }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error in getCoursesForStudent: " + e.getMessage());
         }
-
+    
         return courses;
     }
     

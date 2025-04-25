@@ -5,6 +5,7 @@ import db.DBSetup;
 import db.UserDAO;
 import model.Admin;
 import model.User;
+import ui.LoginFrame;
 import utils.Hasher;
 
 // Main application class
