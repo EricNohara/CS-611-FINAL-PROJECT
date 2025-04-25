@@ -2,9 +2,15 @@ package ui.dashboard.panels;
 
 import db.*;
 import model.*;
+import utils.Hasher;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -179,6 +185,7 @@ public final class StudentsPanel extends JPanel {
         if (teacherCourses.isEmpty()) {
             model.addElement(new Course() {
                 {
+                    setId(-1);
                     setName("-- No active courses --");
                 }
             });
@@ -190,8 +197,10 @@ public final class StudentsPanel extends JPanel {
         JComboBox<Course> courseComboBox = new JComboBox<>(model);
         courseComboBox.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
             JLabel lbl = new JLabel(value.getName());
-            if (isSelected)
+            if (isSelected) {
+                lbl.setOpaque(true);
                 lbl.setBackground(list.getSelectionBackground());
+            }
             return lbl;
         });
 
@@ -290,43 +299,80 @@ public final class StudentsPanel extends JPanel {
         // Add button actions
         cancelButton.addActionListener(e -> dialog.dispose());
         addButton.addActionListener(e -> {
-            String course = (String) courseComboBox.getSelectedItem();
+            Course course = (Course) courseComboBox.getSelectedItem();
+            if (course == null || course.getId() <= 0) {
+                JOptionPane.showMessageDialog(dialog,
+                        "Please choose a valid course.",
+                        "Validation Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-            if (existingRadio.isSelected()) {
-                String email = emailField.getText();
-                if (email.isEmpty()) {
+            UserDAO uDao = UserDAO.getInstance();
+            UserCourseDAO ucDao = UserCourseDAO.getInstance();
+
+            try {
+                if (existingRadio.isSelected()) {
+                    String email = emailField.getText();
+                    if (email.isEmpty()) {
+                        JOptionPane.showMessageDialog(dialog,
+                                "Email is required",
+                                "Validation Error",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    User student = uDao.readByEmail(email); // <- implement in DAO or find manually
+                    if (student == null || student.getRole() != User.Role.STUDENT) {
+                        JOptionPane.showMessageDialog(dialog,
+                                "No student account found with that email.",
+                                "Not Found", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+
+                    /* check if already enrolled */
+                    UserCourse existing = ucDao.read(student.getId(), course.getId());
+                    if (existing != null) {
+                        JOptionPane.showMessageDialog(dialog,
+                                "This student is already enrolled in the course.",
+                                "Duplicate", JOptionPane.INFORMATION_MESSAGE);
+                        return;
+                    }
+
+                    UserCourse uc = new UserCourse(student.getId(), course.getId(),
+                            UserCourse.Status.ACTIVE, User.Role.STUDENT);
+                    ucDao.create(uc);
+
                     JOptionPane.showMessageDialog(dialog,
-                            "Email is required",
-                            "Validation Error",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
+                            "Student added to course successfully!",
+                            "Success", JOptionPane.INFORMATION_MESSAGE);
+                    dialog.dispose();
+
+                } else {
+                    String email = newEmailField.getText().trim();
+                    if (email.isEmpty()) {
+                        JOptionPane.showMessageDialog(dialog,
+                                "Email is required",
+                                "Validation Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    User maybe = uDao.readByEmail(email);
+                    JOptionPane.showMessageDialog(dialog,
+                            (maybe == null)
+                                    ? "User with that email does not exist."
+                                    : "An account with that email already exists.\nUse \"Existing Student\" to add them.",
+                            (maybe == null) ? "User Not Found" : "Duplicate Email",
+                            (maybe == null) ? JOptionPane.INFORMATION_MESSAGE : JOptionPane.ERROR_MESSAGE);
                 }
 
-                // In a real app, this would look up the student and add them to the course
-                JOptionPane.showMessageDialog(dialog,
-                        "Student added to course successfully!",
-                        "Success",
-                        JOptionPane.INFORMATION_MESSAGE);
-                dialog.dispose();
-            } else { // New student
-                String name = nameField.getText();
-                String email = newEmailField.getText();
-                String password = new String(passwordField.getPassword());
+                /* refresh main table */
+                loadStudentsData();
 
-                if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
-                    JOptionPane.showMessageDialog(dialog,
-                            "All fields are required",
-                            "Validation Error",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                // In a real app, this would create a new student and add them to the course
+            } catch (Exception ex) {
                 JOptionPane.showMessageDialog(dialog,
-                        "New student created and added to course successfully!",
-                        "Success",
-                        JOptionPane.INFORMATION_MESSAGE);
-                dialog.dispose();
+                        "Database error: " + ex.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -334,18 +380,98 @@ public final class StudentsPanel extends JPanel {
         dialog.setVisible(true);
     }
 
+    // Import students from csv
     private void importStudents() {
-        // In a real app, this would open a file chooser to import a CSV of students
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Import Students");
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
-        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            // Import students from the selected file
+        // Choose csv file
+        JFileChooser fc = new JFileChooser();
+        fc.setDialogTitle("Import Students");
+        if (fc.showOpenDialog(this) != JFileChooser.APPROVE_OPTION)
+            return;
+        File csvFile = fc.getSelectedFile();
+
+        // choose target course
+        List<Course> courses = CourseDAO.getInstance()
+                .getCoursesForTeacher(teacher.getId());
+        if (courses.isEmpty()) {
             JOptionPane.showMessageDialog(this,
-                    "Students imported successfully from " + fileChooser.getSelectedFile().getName(),
-                    "Import Success",
-                    JOptionPane.INFORMATION_MESSAGE);
+                    "You have no active courses.",
+                    "Import Cancelled", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Course target = (Course) JOptionPane.showInputDialog(
+                this, "Enroll these students in which course?",
+                "Choose Course", JOptionPane.QUESTION_MESSAGE,
+                null, courses.toArray(), courses.get(0));
+
+        if (target == null)
+            return; // cancelled
+
+        // read and process csv
+        int enrolled = 0;
+        int alreadyIn = 0;
+        int notFound = 0;
+        int badLines = 0;
+
+        UserDAO uDao = UserDAO.getInstance();
+        UserCourseDAO ucDao = UserCourseDAO.getInstance();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+
+            String line;
+            boolean header = true;
+            while ((line = br.readLine()) != null) {
+
+                if (header && line.toLowerCase().startsWith("name")) {
+                    header = false;
+                    continue;
+                }
+                header = false;
+
+                String[] parts = line.split(",", -1);
+                if (parts.length < 2) {
+                    badLines++;
+                    continue;
+                }
+
+                String email = parts[1].trim();
+                if (email.isEmpty()) {
+                    badLines++;
+                    continue;
+                }
+
+                User student = uDao.readByEmail(email);
+                if (student == null || student.getRole() != User.Role.STUDENT) {
+                    notFound++; // skip – account doesn’t exist
+                    continue;
+                }
+
+                if (ucDao.read(student.getId(), target.getId()) != null) {
+                    alreadyIn++; // skip duplicates
+                    continue;
+                }
+
+                ucDao.create(new UserCourse(student.getId(), target.getId(),
+                        UserCourse.Status.ACTIVE, User.Role.STUDENT));
+                enrolled++;
+            }
+
+            JOptionPane.showMessageDialog(this,
+                    String.format("Import finished from %s\n"
+                            + "Students enrolled    : %d\n"
+                            + "Already enrolled     : %d\n"
+                            + "No such account      : %d\n"
+                            + "Bad / skipped lines  : %d",
+                            csvFile.getName(), enrolled, alreadyIn, notFound, badLines),
+                    "Import Summary", JOptionPane.INFORMATION_MESSAGE);
+
+            loadStudentsData();
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Error importing students: " + ex.getMessage(),
+                    "Import Failed", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -437,7 +563,14 @@ public final class StudentsPanel extends JPanel {
         // Add button actions
         cancelButton.addActionListener(e -> dialog.dispose());
         removeButton.addActionListener(e -> {
-            String course = (String) courseComboBox.getSelectedItem();
+            Course course = (Course) courseComboBox.getSelectedItem();
+            if (course == null || course.getId() <= 0) {
+                JOptionPane.showMessageDialog(dialog,
+                        "Please choose a valid course.",
+                        "Validation Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
             // Confirm removal
             int confirm = JOptionPane.showConfirmDialog(dialog,
@@ -558,123 +691,175 @@ public final class StudentsPanel extends JPanel {
     }
 
     private void viewStudentGrades() {
-        int selectedRow = studentTable.getSelectedRow();
-        if (selectedRow == -1) {
+
+        int viewRow = studentTable.getSelectedRow();
+        if (viewRow == -1) {
             JOptionPane.showMessageDialog(this,
                     "Please select a student to view grades",
-                    "No Selection",
-                    JOptionPane.WARNING_MESSAGE);
+                    "No Selection", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        // Get student info
-        String studentName = studentTable.getValueAt(selectedRow, 1).toString();
+        // basic student info
+        int studentId = (Integer) studentTable.getValueAt(viewRow, 0);
+        String studentName = studentTable.getValueAt(viewRow, 1).toString();
 
-        // Open grades dialog
-        JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Student Grades - ",
+        // Button dialog shell
+        JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this),
+                "Student Grades – " + studentName,
                 Dialog.ModalityType.APPLICATION_MODAL);
         dialog.setSize(700, 500);
         dialog.setLocationRelativeTo(this);
 
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel root = new JPanel(new BorderLayout(10, 10));
+        root.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Student info panel
-        JPanel infoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel nameLabel = new JLabel("Student: " + studentName);
-        nameLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        infoPanel.add(nameLabel);
-        panel.add(infoPanel, BorderLayout.NORTH);
+        JLabel hdr = new JLabel("Student: " + studentName);
+        hdr.setFont(hdr.getFont().deriveFont(Font.BOLD, 14f));
+        root.add(hdr, BorderLayout.NORTH);
 
-        // Create tabbed pane for different courses
+        // one tab per course that (a) belongs to the teacher and (b) the student is
+        // enrolled in
         JTabbedPane courseTabs = new JTabbedPane();
 
-        // Add tabs for each course
-        addCourseGradeTab(courseTabs, "CS101", studentName);
-        addCourseGradeTab(courseTabs, "CS202", studentName);
+        UserCourseDAO ucDao = UserCourseDAO.getInstance();
+        List<UserCourse> rels = ucDao.readAllCondition("user_id", studentId);
 
-        panel.add(courseTabs, BorderLayout.CENTER);
+        for (UserCourse rel : rels) {
+            Course course = teacherCourses // teacherCourses is a field
+                    .stream().filter(c -> c.getId() == rel.getCourseId())
+                    .findFirst().orElse(null);
 
-        // Button panel
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton closeButton = new JButton("Close");
-        JButton exportButton = new JButton("Export Grades");
-        buttonPanel.add(exportButton);
-        buttonPanel.add(closeButton);
-        panel.add(buttonPanel, BorderLayout.SOUTH);
+            if (course != null) // only show courses taught by THIS teacher
+                addCourseGradeTab(courseTabs, course, studentId);
+        }
 
-        // Add button actions
-        closeButton.addActionListener(e -> dialog.dispose());
-        exportButton.addActionListener(e -> {
-            // In a real app, this would export the grades to a file
+        if (courseTabs.getTabCount() == 0) {
+            courseTabs.addTab("No Grades",
+                    new JLabel("This student has no grades in your courses."));
+        }
+
+        root.add(courseTabs, BorderLayout.CENTER);
+
+        // Buttons
+        JPanel btns = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton exportBtn = new JButton("Export Grades");
+        JButton closeBtn = new JButton("Close");
+        btns.add(exportBtn);
+        btns.add(closeBtn);
+        root.add(btns, BorderLayout.SOUTH);
+
+        closeBtn.addActionListener(e -> dialog.dispose());
+        exportBtn.addActionListener(e -> {
             JOptionPane.showMessageDialog(dialog,
                     "Grades exported successfully!",
-                    "Success",
-                    JOptionPane.INFORMATION_MESSAGE);
+                    "Export", JOptionPane.INFORMATION_MESSAGE);
         });
 
-        dialog.add(panel);
+        dialog.add(root);
         dialog.setVisible(true);
     }
 
-    private void addCourseGradeTab(JTabbedPane tabbedPane, String courseName, String studentName) {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    private void addCourseGradeTab(JTabbedPane tabs,
+            Course course,
+            int studentId) {
 
-        // Course info panel
-        JPanel courseInfoPanel = new JPanel(new GridLayout(3, 2, 10, 5));
-        courseInfoPanel.setBorder(BorderFactory.createTitledBorder("Course Information"));
+        AssignmentDAO aDao = AssignmentDAO.getInstance();
+        SubmissionDAO sDao = SubmissionDAO.getInstance();
 
-        courseInfoPanel.add(new JLabel("Current Grade:"));
-        courseInfoPanel.add(new JLabel("A- (91.5%)"));
+        List<Assignment> assignments = aDao.readAllCondition("course_id", course.getId());
 
-        courseInfoPanel.add(new JLabel("Assignments Completed:"));
-        courseInfoPanel.add(new JLabel("8/12"));
+        // Get grade info
+        double earnedSum = 0, maxSum = 0;
+        int completed = 0;
 
-        courseInfoPanel.add(new JLabel("Last Submission:"));
-        courseInfoPanel.add(new JLabel("2025-04-18 (Homework 3)"));
-
-        panel.add(courseInfoPanel, BorderLayout.NORTH);
-
-        // Grades table
-        String[] gradeColumns = { "Assignment", "Type", "Due Date", "Grade", "Comments" };
-        DefaultTableModel gradeModel = new DefaultTableModel(gradeColumns, 0) {
+        String[] cols = { "Assignment", "Type", "Due Date",
+                "Grade", "Comments" };
+        DefaultTableModel model = new DefaultTableModel(cols, 0) {
             @Override
-            public boolean isCellEditable(int row, int column) {
+            public boolean isCellEditable(int r, int c) {
                 return false;
             }
         };
 
-        if ("CS101".equals(courseName)) {
-            // Sample data for CS101
-            gradeModel.addRow(new Object[] { "Homework 1", "HOMEWORK", "2025-02-10", "95/100", "Excellent work!" });
-            gradeModel.addRow(
-                    new Object[] { "Quiz 1", "QUIZ", "2025-02-15", "48/50", "Great understanding of concepts." });
-            gradeModel.addRow(new Object[] { "Homework 2", "HOMEWORK", "2025-02-24", "89/100",
-                    "Good effort, some errors in logic." });
-            gradeModel.addRow(new Object[] { "Homework 3", "HOMEWORK", "2025-03-10", "92/100", "Well done." });
-            gradeModel
-                    .addRow(new Object[] { "Midterm", "EXAM", "2025-03-15", "85/100", "Strong performance overall." });
-            gradeModel.addRow(new Object[] { "Homework 4", "HOMEWORK", "2025-03-24", "90/100", "Excellent solution." });
-            gradeModel.addRow(new Object[] { "Quiz 2", "QUIZ", "2025-04-01", "45/50", "Very good." });
-            gradeModel.addRow(new Object[] { "Homework 5", "HOMEWORK", "2025-04-10", "94/100", "Outstanding work." });
-        } else if ("CS202".equals(courseName)) {
-            // Sample data for CS202
-            gradeModel.addRow(new Object[] { "Homework 1", "HOMEWORK", "2025-02-12", "88/100",
-                    "Good work, some improvements needed." });
-            gradeModel.addRow(
-                    new Object[] { "Project 1", "PROJECT", "2025-03-01", "185/200", "Excellent implementation." });
-            gradeModel.addRow(new Object[] { "Homework 2", "HOMEWORK", "2025-03-15", "92/100", "Very good solution." });
-            gradeModel.addRow(
-                    new Object[] { "Quiz 1", "QUIZ", "2025-03-20", "43/50", "Strong understanding of concepts." });
-            gradeModel.addRow(new Object[] { "Homework 3", "HOMEWORK", "2025-04-05", "86/100", "Good effort." });
+        Submission lastSub = null;
+
+        for (Assignment a : assignments) {
+
+            // pull the submission(s) for THIS student / assignment
+            List<Submission> subs = sDao.readAllCondition("assignment_id", a.getId())
+                    .stream()
+                    .filter(s -> s.getCollaboratorIds().contains(studentId))
+                    .collect(Collectors.toList());
+
+            Submission sub = subs.stream()
+                    .max(Comparator.comparing(Submission::getSubmittedAt))
+                    .orElse(null);
+
+            String gradeStr = "-";
+            String comment = "";
+            if (sub != null) {
+                lastSub = (lastSub == null ||
+                        sub.getSubmittedAt().after(lastSub.getSubmittedAt()))
+                                ? sub
+                                : lastSub;
+
+                if (sub.getStatus() == Submission.Status.GRADED) {
+                    gradeStr = String.format("%.0f/%.0f",
+                            sub.getPointsEarned(),
+                            a.getMaxPoints());
+                    earnedSum += sub.getPointsEarned();
+                    maxSum += a.getMaxPoints();
+                    completed++;
+                }
+            }
+
+            model.addRow(new Object[] {
+                    a.getName(),
+                    a.getType(),
+                    a.getDueDate().toLocalDateTime().toLocalDate(),
+                    gradeStr
+            });
         }
 
-        JTable gradeTable = new JTable(gradeModel);
-        JScrollPane gradeScrollPane = new JScrollPane(gradeTable);
-        panel.add(gradeScrollPane, BorderLayout.CENTER);
+        // Top summary panel
+        double percent = (maxSum > 0) ? 100.0 * earnedSum / maxSum : 0.0;
+        String letter = getLetterGrade(percent);
 
-        // Add to tabbed pane
-        tabbedPane.addTab(courseName, panel);
+        JPanel summary = new JPanel(new GridLayout(3, 2, 10, 5));
+        summary.setBorder(BorderFactory.createTitledBorder("Course Information"));
+
+        summary.add(new JLabel("Current Grade:"));
+        summary.add(new JLabel(String.format("%s (%.1f%%)", letter, percent)));
+
+        summary.add(new JLabel("Assignments Completed:"));
+        summary.add(new JLabel(completed + " / " + assignments.size()));
+
+        summary.add(new JLabel("Last Submission:"));
+        summary.add(new JLabel(lastSub == null ? "—"
+                : lastSub.getSubmittedAt().toLocalDateTime().toLocalDate()
+                        + " (" + aDao.read(lastSub.getAssignmentId()).getName() + ")"));
+
+        JPanel root = new JPanel(new BorderLayout(10, 10));
+        root.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        root.add(summary, BorderLayout.NORTH);
+        root.add(new JScrollPane(new JTable(model)), BorderLayout.CENTER);
+
+        tabs.addTab(course.getName(), root);
+    }
+
+    // Crude letter-grade map
+    private static String getLetterGrade(double pct) {
+        return (pct >= 93) ? "A"
+                : (pct >= 90) ? "A-"
+                        : (pct >= 87) ? "B+"
+                                : (pct >= 83) ? "B"
+                                        : (pct >= 80) ? "B-"
+                                                : (pct >= 77) ? "C+"
+                                                        : (pct >= 73) ? "C"
+                                                                : (pct >= 70) ? "C-"
+                                                                        : (pct >= 67) ? "D+"
+                                                                                : (pct >= 63) ? "D"
+                                                                                        : (pct >= 60) ? "D-" : "F";
     }
 }
