@@ -2,6 +2,7 @@ package ui.dashboard.panels;
 
 import db.*;
 import model.*;
+import ui.utils.GradingUtils;
 
 
 import javax.swing.*;
@@ -15,6 +16,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.ArrayList;
+
 
 // Grading tab
 public final class GradingPanel extends JPanel implements Refreshable {

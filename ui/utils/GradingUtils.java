@@ -1,4 +1,4 @@
-package ui.dashboard.panels;
+package ui.utils;
 
 import db.UserDAO;
 import model.Assignment;
