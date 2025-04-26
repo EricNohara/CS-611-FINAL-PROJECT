@@ -11,9 +11,6 @@ public class DBConnection {
     private DBConnection() {}
 
     public static Connection getConnection() throws SQLException {
-        if (connection == null || connection.isClosed()) {
-            connection = DriverManager.getConnection(DATABASE_URL);  // SQLite will create the DB if it doesn't exist
-        }
-        return connection;
+        return DriverManager.getConnection(DATABASE_URL);
     }
 }
