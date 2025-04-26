@@ -851,86 +851,156 @@ public final class GradingPanel extends JPanel implements Refreshable {
     }
 
     private void exportGrades() {
-        // In a real app, this would export grades to a file
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Export Grades");
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-
-        if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-            // Export grades to the selected file
+        if (submissionModel.getRowCount() == 0) {
             JOptionPane.showMessageDialog(this,
-                    "Grades exported successfully to " + fileChooser.getSelectedFile().getName(),
-                    "Export Success",
-                    JOptionPane.INFORMATION_MESSAGE);
+                    "There are no submissions to export with the current filter.",
+                    "Nothing to Export", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        JFileChooser fc = new JFileChooser();
+        fc.setDialogTitle("Export Grades");
+        fc.setSelectedFile(new File("grades.csv"));
+        if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION)
+            return;
+
+        File outFile = fc.getSelectedFile();
+
+        SubmissionDAO sDao = SubmissionDAO.getInstance();
+        AssignmentDAO aDao = AssignmentDAO.getInstance();
+        UserDAO uDao = UserDAO.getInstance();
+
+        try (PrintWriter pw = new PrintWriter(outFile)) {
+
+            pw.println("Submission ID,Student ID,Student Name,Course,Assignment,"
+                    + "Submitted,Status,Points,Max Points,Percentage");
+
+            for (int r = 0; r < submissionModel.getRowCount(); r++) {
+
+                int subId = (Integer) submissionModel.getValueAt(r, 0);
+                Submission sub = sDao.read(subId);
+                if (sub == null)
+                    continue;
+
+                Assignment asg = aDao.read(sub.getAssignmentId());
+                Course crs = teacherCourses.stream()
+                        .filter(c -> c.getId() == asg.getCourseId())
+                        .findFirst().orElse(null);
+
+                int stuId = sub.getCollaboratorIds().isEmpty() ? -1
+                        : sub.getCollaboratorIds().get(0);
+                String stuName = (stuId == -1) ? "Unknown"
+                        : uDao.read(stuId).getName();
+
+                String points = (sub.getStatus() == Submission.Status.GRADED)
+                        ? String.format("%.1f", sub.getPointsEarned())
+                        : "";
+                String pct = (sub.getStatus() == Submission.Status.GRADED)
+                        ? String.format("%.1f", 100.0 * sub.getPointsEarned() / asg.getMaxPoints())
+                        : "";
+
+                // escape commas in free-text fields
+                String escStu = "\"" + stuName.replace("\"", "\"\"") + "\"";
+                String escCrs = "\"" + crs.getName().replace("\"", "\"\"") + "\"";
+                String escAsg = "\"" + asg.getName().replace("\"", "\"\"") + "\"";
+
+                pw.println(String.join(",",
+                        String.valueOf(sub.getId()),
+                        String.valueOf(stuId),
+                        escStu,
+                        escCrs,
+                        escAsg,
+                        sub.getSubmittedAt().toString(),
+                        sub.getStatus().toString(),
+                        points,
+                        String.format("%.1f", asg.getMaxPoints()),
+                        pct));
+            }
+
+            JOptionPane.showMessageDialog(this,
+                    "Grades exported successfully to " + outFile.getName(),
+                    "Export Success", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Error exporting grades: " + ex.getMessage(),
+                    "Export Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void publishGrades() {
-        // In a real app, this would publish grades for selected assignments
-        JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Publish Grade",
-                Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setSize(400, 300);
-        dialog.setLocationRelativeTo(this);
+        // Build a list of assignments the teacher owns
+        List<Assignment> allAsg = new ArrayList<>();
+        AssignmentDAO aDao = AssignmentDAO.getInstance();
+        for (Course c : teacherCourses)
+            allAsg.addAll(aDao.readAllCondition("course_id", c.getId()));
 
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        if (allAsg.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    "You have no assignments to publish.",
+                    "Nothing to Publish", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
 
-        // Assignment selection
-        JPanel selectionPanel = new JPanel(new BorderLayout(5, 5));
-        selectionPanel.setBorder(BorderFactory.createTitledBorder("Select Assignments"));
+        // Show selection dialog
+        DefaultListModel<Assignment> lm = new DefaultListModel<>();
+        allAsg.forEach(lm::addElement);
 
-        DefaultListModel<String> assignmentListModel = new DefaultListModel<>();
-        assignmentListModel.addElement("CS101: Homework 1");
-        assignmentListModel.addElement("CS101: Quiz 1");
-        assignmentListModel.addElement("CS202: Project 1");
-        assignmentListModel.addElement("CS303: Midterm Exam");
-
-        JList<String> assignmentList = new JList<>(assignmentListModel);
-        assignmentList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        JScrollPane listScrollPane = new JScrollPane(assignmentList);
-        selectionPanel.add(listScrollPane, BorderLayout.CENTER);
-
-        panel.add(selectionPanel, BorderLayout.CENTER);
-
-        // Options panel
-        JPanel optionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JCheckBox notifyCheckBox = new JCheckBox("Notify students via email");
-        notifyCheckBox.setSelected(true);
-        optionsPanel.add(notifyCheckBox);
-        panel.add(optionsPanel, BorderLayout.SOUTH);
-
-        // Button panel
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton cancelButton = new JButton("Cancel");
-        JButton publishButton = new JButton("Publish");
-        buttonPanel.add(cancelButton);
-        buttonPanel.add(publishButton);
-        panel.add(buttonPanel, BorderLayout.SOUTH);
-
-        // Add button actions
-        cancelButton.addActionListener(e -> dialog.dispose());
-        publishButton.addActionListener(e -> {
-            // Get selected assignments
-            List<String> selectedAssignments = assignmentList.getSelectedValuesList();
-            if (selectedAssignments.isEmpty()) {
-                JOptionPane.showMessageDialog(dialog,
-                        "Please select at least one assignment",
-                        "No Selection",
-                        JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
-            // In a real app, this would publish the grades in the database
-            JOptionPane.showMessageDialog(dialog,
-                    "Grades published successfully!",
-                    "Success",
-                    JOptionPane.INFORMATION_MESSAGE);
-            dialog.dispose();
+        JList<Assignment> list = new JList<>(lm);
+        list.setCellRenderer((lst, val, idx, s, fs) -> {
+            Course crs = teacherCourses.stream()
+                    .filter(c -> c.getId() == val.getCourseId())
+                    .findFirst().orElse(null);
+            return new JLabel(crs.getName() + ": " + val.getName());
         });
+        list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
-        dialog.add(panel);
-        dialog.setVisible(true);
+        JCheckBox notifyChk = new JCheckBox("Notify students via email", true);
+
+        int opt = JOptionPane.showConfirmDialog(
+                this,
+                new Object[] { "Select assignment(s) to publish:",
+                        new JScrollPane(list),
+                        notifyChk },
+                "Publish Grades",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE);
+
+        if (opt != JOptionPane.OK_OPTION || list.getSelectedValuesList().isEmpty())
+            return;
+
+        // Update submissions
+        SubmissionDAO sDao = SubmissionDAO.getInstance();
+        int released = 0;
+
+        for (Assignment asg : list.getSelectedValuesList()) {
+            List<Submission> subs = sDao.readAllCondition("assignment_id", asg.getId());
+
+            for (Submission sub : subs) {
+                if (sub.getStatus() != Submission.Status.GRADED)
+                    continue; // only graded ones
+
+                if (sub.getGrade() < 0) { // not yet published
+                    double percent = 100.0 * sub.getPointsEarned() / asg.getMaxPoints();
+                    sub.setGrade(percent); // store percentage as “released grade”
+                    sDao.update(sub);
+                    released++;
+
+                    if (notifyChk.isSelected()) {
+                        // placeholder: integrate your email service here
+                        // EmailService.notifyStudent(sub.getCollaboratorIds(), asg, percent);
+                    }
+                }
+            }
+        }
+
+        JOptionPane.showMessageDialog(this,
+                String.format("Grades published for %d submission(s).", released),
+                "Publish Complete", JOptionPane.INFORMATION_MESSAGE);
+
+        loadSubmissionsData(); // refresh table
     }
+
 
     @Override
     public void refresh() {
