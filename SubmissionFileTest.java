@@ -67,14 +67,14 @@ public class SubmissionFileTest {
             boolean uploadSuccess = SubmissionFileManager.uploadSubmission(selectedFile, submission);
             System.out.println("Upload successful: " + uploadSuccess);
 
-            // Now try to delete the uploaded file
-            if (uploadSuccess) {
-                int confirm = JOptionPane.showConfirmDialog(null, "Delete uploaded file?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
-                if (confirm == JOptionPane.YES_OPTION) {
-                    boolean deleteSuccess = SubmissionFileManager.deleteSubmission(submission);
-                    System.out.println("Delete successful: " + deleteSuccess);
-                }
-            }
+//            // Now try to delete the uploaded file
+//            if (uploadSuccess) {
+//                int confirm = JOptionPane.showConfirmDialog(null, "Delete uploaded file?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
+//                if (confirm == JOptionPane.YES_OPTION) {
+//                    boolean deleteSuccess = SubmissionFileManager.deleteSubmission(submission);
+//                    System.out.println("Delete successful: " + deleteSuccess);
+//                }
+//            }
         } else {
             System.out.println("No file selected.");
         }

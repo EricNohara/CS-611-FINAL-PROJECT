@@ -82,7 +82,9 @@ public class SubmissionDAO implements CrudDAO<Submission> {
 
     @Override
     public List<Submission> readAllCondition(String columnName, Object value) {
-        String query = "SELECT * FROM assignment_templates WHERE " + columnName.trim() + " = ?";
+        String query = "SELECT * FROM submissions WHERE " + columnName.trim() + " = ?";
+        //System.out.println("SQL = " + query + ", param = " + value);
+
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
     
@@ -97,6 +99,25 @@ public class SubmissionDAO implements CrudDAO<Submission> {
         }
         return null;
     }
+//    private List<Integer> loadCollaboratorsForSubmission(int submissionId) {
+//        List<Integer> collaboratorIds = new ArrayList<>();
+//        String collaboratorQuery = "SELECT user_id FROM user_submissions WHERE submission_id = ?";
+//
+//        try (Connection connection = DBConnection.getConnection();
+//             PreparedStatement stmt = connection.prepareStatement(collaboratorQuery)) {
+//            stmt.setInt(1, submissionId);
+//            try (ResultSet rs = stmt.executeQuery()) {
+//                while (rs.next()) {
+//                    collaboratorIds.add(rs.getInt("user_id"));
+//                }
+//            }
+//        } catch (SQLException e) {
+//            System.err.println("Error loading collaborators: " + e.getMessage());
+//        }
+//
+//        return collaboratorIds;
+//    }
+//
 
     @Override
     public List<Submission> readAll() {
@@ -183,6 +204,33 @@ public class SubmissionDAO implements CrudDAO<Submission> {
     }
 
     @Override
+//    public Submission buildFromResultSet(ResultSet rs) throws SQLException {
+//        int id = rs.getInt("id");
+//        int assignmentId = rs.getInt("assignment_id");
+//        int graderId = rs.getInt("grader_id");
+//        String filepath = rs.getString("filepath");
+//        Timestamp submittedAt = rs.getTimestamp("submitted_at");
+//        double pointsEarned = rs.getDouble("points_earned");
+//        double grade = rs.getDouble("grade");
+//        Submission.Status status = Submission.Status.values()[rs.getInt("status")];
+//
+//        // do query of all users in user_submissions for this submission id
+//        List<Integer> collaboratorIds = new ArrayList<>();
+//        String collaboratorQuery = "SELECT user_id FROM user_submissions WHERE submission_id = ?";
+//
+//        try (Connection connection = DBConnection.getConnection();
+//            PreparedStatement stmt = connection.prepareStatement(collaboratorQuery)) {
+//            stmt.setInt(1, id);
+//            try (ResultSet collabRs = stmt.executeQuery()) {
+//                while (collabRs.next()) {
+//                    int userId = collabRs.getInt("user_id");
+//                    if (userId > -1) collaboratorIds.add(userId);
+//                }
+//            }
+//        }
+//
+//        return new Submission(id, assignmentId, graderId, filepath, submittedAt, pointsEarned, grade, status, collaboratorIds);
+//    }
     public Submission buildFromResultSet(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         int assignmentId = rs.getInt("assignment_id");
@@ -192,22 +240,8 @@ public class SubmissionDAO implements CrudDAO<Submission> {
         double pointsEarned = rs.getDouble("points_earned");
         double grade = rs.getDouble("grade");
         Submission.Status status = Submission.Status.values()[rs.getInt("status")];
-    
-        // do query of all users in user_submissions for this submission id
-        List<Integer> collaboratorIds = new ArrayList<>();
-        String collaboratorQuery = "SELECT user_id FROM user_submissions WHERE submission_id = ?";
 
-        try (Connection connection = DBConnection.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(collaboratorQuery)) {
-            stmt.setInt(1, id);
-            try (ResultSet collabRs = stmt.executeQuery()) {
-                while (collabRs.next()) {
-                    int userId = collabRs.getInt("user_id");
-                    if (userId > -1) collaboratorIds.add(userId);
-                }
-            }
-        }
-
-        return new Submission(id, assignmentId, graderId, filepath, submittedAt, pointsEarned, grade, status, collaboratorIds);
+        return new Submission(id, assignmentId, graderId, filepath, submittedAt, pointsEarned, grade, status, new ArrayList<>());
     }
+
 }

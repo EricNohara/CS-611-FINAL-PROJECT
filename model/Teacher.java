@@ -36,6 +36,7 @@ public class Teacher extends User implements SubmissionGrader, CourseManager {
 
         submission.setPointsEarned(pointsEarned);
         submission.setGrade(grade);
+        System.out.println("get points:"+pointsEarned+" grade:"+grade);
 
         // update the submission in the table
         SubmissionDAO submissionDAO = SubmissionDAO.getInstance();

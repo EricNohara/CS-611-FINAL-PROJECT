@@ -5,13 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2bb920b5-becd-4832-9890-66cefd7543bd" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/ui/dashboard/TeacherDashboard.java" beforeDir="false" afterPath="$PROJECT_DIR$/ui/dashboard/TeacherDashboard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SubmissionFileTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/SubmissionFileTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/SubmissionDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/db/SubmissionDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model/Teacher.java" beforeDir="false" afterPath="$PROJECT_DIR$/model/Teacher.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/dashboard/panels/AssignmentsPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/ui/dashboard/panels/AssignmentsPanel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/dashboard/panels/CoursesPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/ui/dashboard/panels/CoursesPanel.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/dashboard/panels/GradingPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/ui/dashboard/panels/GradingPanel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/dashboard/panels/OverviewPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/ui/dashboard/panels/OverviewPanel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/dashboard/panels/StudentsPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/ui/dashboard/panels/StudentsPanel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/dashboard/panels/TemplatesPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/ui/dashboard/panels/TemplatesPanel.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,8 +20,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -94,7 +93,7 @@
       <workItem from="1745435015458" duration="217000" />
       <workItem from="1745523230486" duration="34000" />
       <workItem from="1745523266778" duration="10029000" />
-      <workItem from="1745622365625" duration="7044000" />
+      <workItem from="1745622365625" duration="14654000" />
     </task>
     <servers />
   </component>
