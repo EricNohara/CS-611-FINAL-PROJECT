@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 // Courses templates
-public final class TemplatesPanel extends JPanel {
+public final class TemplatesPanel extends JPanel implements Refreshable {
 
     private final Teacher teacher;
     private final JTabbedPane parentTabs;
@@ -814,5 +814,9 @@ public final class TemplatesPanel extends JPanel {
         }
 
         model.removeRow(selectedRow);
+    }
+    @Override
+    public void refresh() {
+        loadTemplateNames();
     }
 }

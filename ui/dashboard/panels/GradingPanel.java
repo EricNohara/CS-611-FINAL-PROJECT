@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Grading tab
-public final class GradingPanel extends JPanel {
+public final class GradingPanel extends JPanel implements Refreshable {
 
     private final Teacher teacher;
     private final JTabbedPane parentTabs;
@@ -999,5 +999,11 @@ public final class GradingPanel extends JPanel {
                 "Publish Complete", JOptionPane.INFORMATION_MESSAGE);
 
         loadSubmissionsData(); // refresh table
+    }
+
+
+    @Override
+    public void refresh() {
+        loadSubmissionsData();
     }
 }
