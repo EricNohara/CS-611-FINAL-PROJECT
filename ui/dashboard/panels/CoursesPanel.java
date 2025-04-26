@@ -10,11 +10,12 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.sql.Timestamp;
 import java.util.List;
 
 // Courses tab
-public final class CoursesPanel extends JPanel {
+public final class CoursesPanel extends JPanel implements Refreshable{
 
     private final Teacher teacher;
     private final JTabbedPane parentTabs;
@@ -585,5 +586,10 @@ public final class CoursesPanel extends JPanel {
                     "Database Error",
                     JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    @Override
+    public void refresh() {
+        loadCourseRows();
     }
 }

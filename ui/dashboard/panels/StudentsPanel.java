@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 // Students tab
-public final class StudentsPanel extends JPanel {
+public final class StudentsPanel extends JPanel implements Refreshable{
 
     private final Teacher teacher;
     private final JTabbedPane parentTabs;
@@ -676,5 +676,10 @@ public final class StudentsPanel extends JPanel {
 
         // Add to tabbed pane
         tabbedPane.addTab(courseName, panel);
+    }
+
+    @Override
+    public void refresh() {
+        loadStudentsData();
     }
 }

@@ -15,6 +15,8 @@ import ui.dashboard.panels.TemplatesPanel;
 import ui.LoginFrame;
 import ui.dashboard.panels.AssignmentsPanel;
 import ui.dashboard.panels.GradingPanel;
+import ui.dashboard.panels.Refreshable;
+
 
 
 public class TeacherDashboard extends JFrame {
@@ -39,13 +41,20 @@ public class TeacherDashboard extends JFrame {
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 18));
         headerPanel.add(welcomeLabel, BorderLayout.WEST);
 
+        //refresh
+        JButton refreshButton = new JButton("Refresh");
+        refreshButton.addActionListener(e -> refresh());
+
+
+
+
         JButton logoutButton = new JButton("Logout");
-        JPanel logoutPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        logoutPanel.add(logoutButton);
-        headerPanel.add(logoutPanel, BorderLayout.EAST);
 
         mainPanel.add(headerPanel, BorderLayout.NORTH);
-
+        JPanel topRightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        topRightPanel.add(refreshButton);
+        topRightPanel.add(logoutButton);
+        headerPanel.add(topRightPanel, BorderLayout.EAST);
         // Create tabbed pane for different teacher functions
         tabbedPane = new JTabbedPane();
 
@@ -66,6 +75,14 @@ public class TeacherDashboard extends JFrame {
 
         // Students panel
         tabbedPane.addTab("Students", new StudentsPanel(teacher, tabbedPane));
+
+        //refresh
+        tabbedPane.addChangeListener(e -> {
+            Component selected = tabbedPane.getSelectedComponent();
+            if (selected != null && selected instanceof Refreshable) {
+                ((Refreshable) selected).refresh();
+            }
+        });
 
         mainPanel.add(tabbedPane, BorderLayout.CENTER);
 
@@ -97,4 +114,14 @@ public class TeacherDashboard extends JFrame {
             });
         }
     }
+    private void refresh() {
+        int tabCount = tabbedPane.getTabCount();
+        for (int i = 0; i < tabCount; i++) {
+            Component tab = tabbedPane.getComponentAt(i);
+            if (tab instanceof Refreshable) {
+                ((Refreshable) tab).refresh();
+            }
+        }
+    }
+
 }

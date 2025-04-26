@@ -9,13 +9,19 @@ import java.awt.*;
 import java.sql.Timestamp;
 import java.util.List;
 
-public final class OverviewPanel extends JPanel {
+public final class OverviewPanel extends JPanel implements Refreshable{
+    private Teacher teacher;
 
     public OverviewPanel(Teacher teacher) {
         super(new BorderLayout(10, 10));
+        this.teacher = teacher; // 需要把 teacher 保存成成员变量
+        buildUI();
+    }
+    private void buildUI() {
+        removeAll();
+        setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Build the 4 stat cards
         JPanel cards = new JPanel(new GridLayout(2, 2, 15, 15));
 
         CourseDAO courseDAO = CourseDAO.getInstance();
@@ -23,6 +29,7 @@ public final class OverviewPanel extends JPanel {
         SubmissionDAO submDAO = SubmissionDAO.getInstance();
 
         int activeCourses = courseDAO.getActiveCoursesCount(teacher.getId());
+        //System.out.println(activeCourses);
         int totalStudents = courseDAO.getTotalStudentsCount(teacher.getId());
 
         List<Course> courses = courseDAO.getCoursesForTeacher(teacher.getId());
@@ -60,7 +67,6 @@ public final class OverviewPanel extends JPanel {
 
         add(cards, BorderLayout.NORTH);
 
-        // Recent activity table
         JPanel activityPanel = new JPanel(new BorderLayout(5, 5));
         activityPanel.setBorder(BorderFactory.createTitledBorder("Recent Activity"));
 
@@ -90,7 +96,7 @@ public final class OverviewPanel extends JPanel {
             String det = (s.getStatus() == Submission.Status.GRADED) ? a.getName() + " grades released"
                     : "New submission for " + a.getName();
 
-            model.addRow(new Object[] { s.getSubmittedAt(), act, c.getName(), det });
+            model.addRow(new Object[]{s.getSubmittedAt(), act, c.getName(), det});
             added++;
         }
 
@@ -98,5 +104,12 @@ public final class OverviewPanel extends JPanel {
         activityPanel.add(new JScrollPane(tbl), BorderLayout.CENTER);
 
         add(activityPanel, BorderLayout.CENTER);
+
+        revalidate();
+        repaint();
+    }
+    @Override
+    public void refresh() {
+        buildUI();
     }
 }

@@ -10,6 +10,7 @@ import utils.SubmissionFileManager;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -26,7 +27,7 @@ import java.util.Date;
 import java.util.List;
 
 // Assignments Tab
-public final class AssignmentsPanel extends JPanel {
+public final class AssignmentsPanel extends JPanel implements Refreshable{
 
     private final Teacher teacher;
     private final JTabbedPane parentTabs;
@@ -1713,5 +1714,9 @@ public final class AssignmentsPanel extends JPanel {
         for (AssignmentTemplate at : tpl.getAssignmentTemplates()) {
             templateComboBox.addItem(new AssignmentTemplateItem(at));
         }
+    }
+    @Override
+    public void refresh() {
+        loadAssignments(null,null);
     }
 }
