@@ -66,6 +66,11 @@
     &quot;应用程序.SubmissionFileTest.executor&quot;: &quot;Run&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="ui.dashboard" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -89,7 +94,7 @@
       <workItem from="1745523230486" duration="34000" />
       <workItem from="1745523266778" duration="10029000" />
       <workItem from="1745622365625" duration="15637000" />
-      <workItem from="1745703661386" duration="472000" />
+      <workItem from="1745703661386" duration="4722000" />
     </task>
     <servers />
   </component>

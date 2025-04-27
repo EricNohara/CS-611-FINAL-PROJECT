@@ -36,7 +36,7 @@ public final class StudentsPanel extends JPanel implements Refreshable{
                 .getCoursesForTeacher(teacher.getId());
 
         buildUI();
-        loadStudentsData(); // initial fill
+        loadStudentGraderData(); // initial fill
     }
 
     // UI construction
@@ -52,17 +52,20 @@ public final class StudentsPanel extends JPanel implements Refreshable{
         filter.add(courseCombo);
 
         JButton applyBtn = new JButton("Apply Filter");
-        JButton addBtn = new JButton("Add Student");
+        JButton addStudentBtn = new JButton("Add Student");
         JButton importBtn = new JButton("Import Students");
+        JButton addGraderBtn = new JButton("Add Grader");
+
         filter.add(applyBtn);
         filter.add(Box.createHorizontalStrut(20));
-        filter.add(addBtn);
+        filter.add(addStudentBtn);
         filter.add(importBtn);
+        filter.add(addGraderBtn);
 
         add(filter, BorderLayout.NORTH);
 
         // Table
-        String[] cols = { "ID", "Name", "Email", "Courses", "Last Login" };
+        String[] cols = { "ID", "Name", "Email", "Courses", "CourseIds","Last Login","Role" };
         studentModel = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int r, int c) {
@@ -85,9 +88,10 @@ public final class StudentsPanel extends JPanel implements Refreshable{
         add(actions, BorderLayout.SOUTH);
 
         // Listeners
-        applyBtn.addActionListener(e -> loadStudentsData());
-        addBtn.addActionListener(e -> addStudent());
+        applyBtn.addActionListener(e -> loadStudentGraderData());
+        addStudentBtn.addActionListener(e -> addStudent());
         importBtn.addActionListener(e -> importStudents());
+        addGraderBtn.addActionListener(e -> addGrader());
         viewBtn.addActionListener(e -> viewStudentProfile());
         removeBtn.addActionListener(e -> removeStudentFromCourse());
         emailBtn.addActionListener(e -> emailStudent());
@@ -97,7 +101,7 @@ public final class StudentsPanel extends JPanel implements Refreshable{
     // Helpers
 
     // Helper method to load students data
-    private void loadStudentsData(DefaultTableModel model, String courseFilter, List<Course> teacherCourses) {
+    private void loadStudentGraderData(DefaultTableModel model, String courseFilter, List<Course> teacherCourses) {
         // Clear existing data
         model.setRowCount(0);
 
@@ -106,8 +110,8 @@ public final class StudentsPanel extends JPanel implements Refreshable{
         List<User> allUsers = userDAO.readAll();
 
         // Filter students only
-        List<User> students = allUsers.stream()
-                .filter(u -> u.getRole() == User.Role.STUDENT)
+        List<User> users = allUsers.stream()
+                .filter(u -> u.getRole() == User.Role.STUDENT|| u.getRole() == User.Role.GRADER)
                 .collect(Collectors.toList());
 
         // Get user-course relationships
@@ -115,11 +119,11 @@ public final class StudentsPanel extends JPanel implements Refreshable{
         List<UserCourse> allUserCourses = userCourseDAO.readAll();
 
         // For each student, check if they're in any of the teacher's courses
-        for (User student : students) {
+        for (User user : users) {
             // Find courses for this student
             List<Course> studentCourses = teacherCourses.stream()
                     .filter(course -> allUserCourses.stream()
-                            .anyMatch(uc -> uc.getUserId() == student.getId() && uc.getCourseId() == course.getId()))
+                            .anyMatch(uc -> uc.getUserId() == user.getId() && uc.getCourseId() == course.getId()))
                     .collect(Collectors.toList());
 
             // Apply course filter
@@ -139,21 +143,26 @@ public final class StudentsPanel extends JPanel implements Refreshable{
             String coursesStr = studentCourses.stream()
                     .map(Course::getName)
                     .collect(Collectors.joining(", "));
+            String courseIdStr = studentCourses.stream()
+                    .map(course -> String.valueOf(course.getId())) // 把Integer转成String
+                    .collect(Collectors.joining(" "));
 
             // Add to table
             Object[] rowData = {
-                    student.getId(),
-                    student.getName(),
-                    student.getEmail(),
+                    user.getId(),
+                    user.getName(),
+                    user.getEmail(),
                     coursesStr,
-                    student.getLastUpdated() // Using last update timestamp as "last login"
+                    courseIdStr,
+                    user.getLastUpdated() ,
+                    user.getRole()// Using last update timestamp as "last login"
             };
             model.addRow(rowData);
         }
     }
 
-    private void loadStudentsData() {
-        loadStudentsData(studentModel,
+    private void loadStudentGraderData() {
+        loadStudentGraderData(studentModel,
                 (String) courseCombo.getSelectedItem(),
                 teacherCourses);
     }
@@ -380,7 +389,7 @@ public final class StudentsPanel extends JPanel implements Refreshable{
                 }
 
                 /* refresh main table */
-                loadStudentsData();
+                loadStudentGraderData();
 
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(dialog,
@@ -392,7 +401,240 @@ public final class StudentsPanel extends JPanel implements Refreshable{
         dialog.add(panel);
         dialog.setVisible(true);
     }
+    private void addGrader() {
+        JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Add Grader to Course",
+                Dialog.ModalityType.APPLICATION_MODAL);
+        dialog.setSize(450, 300);
+        dialog.setLocationRelativeTo(this);
 
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // Form panel
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // Course selection
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        formPanel.add(new JLabel("Course:"), gbc);
+
+        CourseDAO courseDAO = CourseDAO.getInstance();
+        List<Course> teacherCourses = courseDAO.getCoursesForTeacher(teacher.getId());
+
+        DefaultComboBoxModel<Course> model = new DefaultComboBoxModel<>();
+        if (teacherCourses.isEmpty()) {
+            model.addElement(new Course() {
+                {
+                    setId(-1);
+                    setName("-- No active courses --");
+                }
+            });
+        } else {
+            teacherCourses.forEach(model::addElement);
+        }
+
+        // show course names via renderer
+        JComboBox<Course> courseComboBox = new JComboBox<>(model);
+        courseComboBox.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
+            JLabel lbl = new JLabel(value.getName());
+            if (isSelected) {
+                lbl.setOpaque(true);
+                lbl.setBackground(list.getSelectionBackground());
+            }
+            return lbl;
+        });
+
+        formPanel.add(courseComboBox, gbc);
+
+        // Grader selection method
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        JPanel methodPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        JRadioButton existingRadio = new JRadioButton("Existing Grader");
+        JRadioButton newRadio = new JRadioButton("New Grader");
+        ButtonGroup group = new ButtonGroup();
+        group.add(existingRadio);
+        group.add(newRadio);
+        existingRadio.setSelected(true);
+        methodPanel.add(existingRadio);
+        methodPanel.add(Box.createHorizontalStrut(10));
+        methodPanel.add(newRadio);
+        formPanel.add(methodPanel, gbc);
+
+        // Grader fields panel (for both existing and new Grader)
+        JPanel existingPanel = new JPanel(new GridBagLayout());
+        JPanel newPanel = new JPanel(new GridBagLayout());
+
+        // Existing Grader panel
+        GridBagConstraints gbc2 = new GridBagConstraints();
+        gbc2.insets = new Insets(5, 5, 5, 5);
+        gbc2.fill = GridBagConstraints.HORIZONTAL;
+
+        gbc2.gridx = 0;
+        gbc2.gridy = 0;
+        existingPanel.add(new JLabel("Email:"), gbc2);
+
+        gbc2.gridx = 1;
+        JTextField emailField = new JTextField(20);
+        existingPanel.add(emailField, gbc2);
+
+        // New Grader panel
+        GridBagConstraints gbc3 = new GridBagConstraints();
+        gbc3.insets = new Insets(5, 5, 5, 5);
+        gbc3.fill = GridBagConstraints.HORIZONTAL;
+
+        gbc3.gridx = 0;
+        gbc3.gridy = 0;
+        newPanel.add(new JLabel("Name:"), gbc3);
+
+        gbc3.gridx = 1;
+        JTextField nameField = new JTextField(20);
+        newPanel.add(nameField, gbc3);
+
+        gbc3.gridx = 0;
+        gbc3.gridy = 1;
+        newPanel.add(new JLabel("Email:"), gbc3);
+
+        gbc3.gridx = 1;
+        JTextField newEmailField = new JTextField(20);
+        newPanel.add(newEmailField, gbc3);
+
+        gbc3.gridx = 0;
+        gbc3.gridy = 2;
+        newPanel.add(new JLabel("Password:"), gbc3);
+
+        gbc3.gridx = 1;
+        JPasswordField passwordField = new JPasswordField(20);
+        newPanel.add(passwordField, gbc3);
+
+        // Add student panels to a card layout
+        JPanel cardPanel = new JPanel(new CardLayout());
+        cardPanel.add(existingPanel, "existing");
+        cardPanel.add(newPanel, "new");
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        formPanel.add(cardPanel, gbc);
+
+        // Set initial state
+        CardLayout cl = (CardLayout) cardPanel.getLayout();
+        cl.show(cardPanel, "existing");
+
+        // Add radio button listeners to switch between panels
+        existingRadio.addActionListener(e -> cl.show(cardPanel, "existing"));
+        newRadio.addActionListener(e -> cl.show(cardPanel, "new"));
+
+        panel.add(formPanel, BorderLayout.CENTER);
+
+        // Button panel
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton cancelButton = new JButton("Cancel");
+        JButton addButton = new JButton("Add Grader");
+        buttonPanel.add(cancelButton);
+        buttonPanel.add(addButton);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
+
+        // Add button actions
+        cancelButton.addActionListener(e -> dialog.dispose());
+        addButton.addActionListener(e -> {
+            Course course = (Course) courseComboBox.getSelectedItem();
+            if (course == null || course.getId() <= 0) {
+                JOptionPane.showMessageDialog(dialog,
+                        "Please choose a valid course.",
+                        "Validation Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            UserDAO uDao = UserDAO.getInstance();
+            UserCourseDAO ucDao = UserCourseDAO.getInstance();
+
+            try {
+                if (existingRadio.isSelected()) {
+                    String email = emailField.getText();
+                    if (email.isEmpty()) {
+                        JOptionPane.showMessageDialog(dialog,
+                                "Email is required",
+                                "Validation Error",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    User grader = uDao.readByEmail(email); // <- implement in DAO or find manually
+                    if (grader == null || grader.getRole() != User.Role.GRADER) {
+                        JOptionPane.showMessageDialog(dialog,
+                                "No grader account found with that email.",
+                                "Not Found", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+
+                    /* check if already enrolled */
+                    UserCourse existing = ucDao.read(grader.getId(), course.getId());
+                    if (existing != null) {
+                        JOptionPane.showMessageDialog(dialog,
+                                "This grader is already enrolled in the course.",
+                                "Duplicate", JOptionPane.INFORMATION_MESSAGE);
+                        return;
+                    }
+
+                    UserCourse uc = new UserCourse(grader.getId(), course.getId(),
+                            UserCourse.Status.ACTIVE, User.Role.GRADER);
+                    ucDao.create(uc);
+
+                    JOptionPane.showMessageDialog(dialog,
+                            "grader added to course successfully!",
+                            "Success", JOptionPane.INFORMATION_MESSAGE);
+                    dialog.dispose();
+
+                } else {
+                    String email = newEmailField.getText().trim();
+                    String name = nameField.getText().trim();
+                    String password = new String(passwordField.getPassword());
+                    if (email.isEmpty()) {
+                        JOptionPane.showMessageDialog(dialog,
+                                "Email is required",
+                                "Validation Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
+                        JOptionPane.showMessageDialog(dialog, "All fields are required", "Validation Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    User existing = uDao.readByEmail(email);
+                    if (existing != null) {
+                        JOptionPane.showMessageDialog(dialog, "An account with that email already exists.\nUse 'Existing Grader' instead.", "Duplicate Email", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    Grader newGrader = new Grader(name, email, password);
+                    uDao.create(newGrader);
+
+                    ucDao.create(new UserCourse(newGrader.getId(), course.getId(), UserCourse.Status.ACTIVE, User.Role.GRADER));
+
+                    JOptionPane.showMessageDialog(dialog, "New grader created and added to course successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    dialog.dispose();
+                }
+
+                /* refresh main table */
+                loadStudentGraderData();
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(dialog,
+                        "Database error: " + ex.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        dialog.add(panel);
+        dialog.setVisible(true);
+    }
     // Import students from csv
     private void importStudents() {
 
@@ -479,7 +721,7 @@ public final class StudentsPanel extends JPanel implements Refreshable{
                             csvFile.getName(), enrolled, alreadyIn, notFound, badLines),
                     "Import Summary", JOptionPane.INFORMATION_MESSAGE);
 
-            loadStudentsData();
+            loadStudentGraderData();
 
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this,
@@ -514,17 +756,17 @@ public final class StudentsPanel extends JPanel implements Refreshable{
         int selectedRow = studentTable.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this,
-                    "Please select a student to remove from course",
+                    "Please select a user to remove from course",
                     "No Selection",
                     JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         // Get student info
-        String studentName = studentTable.getValueAt(selectedRow, 1).toString();
+        String userName = studentTable.getValueAt(selectedRow, 1).toString();
 
         // Show course selection dialog
-        JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Remove Student from Course",
+        JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Remove User from Course",
                 Dialog.ModalityType.APPLICATION_MODAL);
         dialog.setSize(400, 200);
         dialog.setLocationRelativeTo(this);
@@ -541,10 +783,10 @@ public final class StudentsPanel extends JPanel implements Refreshable{
         // Student name
         gbc.gridx = 0;
         gbc.gridy = 0;
-        formPanel.add(new JLabel("Student:"), gbc);
+        formPanel.add(new JLabel("User:"), gbc);
 
         gbc.gridx = 1;
-        JLabel nameLabel = new JLabel(studentName);
+        JLabel nameLabel = new JLabel(userName);
         formPanel.add(nameLabel, gbc);
 
         // Course selection
@@ -556,8 +798,8 @@ public final class StudentsPanel extends JPanel implements Refreshable{
         JComboBox<String> courseComboBox = new JComboBox<>();
 
         // Get courses from student's enrollment (from table data)
-        String courses = studentTable.getValueAt(selectedRow, 3).toString();
-        for (String course : courses.split(", ")) {
+        String courses = studentTable.getValueAt(selectedRow, 4).toString();
+        for (String course : courses.split(" ")) {
             courseComboBox.addItem(course);
         }
 
@@ -575,26 +817,39 @@ public final class StudentsPanel extends JPanel implements Refreshable{
 
         // Add button actions
         cancelButton.addActionListener(e -> dialog.dispose());
-        removeButton.addActionListener(e -> {
-            Course course = (Course) courseComboBox.getSelectedItem();
-            if (course == null || course.getId() <= 0) {
-                JOptionPane.showMessageDialog(dialog,
-                        "Please choose a valid course.",
-                        "Validation Error",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+        String selectedCourse = (String) courseComboBox.getSelectedItem();
+//        Course selectedCourse = null;
+//        for (Course c : courses) {
+//            if (c.getName().equals(courseName)) {
+//                selectedCourse = c;
+//                break;
+//            }
+//        }
+        if (selectedCourse == null ) {
+            JOptionPane.showMessageDialog(dialog,
+                    "Please choose a valid course.",
+                    "Validation Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        int userId = (Integer)studentTable.getValueAt(selectedRow, 0);
+        System.out.println("Selected course raw: [" + selectedCourse + "]");
 
+        int courseId = Integer.parseInt((String) selectedCourse);
+
+        removeButton.addActionListener(e -> {
             // Confirm removal
             int confirm = JOptionPane.showConfirmDialog(dialog,
-                    "Are you sure you want to remove " + studentName + " from " + course + "?",
+                    "Are you sure you want to remove " + userName + " from " + selectedCourse + "?",
                     "Confirm Removal",
                     JOptionPane.YES_NO_OPTION);
 
             if (confirm != JOptionPane.YES_OPTION) {
                 return;
             }
-
+            UserCourseDAO enrollmentDAO = UserCourseDAO.getInstance();
+            enrollmentDAO.delete(userId,courseId);
+            //System.out.println("Removed " + userCourseId + " from " + selectedCourse + ".");
             // In a real app, this would remove the student from the course in the database
             JOptionPane.showMessageDialog(dialog,
                     "Student removed from course successfully!",
@@ -878,6 +1133,6 @@ public final class StudentsPanel extends JPanel implements Refreshable{
 
     @Override
     public void refresh() {
-        loadStudentsData();
+        loadStudentGraderData();
     }
 }
