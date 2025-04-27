@@ -15,14 +15,14 @@ import java.util.stream.Collectors;
 // Courses templates
 public final class TemplatesPanel extends JPanel implements Refreshable {
 
-    private final Teacher teacher;
+    private final User teacher;
     private final JTabbedPane parentTabs;
 
     // widgets we need to touch from helpers
     private DefaultListModel<String> templateListModel;
     private JList<String> templateJList;
 
-    public TemplatesPanel(Teacher teacher, JTabbedPane parentTabs) {
+    public TemplatesPanel(User teacher, JTabbedPane parentTabs) {
         super(new BorderLayout(10, 10));
         this.teacher = teacher;
         this.parentTabs = parentTabs;
@@ -263,6 +263,14 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
     }
 
     private void editSelectedTemplate() {
+        if (!(teacher instanceof Teacher)) {
+            JOptionPane.showMessageDialog(this,
+                    "You do not have permission to edit template.",
+                    "Permission denied",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        Teacher tc = (Teacher) teacher;
         String selectedTemplateName = templateJList.getSelectedValue();
         if (selectedTemplateName == null) {
             JOptionPane.showMessageDialog(this,
@@ -450,7 +458,7 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
                 selectedTemplate.setAssignmentTemplates(newAssignmentTemplates);
 
                 // Use teacher to edit the template
-                teacher.editCourseTemplate(selectedTemplate);
+                tc.editCourseTemplate(selectedTemplate);
 
                 // Update UI
                 DefaultListModel<String> model = (DefaultListModel<String>) templateJList.getModel();
@@ -477,6 +485,14 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
     }
 
     private void deleteSelectedTemplate() {
+        if (!(teacher instanceof Teacher)) {
+            JOptionPane.showMessageDialog(this,
+                    "You do not have permission to delete template.",
+                    "Permission denied",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        Teacher tc = (Teacher) teacher;
         String selectedTemplateName = templateJList.getSelectedValue();
         if (selectedTemplateName == null) {
             JOptionPane.showMessageDialog(this,
@@ -516,7 +532,7 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
 
         try {
             // Use teacher to delete the template
-            teacher.deleteCourseTemplate(selectedTemplate);
+            tc.deleteCourseTemplate(selectedTemplate);
 
             // Update UI
             DefaultListModel<String> model = (DefaultListModel<String>) templateJList.getModel();

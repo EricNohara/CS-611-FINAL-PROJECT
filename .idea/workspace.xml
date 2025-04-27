@@ -5,14 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2bb920b5-becd-4832-9890-66cefd7543bd" name="Changes" comment="Changes">
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CS-611-FINAL-PROJECT.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/CS-611-FINAL-PROJECT/.idea/libraries/sqlite_jdbc_3_49_1_0.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/CS-611-FINAL-PROJECT/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CS-611-FINAL-PROJECT/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/CS-611-FINAL-PROJECT/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CS-611-FINAL-PROJECT/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/CS-611-FINAL-PROJECT/CS-611-FINAL-PROJECT.iml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CS-611-FINAL-PROJECT/CS-611-FINAL-PROJECT.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/dashboard/panels/AssignmentsPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/ui/dashboard/panels/AssignmentsPanel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/dashboard/panels/CoursesPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/ui/dashboard/panels/CoursesPanel.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/dashboard/panels/GradingPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/ui/dashboard/panels/GradingPanel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/dashboard/panels/OverviewPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/ui/dashboard/panels/OverviewPanel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/dashboard/panels/StudentsPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/ui/dashboard/panels/StudentsPanel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/dashboard/panels/TemplatesPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/ui/dashboard/panels/TemplatesPanel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/utils/GradingUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/ui/utils/GradingUtils.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,30 +52,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/fanjuling/Documents/code/CS611/CS-611-FINAL-PROJECT",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "onboarding.tips.debug.path": "/Users/fanjuling/Documents/code/CS611/CS-611-FINAL-PROJECT/src/Main.java",
-    "project.structure.last.edited": "模块",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "vue.rearranger.settings.migration": "true",
-    "应用程序.GradingSystemApp.executor": "Run",
-    "应用程序.LoginFrame.executor": "Run",
-    "应用程序.Main.executor": "Run",
-    "应用程序.SubmissionFileTest.executor": "Run"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/fanjuling/Documents/code/CS611/CS-611-FINAL-PROJECT&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;onboarding.tips.debug.path&quot;: &quot;/Users/fanjuling/Documents/code/CS611/CS-611-FINAL-PROJECT/src/Main.java&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;模块&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;,
+    &quot;应用程序.GradingSystemApp.executor&quot;: &quot;Run&quot;,
+    &quot;应用程序.LoginFrame.executor&quot;: &quot;Run&quot;,
+    &quot;应用程序.Main.executor&quot;: &quot;Run&quot;,
+    &quot;应用程序.SubmissionFileTest.executor&quot;: &quot;Run&quot;
   }
-}]]></component>
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="ui.dashboard" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -98,6 +104,7 @@
       <workItem from="1745523230486" duration="34000" />
       <workItem from="1745523266778" duration="10029000" />
       <workItem from="1745622365625" duration="15637000" />
+      <workItem from="1745703661386" duration="4020000" />
     </task>
     <servers />
   </component>

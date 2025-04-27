@@ -350,6 +350,8 @@ public final class StudentsPanel extends JPanel implements Refreshable{
 
                 } else {
                     String email = newEmailField.getText().trim();
+                    String name = nameField.getText().trim();
+                    String password = new String(passwordField.getPassword());
                     if (email.isEmpty()) {
                         JOptionPane.showMessageDialog(dialog,
                                 "Email is required",
@@ -357,13 +359,24 @@ public final class StudentsPanel extends JPanel implements Refreshable{
                         return;
                     }
 
-                    User maybe = uDao.readByEmail(email);
-                    JOptionPane.showMessageDialog(dialog,
-                            (maybe == null)
-                                    ? "User with that email does not exist."
-                                    : "An account with that email already exists.\nUse \"Existing Student\" to add them.",
-                            (maybe == null) ? "User Not Found" : "Duplicate Email",
-                            (maybe == null) ? JOptionPane.INFORMATION_MESSAGE : JOptionPane.ERROR_MESSAGE);
+                    if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
+                        JOptionPane.showMessageDialog(dialog, "All fields are required", "Validation Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    User existing = uDao.readByEmail(email);
+                    if (existing != null) {
+                        JOptionPane.showMessageDialog(dialog, "An account with that email already exists.\nUse 'Existing Student' instead.", "Duplicate Email", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    Student newStudent = new Student(name, email, password);
+                    uDao.create(newStudent);
+
+                    ucDao.create(new UserCourse(newStudent.getId(), course.getId(), UserCourse.Status.ACTIVE, User.Role.STUDENT));
+
+                    JOptionPane.showMessageDialog(dialog, "New student created and added to course successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    dialog.dispose();
                 }
 
                 /* refresh main table */

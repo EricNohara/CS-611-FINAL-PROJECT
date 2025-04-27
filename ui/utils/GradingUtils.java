@@ -1,10 +1,7 @@
 package ui.utils;
 
 import db.UserDAO;
-import model.Assignment;
-import model.Submission;
-import model.Teacher;
-import model.User;
+import model.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -22,7 +19,7 @@ public final class GradingUtils {
         buildDialog(parent, submission, assignment, null, false);
     }
 
-    public static void showGradingDialog(Component parent, Teacher teacher, Submission submission, Assignment assignment, Runnable refreshCallback) {
+    public static void showGradingDialog(Component parent, User teacher, Submission submission, Assignment assignment, Runnable refreshCallback) {
         buildDialog(parent, submission, assignment, new GradingContext(teacher, refreshCallback), true);
     }
 
@@ -208,7 +205,8 @@ public final class GradingUtils {
         }
     }
 
-    private static void saveGrade(Teacher teacher, Submission submission, Assignment assignment, JPanel gradingPanel, JDialog dialog, Runnable refreshCallback) {
+    private static void saveGrade(User teacher, Submission submission, Assignment assignment, JPanel gradingPanel, JDialog dialog, Runnable refreshCallback) {
+
         JTable rubricTable = (JTable) gradingPanel.getClientProperty("rubricTable");
         if (rubricTable != null && rubricTable.isEditing()) {
             rubricTable.getCellEditor().stopCellEditing();
@@ -216,7 +214,7 @@ public final class GradingUtils {
 
         try {
             DefaultTableModel model = (DefaultTableModel) gradingPanel.getClientProperty("rubricModel");
-            JTextArea feedbackArea = (JTextArea) gradingPanel.getClientProperty("feedbackArea");
+            //JTextArea feedbackArea = (JTextArea) gradingPanel.getClientProperty("feedbackArea");
 
             double totalPoints = 0;
             for (int i = 0; i < model.getRowCount(); i++) {
@@ -241,6 +239,8 @@ public final class GradingUtils {
 
             submission.setGraderId(teacher.getId());
             //submission.setFeedback(feedbackArea.getText());
+
+
             teacher.gradeSubmission(submission, totalPoints);
 
             JOptionPane.showMessageDialog(dialog, "Graded successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -255,7 +255,7 @@ public final class GradingUtils {
     }
 
     private static class GradingContext {
-        Teacher teacher;
+        User teacher;
         Runnable refreshCallback;
 
         GradingContext(Teacher teacher, Runnable refreshCallback) {

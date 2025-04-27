@@ -10,9 +10,9 @@ import java.sql.Timestamp;
 import java.util.List;
 
 public final class OverviewPanel extends JPanel implements Refreshable{
-    private Teacher teacher;
+    private User teacher;
 
-    public OverviewPanel(Teacher teacher) {
+    public OverviewPanel(User teacher) {
         super(new BorderLayout(10, 10));
         this.teacher = teacher; // 需要把 teacher 保存成成员变量
         buildUI();

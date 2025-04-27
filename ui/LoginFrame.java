@@ -10,6 +10,7 @@ import model.Teacher;
 import model.User;
 import ui.dashboard.TeacherDashboard;
 import ui.dashboard.AdminDashboard;
+import ui.dashboard.GraderDashboard;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -164,7 +165,7 @@ public class LoginFrame extends JFrame {
                     dashboard.setVisible(true);
                 });
                 break;
-                
+               */
             case GRADER:
                 // Open grader dashboard
                 SwingUtilities.invokeLater(() -> {
@@ -172,7 +173,7 @@ public class LoginFrame extends JFrame {
                     dashboard.setVisible(true);
                 });
                 break;
-            */
+
             case TEACHER:
                 // Open teacher dashboard
                 SwingUtilities.invokeLater(() -> {

@@ -17,14 +17,14 @@ import java.util.List;
 // Courses tab
 public final class CoursesPanel extends JPanel implements Refreshable{
 
-    private final Teacher teacher;
+    private final User teacher;
     private final JTabbedPane parentTabs;
 
     // UI elements we need to refresh
     private DefaultTableModel courseModel;
     private JTable courseTable;
 
-    public CoursesPanel(Teacher teacher, JTabbedPane parentTabs) {
+    public CoursesPanel(User teacher, JTabbedPane parentTabs) {
         super(new BorderLayout(10, 10));
         this.teacher = teacher;
         this.parentTabs = parentTabs;

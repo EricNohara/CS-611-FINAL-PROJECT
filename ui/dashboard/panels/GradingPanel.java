@@ -22,7 +22,7 @@ import java.util.ArrayList;
 // Grading tab
 public final class GradingPanel extends JPanel implements Refreshable {
 
-    private final Teacher teacher;
+    private final User grader;
     private final JTabbedPane parentTabs;
     private final List<Course> teacherCourses;
 
@@ -33,9 +33,9 @@ public final class GradingPanel extends JPanel implements Refreshable {
     private JComboBox<String> assignmentCombo;
     private JComboBox<String> statusCombo;
 
-    public GradingPanel(Teacher teacher, JTabbedPane parentTabs) {
+    public GradingPanel(User teacher, JTabbedPane parentTabs) {
         super(new BorderLayout(10, 10));
-        this.teacher = teacher;
+        this.grader = teacher;
         this.parentTabs = parentTabs;
 
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -233,7 +233,7 @@ public final class GradingPanel extends JPanel implements Refreshable {
 
     // Helper method to grade a submission
     private void gradeSubmission(Submission submission, Assignment assignment) {
-        GradingUtils.showGradingDialog(this, teacher, submission, assignment, this::loadSubmissionsData);
+        GradingUtils.showGradingDialog(this, grader, submission, assignment, this::loadSubmissionsData);
     }
 
 
@@ -359,6 +359,14 @@ public final class GradingPanel extends JPanel implements Refreshable {
     }
 
     private void saveGrade(Submission submission, Assignment assignment, JPanel gradingPanel, JDialog dialog) {
+        if (!(grader instanceof SubmissionGrader)) {
+            JOptionPane.showMessageDialog(this,
+                    "You do not have permission to grade.",
+                    "Permission denied",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        SubmissionGrader grd = (SubmissionGrader) grader;
         try {
             JScrollPane rubricScrollPane = (JScrollPane) ((JPanel) gradingPanel.getComponent(0)).getComponent(0);
             JTable rubricTable = (JTable) rubricScrollPane.getViewport().getView();
@@ -386,8 +394,11 @@ public final class GradingPanel extends JPanel implements Refreshable {
                 submission.setStatus(Submission.Status.GRADED);
             }
 
-            submission.setGraderId(teacher.getId());
-            teacher.gradeSubmission(submission, totalPoints);
+            submission.setGraderId(grader.getId());
+
+
+
+            grd.gradeSubmission(submission, totalPoints);
 
             JOptionPane.showMessageDialog(dialog, "Submission graded successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
             dialog.dispose();

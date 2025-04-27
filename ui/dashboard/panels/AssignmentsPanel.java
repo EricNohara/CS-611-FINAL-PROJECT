@@ -27,7 +27,7 @@ import java.util.List;
 // Assignments Tab
 public final class AssignmentsPanel extends JPanel implements Refreshable{
 
-    private final Teacher teacher;
+    private final User teacher;
     private final JTabbedPane parentTabs;
     private final List<Course> teacherCourses;
 
@@ -37,7 +37,7 @@ public final class AssignmentsPanel extends JPanel implements Refreshable{
     private JComboBox<String> courseCombo;
     private JComboBox<String> typeCombo;
 
-    public AssignmentsPanel(Teacher teacher,
+    public AssignmentsPanel(User teacher,
             JTabbedPane parentTabs) {
         super(new BorderLayout(10, 10));
         this.teacher = teacher;
@@ -443,6 +443,14 @@ public final class AssignmentsPanel extends JPanel implements Refreshable{
     }
 
     private void editSelectedAssignment() {
+        if (!(teacher instanceof Teacher)) {
+            JOptionPane.showMessageDialog(this,
+                    "You do not have permission to edit assignment.",
+                    "Permission denied",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        Teacher tc = (Teacher) teacher;
         int selectedRow = assignmentTable.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this,
@@ -677,7 +685,7 @@ public final class AssignmentsPanel extends JPanel implements Refreshable{
                 // If Assignment had a description field, we would set it here
 
                 // Save to database
-                teacher.editAssignment(assignment);
+                tc.editAssignment(assignment);
 
                 // Show success message
                 JOptionPane.showMessageDialog(dialog,
@@ -712,6 +720,14 @@ public final class AssignmentsPanel extends JPanel implements Refreshable{
     }
 
     private void deleteSelectedAssignment() {
+        if (!(teacher instanceof Teacher)) {
+            JOptionPane.showMessageDialog(this,
+                    "You do not have permission to delete assignment.",
+                    "Permission denied",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        Teacher tc = (Teacher) teacher;
         int selectedRow = assignmentTable.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this,
@@ -803,7 +819,7 @@ public final class AssignmentsPanel extends JPanel implements Refreshable{
             }
 
             // Delete the assignment
-            teacher.deleteAssignment(assignment);
+            tc.deleteAssignment(assignment);
 
             // Update the table model
             DefaultTableModel model = (DefaultTableModel) assignmentTable.getModel();
