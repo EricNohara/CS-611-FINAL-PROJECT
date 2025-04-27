@@ -206,7 +206,10 @@ public final class GradingUtils {
     }
 
     private static void saveGrade(User teacher, Submission submission, Assignment assignment, JPanel gradingPanel, JDialog dialog, Runnable refreshCallback) {
-
+        if(!(teacher instanceof SubmissionGrader)) {
+            return;
+        }
+        SubmissionGrader grader = (SubmissionGrader) teacher;
         JTable rubricTable = (JTable) gradingPanel.getClientProperty("rubricTable");
         if (rubricTable != null && rubricTable.isEditing()) {
             rubricTable.getCellEditor().stopCellEditing();
@@ -241,7 +244,7 @@ public final class GradingUtils {
             //submission.setFeedback(feedbackArea.getText());
 
 
-            teacher.gradeSubmission(submission, totalPoints);
+            grader.gradeSubmission(submission, totalPoints);
 
             JOptionPane.showMessageDialog(dialog, "Graded successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
             dialog.dispose();
@@ -258,7 +261,7 @@ public final class GradingUtils {
         User teacher;
         Runnable refreshCallback;
 
-        GradingContext(Teacher teacher, Runnable refreshCallback) {
+        GradingContext(User teacher, Runnable refreshCallback) {
             this.teacher = teacher;
             this.refreshCallback = refreshCallback;
         }
