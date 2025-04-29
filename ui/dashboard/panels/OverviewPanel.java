@@ -14,7 +14,7 @@ public final class OverviewPanel extends JPanel implements Refreshable{
 
     public OverviewPanel(User teacher) {
         super(new BorderLayout(10, 10));
-        this.teacher = teacher; // 需要把 teacher 保存成成员变量
+        this.teacher = teacher;
         buildUI();
     }
     private void buildUI() {

@@ -696,7 +696,7 @@ public final class GradingPanel extends JPanel implements Refreshable {
 
                 if (sub.getGrade() < 0) { // not yet published
                     double percent = 100.0 * sub.getPointsEarned() / asg.getMaxPoints();
-                    sub.setGrade(percent); // store percentage as “released grade”
+                    sub.setGrade(percent); // store percentage as released grade
                     sDao.update(sub);
                     released++;
 

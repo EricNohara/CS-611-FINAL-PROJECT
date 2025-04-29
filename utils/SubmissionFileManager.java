@@ -13,6 +13,7 @@ public class SubmissionFileManager {
 
     public static boolean uploadSubmission(File upload, Submission submission) {
         String savePath = buildSavePath(submission);
+        submission.setFilepath(savePath);
         String submissionName = buildSubmissionName(submission) + getFileExtension(upload);
 
         // create a new File object for the final destination (save path + renamed file name)

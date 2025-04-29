@@ -47,7 +47,7 @@
 #### Windows
 
 ```
-javac -cp ".;lib/sqlite-jdbc-3.49.1.0.jar" -d out *.java db/*.java model/*.java utils/*.java
+javac -cp ".;lib/sqlite-jdbc-3.49.1.0.jar" -d out *.java db/*.java model/*.java utils/*.java ui/*.java
 java -cp "out;lib/sqlite-jdbc-3.49.1.0.jar" Main
 del /s /q out\*.class
 ```

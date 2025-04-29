@@ -144,7 +144,7 @@ public final class StudentsPanel extends JPanel implements Refreshable{
                     .map(Course::getName)
                     .collect(Collectors.joining(", "));
             String courseIdStr = studentCourses.stream()
-                    .map(course -> String.valueOf(course.getId())) // 把Integer转成String
+                    .map(course -> String.valueOf(course.getId()))
                     .collect(Collectors.joining(" "));
 
             // Add to table
