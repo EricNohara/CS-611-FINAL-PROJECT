@@ -21,6 +21,8 @@ public class Course {
         this.courseTemplate = courseTemplate;
         if (courseTemplate != null) {
             this.courseTemplateId = courseTemplate.getId();
+        } else {
+            this.courseTemplateId = -1;
         }
 
         this.name = name;
@@ -32,9 +34,6 @@ public class Course {
     public void setId(int id) { this.id = id; }
     
     public int getCourseTemplateId() {
-        if(courseTemplate == null) {
-            return -1;
-        }
         return courseTemplateId;
     }
     public void setCourseTemplateId(int courseTemplateId) {this.courseTemplateId = courseTemplateId;}

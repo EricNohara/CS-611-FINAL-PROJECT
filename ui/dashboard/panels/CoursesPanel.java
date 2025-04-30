@@ -225,11 +225,7 @@ public final class CoursesPanel extends JPanel implements Refreshable{
                 dialog.dispose();
 
                 // Refresh the courses panel
-                // This would ideally be done by having a refreshCourses method
-                // For now, we can switch to another tab and back
-                int currentIndex = parentTabs.getSelectedIndex();
-                parentTabs.setSelectedIndex(currentIndex == 0 ? 1 : 0);
-                parentTabs.setSelectedIndex(1); // Switch to Courses tab
+                refresh();
 
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(dialog,
@@ -429,9 +425,7 @@ public final class CoursesPanel extends JPanel implements Refreshable{
                 dialog.dispose();
 
                 // Refresh the courses panel
-                int currentIndex = parentTabs.getSelectedIndex();
-                parentTabs.setSelectedIndex(currentIndex == 0 ? 1 : 0);
-                parentTabs.setSelectedIndex(1); // Switch to Courses tab
+               refresh();
 
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(dialog,
@@ -575,10 +569,7 @@ public final class CoursesPanel extends JPanel implements Refreshable{
                     JOptionPane.INFORMATION_MESSAGE);
 
             // Refresh the courses panel
-            // For now, we can switch to another tab and back
-            int currentIndex = parentTabs.getSelectedIndex();
-            parentTabs.setSelectedIndex(currentIndex == 0 ? 1 : 0);
-            parentTabs.setSelectedIndex(1); // Switch to Courses tab
+            refresh();
 
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this,
