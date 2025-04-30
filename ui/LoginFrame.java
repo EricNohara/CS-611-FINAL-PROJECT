@@ -30,6 +30,7 @@ public class LoginFrame extends JFrame {
     private JPasswordField passwordField;
     private JButton loginButton;
     private JButton cancelButton;
+    private JButton signUpButton;
     private UserDAO userDAO;
     
     public LoginFrame() {
@@ -51,6 +52,7 @@ public class LoginFrame extends JFrame {
         
         loginButton = new JButton("Login");
         cancelButton = new JButton("Cancel");
+        signUpButton = new JButton("Sign Up");
         
         // Set up layout
         JPanel panel = new JPanel(new GridBagLayout());
@@ -79,6 +81,7 @@ public class LoginFrame extends JFrame {
         
         // Buttons row
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.add(signUpButton);
         buttonPanel.add(loginButton);
         buttonPanel.add(cancelButton);
         
@@ -100,6 +103,13 @@ public class LoginFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.exit(0);
+            }
+        });
+
+        signUpButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showSignUpDialog();
             }
         });
         
@@ -153,6 +163,160 @@ public class LoginFrame extends JFrame {
                 JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    private void showSignUpDialog() {
+        // Create the dialog
+        JDialog signUpDialog = new JDialog(this, "Sign Up", true);
+        signUpDialog.setSize(400, 300);
+        signUpDialog.setLocationRelativeTo(this);
+        
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        
+        // Name field
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panel.add(new JLabel("Name:"), gbc);
+        
+        gbc.gridx = 1;
+        JTextField nameField = new JTextField(20);
+        panel.add(nameField, gbc);
+        
+        // Email field
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        panel.add(new JLabel("Email:"), gbc);
+        
+        gbc.gridx = 1;
+        JTextField newEmailField = new JTextField(20);
+        panel.add(newEmailField, gbc);
+        
+        // Password field
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        panel.add(new JLabel("Password:"), gbc);
+        
+        gbc.gridx = 1;
+        JPasswordField newPasswordField = new JPasswordField(20);
+        panel.add(newPasswordField, gbc);
+        
+        // Confirm password field
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        panel.add(new JLabel("Confirm Password:"), gbc);
+        
+        gbc.gridx = 1;
+        JPasswordField confirmPasswordField = new JPasswordField(20);
+        panel.add(confirmPasswordField, gbc);
+        
+        // Role selection
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        panel.add(new JLabel("Role:"), gbc);
+        
+        gbc.gridx = 1;
+        String[] roles = {"Student", "Grader", "Teacher"};
+        JComboBox<String> roleComboBox = new JComboBox<>(roles);
+        panel.add(roleComboBox, gbc);
+        
+        // Buttons
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JButton createButton = new JButton("Create Account");
+        JButton cancelButton = new JButton("Cancel");
+        buttonPanel.add(createButton);
+        buttonPanel.add(cancelButton);
+        panel.add(buttonPanel, gbc);
+        
+        // Create button action
+        createButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String name = nameField.getText().trim();
+                String email = newEmailField.getText().trim();
+                String password = new String(newPasswordField.getPassword());
+                String confirmPassword = new String(confirmPasswordField.getPassword());
+                String selectedRole = (String) roleComboBox.getSelectedItem();
+                
+                // Validate input
+                if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
+                    JOptionPane.showMessageDialog(signUpDialog, 
+                        "All fields are required", 
+                        "Validation Error", 
+                        JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                
+                if (!password.equals(confirmPassword)) {
+                    JOptionPane.showMessageDialog(signUpDialog, 
+                        "Passwords do not match", 
+                        "Validation Error", 
+                        JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                
+                // Check if email already exists
+                if (userDAO.readByEmail(email) != null) {
+                    JOptionPane.showMessageDialog(signUpDialog, 
+                        "Email already exists", 
+                        "Validation Error", 
+                        JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                
+                // Create user based on selected role
+                User newUser = null;
+                String hashedPassword = Hasher.hashPassword(password);
+                
+                switch (selectedRole) {
+                    case "Student":
+                        newUser = new Student(name, email, hashedPassword);
+                        break;
+                    case "Grader":
+                        newUser = new Grader(name, email, hashedPassword);
+                        break;
+                    case "Teacher":
+                        newUser = new Teacher(name, email, hashedPassword);
+                        break;
+                }
+                
+                // Save user to database
+                if (newUser != null) {
+                    userDAO.create(newUser);
+                    
+                    JOptionPane.showMessageDialog(signUpDialog, 
+                        "Account created successfully. You can now log in.", 
+                        "Success", 
+                        JOptionPane.INFORMATION_MESSAGE);
+                    
+                    signUpDialog.dispose();
+                    
+                    // Pre-fill the login form with the new email
+                    emailField.setText(email);
+                    passwordField.setText("");
+                }
+            }
+        });
+        
+        // Cancel button action
+        cancelButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                signUpDialog.dispose();
+            }
+        });
+        
+        signUpDialog.add(panel);
+        signUpDialog.setVisible(true);
+    }
+
     
     private void openUserDashboard(User user) {
         // Open appropriate window based on user role
