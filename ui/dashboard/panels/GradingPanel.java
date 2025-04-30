@@ -149,7 +149,7 @@ public final class GradingPanel extends JPanel implements Refreshable {
         // Get submissions from database
         SubmissionDAO submissionDAO = SubmissionDAO.getInstance();
         List<Submission> allSubmissions = submissionDAO.readAll();
-
+        //System.out.println("all submission"+allSubmissions.size());
         // Get assignments
         AssignmentDAO assignmentDAO = AssignmentDAO.getInstance();
 

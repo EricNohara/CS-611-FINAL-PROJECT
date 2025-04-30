@@ -204,33 +204,6 @@ public class SubmissionDAO implements CrudDAO<Submission> {
     }
 
     @Override
-//    public Submission buildFromResultSet(ResultSet rs) throws SQLException {
-//        int id = rs.getInt("id");
-//        int assignmentId = rs.getInt("assignment_id");
-//        int graderId = rs.getInt("grader_id");
-//        String filepath = rs.getString("filepath");
-//        Timestamp submittedAt = rs.getTimestamp("submitted_at");
-//        double pointsEarned = rs.getDouble("points_earned");
-//        double grade = rs.getDouble("grade");
-//        Submission.Status status = Submission.Status.values()[rs.getInt("status")];
-//
-//        // do query of all users in user_submissions for this submission id
-//        List<Integer> collaboratorIds = new ArrayList<>();
-//        String collaboratorQuery = "SELECT user_id FROM user_submissions WHERE submission_id = ?";
-//
-//        try (Connection connection = DBConnection.getConnection();
-//            PreparedStatement stmt = connection.prepareStatement(collaboratorQuery)) {
-//            stmt.setInt(1, id);
-//            try (ResultSet collabRs = stmt.executeQuery()) {
-//                while (collabRs.next()) {
-//                    int userId = collabRs.getInt("user_id");
-//                    if (userId > -1) collaboratorIds.add(userId);
-//                }
-//            }
-//        }
-//
-//        return new Submission(id, assignmentId, graderId, filepath, submittedAt, pointsEarned, grade, status, collaboratorIds);
-//    }
     public Submission buildFromResultSet(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         int assignmentId = rs.getInt("assignment_id");
@@ -241,7 +214,35 @@ public class SubmissionDAO implements CrudDAO<Submission> {
         double grade = rs.getDouble("grade");
         Submission.Status status = Submission.Status.values()[rs.getInt("status")];
 
-        return new Submission(id, assignmentId, graderId, filepath, submittedAt, pointsEarned, grade, status, new ArrayList<>());
+        // do query of all users in user_submissions for this submission id
+        List<Integer> collaboratorIds = new ArrayList<>();
+        String collaboratorQuery = "SELECT user_id FROM user_submissions WHERE submission_id = ?";
+
+        try (Connection connection = DBConnection.getConnection();
+            PreparedStatement stmt = connection.prepareStatement(collaboratorQuery)) {
+            stmt.setInt(1, id);
+            try (ResultSet collabRs = stmt.executeQuery()) {
+                while (collabRs.next()) {
+                    int userId = collabRs.getInt("user_id");
+                    if (userId > -1) collaboratorIds.add(userId);
+                }
+            }
+        }
+
+        return new Submission(id, assignmentId, graderId, filepath, submittedAt, pointsEarned, grade, status, collaboratorIds);
     }
+//    public Submission buildFromResultSet(ResultSet rs) throws SQLException {
+//        int id = rs.getInt("id");
+//        int assignmentId = rs.getInt("assignment_id");
+//        int graderId = rs.getInt("grader_id");
+//        String filepath = rs.getString("filepath");
+//        Timestamp submittedAt = rs.getTimestamp("submitted_at");
+//        double pointsEarned = rs.getDouble("points_earned");
+//        double grade = rs.getDouble("grade");
+//        Submission.Status status = Submission.Status.values()[rs.getInt("status")];
+//
+//        return new Submission(id, assignmentId, graderId, filepath, submittedAt, pointsEarned, grade, status, new ArrayList<>());
+//    }
+//
 
 }

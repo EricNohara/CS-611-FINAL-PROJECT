@@ -1,5 +1,8 @@
 package ui.utils;
 
+import db.AssignmentDAO;
+import db.SubmissionDAO;
+import db.UserCourseDAO;
 import db.UserDAO;
 import model.*;
 
@@ -11,7 +14,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class GradingUtils {
 
@@ -25,7 +30,7 @@ public final class GradingUtils {
 
     private static void buildDialog(Component parent, Submission submission, Assignment assignment, GradingContext gradingContext, boolean enableGrading) {
         List<String> studentNames = loadStudentNames(submission);
-
+        System.out.println("check student name"+studentNames.size());
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(parent), enableGrading ? "Grade Submission" : "View Submission", Dialog.ModalityType.APPLICATION_MODAL);
         dialog.setSize(900, 700);
         dialog.setLocationRelativeTo(parent);
@@ -266,4 +271,84 @@ public final class GradingUtils {
             this.refreshCallback = refreshCallback;
         }
     }
+
+//    private double GetStudentGrade(int studentId, int courseId){
+//        AssignmentDAO aDao = AssignmentDAO.getInstance();
+//        SubmissionDAO sDao = SubmissionDAO.getInstance();
+//
+//        List<Assignment> assignments = aDao.readAllCondition("course_id", courseId);
+//
+//        // Get grade info
+//        double earnedSum = 0, maxSum = 0;
+//        int completed = 0;
+//
+//        String[] cols = { "Assignment", "Type", "Due Date",
+//                "Grade", "Comments" };
+//        DefaultTableModel model = new DefaultTableModel(cols, 0) {
+//            @Override
+//            public boolean isCellEditable(int r, int c) {
+//                return false;
+//            }
+//        };
+//
+//        Submission lastSub = null;
+//
+//        for (Assignment a : assignments) {
+//
+//            // pull the submission(s) for THIS student / assignment
+//            List<Submission> subs = sDao.readAllCondition("assignment_id", a.getId())
+//                    .stream()
+//                    .filter(s -> s.getCollaboratorIds().contains(studentId))
+//                    .collect(Collectors.toList());
+//
+//            Submission sub = subs.stream()
+//                    .max(Comparator.comparing(Submission::getSubmittedAt))
+//                    .orElse(null);
+//
+//            String gradeStr = "-";
+//            String comment = "";
+//            if (sub != null) {
+//                lastSub = (lastSub == null ||
+//                        sub.getSubmittedAt().after(lastSub.getSubmittedAt()))
+//                        ? sub
+//                        : lastSub;
+//
+//                if (sub.getStatus() == Submission.Status.GRADED) {
+//                    gradeStr = String.format("%.0f/%.0f",
+//                            sub.getPointsEarned(),
+//                            a.getMaxPoints());
+//                    earnedSum += sub.getPointsEarned();
+//                    maxSum += a.getMaxPoints();
+//                    completed++;
+//                }
+//            }
+//
+//
+//        }
+//
+//        // Top summary panel
+//        double percent = (maxSum > 0) ? 100.0 * earnedSum / maxSum : 0.0;
+//        String letter = getLetterGrade(percent);
+//
+//        JPanel summary = new JPanel(new GridLayout(3, 2, 10, 5));
+//        summary.setBorder(BorderFactory.createTitledBorder("Course Information"));
+//
+//        summary.add(new JLabel("Current Grade:"));
+//        summary.add(new JLabel(String.format("%s (%.1f%%)", letter, percent)));
+//
+//        summary.add(new JLabel("Assignments Completed:"));
+//        summary.add(new JLabel(completed + " / " + assignments.size()));
+//
+//        summary.add(new JLabel("Last Submission:"));
+//        summary.add(new JLabel(lastSub == null ? "—"
+//                : lastSub.getSubmittedAt().toLocalDateTime().toLocalDate()
+//                + " (" + aDao.read(lastSub.getAssignmentId()).getName() + ")"));
+//
+//        JPanel root = new JPanel(new BorderLayout(10, 10));
+//        root.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+//        root.add(summary, BorderLayout.NORTH);
+//        root.add(new JScrollPane(new JTable(model)), BorderLayout.CENTER);
+//
+//
+//    }
 }

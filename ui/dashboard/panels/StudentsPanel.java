@@ -3,6 +3,7 @@ package ui.dashboard.panels;
 import db.*;
 import model.*;
 import utils.Hasher;
+import ui.utils.StudentGradeResult;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -13,6 +14,10 @@ import java.io.FileReader;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static ui.utils.StudentGradeResult.getLetterGrade;
+import static ui.utils.StudentGradeResult.getStudentGradePercent;
+
 
 // Students tab
 public final class StudentsPanel extends JPanel implements Refreshable{
@@ -65,7 +70,7 @@ public final class StudentsPanel extends JPanel implements Refreshable{
         add(filter, BorderLayout.NORTH);
 
         // Table
-        String[] cols = { "ID", "Name", "Email", "Courses", "CourseIds","Last Login","Role" };
+        String[] cols = { "ID", "Name", "Email", "Course", "CourseId","Last Login","Role","Grade" };
         studentModel = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int r, int c) {
@@ -120,44 +125,30 @@ public final class StudentsPanel extends JPanel implements Refreshable{
 
         // For each student, check if they're in any of the teacher's courses
         for (User user : users) {
-            // Find courses for this student
-            List<Course> studentCourses = teacherCourses.stream()
-                    .filter(course -> allUserCourses.stream()
-                            .anyMatch(uc -> uc.getUserId() == user.getId() && uc.getCourseId() == course.getId()))
-                    .collect(Collectors.toList());
+            for (Course course : teacherCourses) {
+                boolean enrolled = allUserCourses.stream()
+                        .anyMatch(uc -> uc.getUserId() == user.getId() && uc.getCourseId() == course.getId());
 
-            // Apply course filter
-            if (courseFilter != null && !"All Courses".equals(courseFilter)) {
-                boolean inFilteredCourse = studentCourses.stream()
-                        .anyMatch(course -> course.getName().equals(courseFilter));
-
-                if (!inFilteredCourse)
+                if (!enrolled)
                     continue;
+
+                if (courseFilter != null && !"All Courses".equals(courseFilter) &&
+                        !course.getName().equals(courseFilter))
+                    continue;
+                double grade=getStudentGradePercent(user.getId(),course.getId());
+
+                Object[] rowData = {
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail(),
+                        course.getName(),
+                        course.getId(),
+                        user.getLastUpdated(),
+                        user.getRole(),
+                        grade
+                };
+                model.addRow(rowData);
             }
-
-            // Skip if not in any of teacher's courses
-            if (studentCourses.isEmpty())
-                continue;
-
-            // Format courses string
-            String coursesStr = studentCourses.stream()
-                    .map(Course::getName)
-                    .collect(Collectors.joining(", "));
-            String courseIdStr = studentCourses.stream()
-                    .map(course -> String.valueOf(course.getId()))
-                    .collect(Collectors.joining(" "));
-
-            // Add to table
-            Object[] rowData = {
-                    user.getId(),
-                    user.getName(),
-                    user.getEmail(),
-                    coursesStr,
-                    courseIdStr,
-                    user.getLastUpdated() ,
-                    user.getRole()// Using last update timestamp as "last login"
-            };
-            model.addRow(rowData);
         }
     }
 
@@ -990,21 +981,17 @@ public final class StudentsPanel extends JPanel implements Refreshable{
         // enrolled in
         JTabbedPane courseTabs = new JTabbedPane();
 
-        UserCourseDAO ucDao = UserCourseDAO.getInstance();
-        List<UserCourse> rels = ucDao.readAllCondition("user_id", studentId);
+        int courseId = Integer.parseInt(studentTable.getValueAt(viewRow, 4).toString());
 
-        for (UserCourse rel : rels) {
-            Course course = teacherCourses // teacherCourses is a field
-                    .stream().filter(c -> c.getId() == rel.getCourseId())
-                    .findFirst().orElse(null);
+        Course course = teacherCourses.stream()
+                .filter(c -> c.getId() == courseId)
+                .findFirst()
+                .orElse(null);
 
-            if (course != null) // only show courses taught by THIS teacher
-                addCourseGradeTab(courseTabs, course, studentId);
-        }
-
-        if (courseTabs.getTabCount() == 0) {
-            courseTabs.addTab("No Grades",
-                    new JLabel("This student has no grades in your courses."));
+        if (course != null) {
+            addCourseGradeTab(courseTabs, course, studentId);
+        } else {
+            courseTabs.addTab("No Grades", new JLabel("This student is not in your course."));
         }
 
         root.add(courseTabs, BorderLayout.CENTER);
@@ -1116,20 +1103,6 @@ public final class StudentsPanel extends JPanel implements Refreshable{
         tabs.addTab(course.getName(), root);
     }
 
-    // Crude letter-grade map
-    private static String getLetterGrade(double pct) {
-        return (pct >= 93) ? "A"
-                : (pct >= 90) ? "A-"
-                        : (pct >= 87) ? "B+"
-                                : (pct >= 83) ? "B"
-                                        : (pct >= 80) ? "B-"
-                                                : (pct >= 77) ? "C+"
-                                                        : (pct >= 73) ? "C"
-                                                                : (pct >= 70) ? "C-"
-                                                                        : (pct >= 67) ? "D+"
-                                                                                : (pct >= 63) ? "D"
-                                                                                        : (pct >= 60) ? "D-" : "F";
-    }
 
     @Override
     public void refresh() {
