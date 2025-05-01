@@ -5,12 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2bb920b5-becd-4832-9890-66cefd7543bd" name="Changes" comment="Changes">
-      <change beforePath="$PROJECT_DIR$/db/SubmissionDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/db/SubmissionDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/CS-611-FINAL-PROJECT/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CS-611-FINAL-PROJECT/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/CS-611-FINAL-PROJECT/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CS-611-FINAL-PROJECT/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/CS-611-FINAL-PROJECT/CS-611-FINAL-PROJECT.iml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CS-611-FINAL-PROJECT/CS-611-FINAL-PROJECT.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/dashboard/panels/GradingPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/ui/dashboard/panels/GradingPanel.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/dashboard/panels/StudentsPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/ui/dashboard/panels/StudentsPanel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/utils/GradingUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/ui/utils/GradingUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/utils/StudentGradeResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/ui/utils/StudentGradeResult.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -104,7 +104,11 @@
       <workItem from="1745724594284" duration="7609000" />
       <workItem from="1745885290237" duration="10000" />
       <workItem from="1745957049028" duration="4057000" />
-      <workItem from="1745984880315" duration="5312000" />
+      <workItem from="1745984880315" duration="5381000" />
+      <workItem from="1745990293453" duration="223000" />
+      <workItem from="1746042243737" duration="123000" />
+      <workItem from="1746051892233" duration="160000" />
+      <workItem from="1746053027923" duration="2687000" />
     </task>
     <servers />
   </component>

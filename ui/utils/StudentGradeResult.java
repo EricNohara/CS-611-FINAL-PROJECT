@@ -37,8 +37,7 @@ public class StudentGradeResult {
 
         List<Assignment> assignments = aDao.readAllCondition("course_id", courseId);
 
-        double earnedSum = 0, maxSum = 0;
-
+        double retGrade = 0;
         for (Assignment a : assignments) {
             List<Submission> subs = sDao.readAllCondition("assignment_id", a.getId())
                     .stream()
@@ -50,12 +49,13 @@ public class StudentGradeResult {
                     .orElse(null);
 
             if (sub != null && sub.getStatus() == Submission.Status.GRADED) {
-                earnedSum += sub.getPointsEarned();
-                maxSum += a.getMaxPoints();
+                double earnedPoints = sub.getPointsEarned();
+                double maxPoints = a.getMaxPoints();
+                retGrade+= (earnedPoints/maxPoints)*a.getWeight();
             }
         }
 
-        return 100.0 * earnedSum / maxSum;
+        return retGrade*100;
     }
 
     public static String getLetterGrade(double pct) {
