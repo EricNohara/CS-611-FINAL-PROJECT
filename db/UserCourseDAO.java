@@ -91,7 +91,7 @@ public class UserCourseDAO implements CrudDAO<UserCourse> {
     
     @Override
     public void update(UserCourse userCourse) {
-        String query = "UPDATE user_courses SET user_id = ?, course_id = ?, status = ?, role = ? WHERE user_id = ? AND course_id = ?";
+        String query = "UPDATE user_courses SET status = ?, role = ? WHERE user_id = ? AND course_id = ?";
 
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
