@@ -5,7 +5,6 @@ import java.sql.SQLException;
 
 public class DBConnection {
     private static final String DATABASE_URL = "jdbc:sqlite:./data/database.db";
-    private static Connection connection;
 
     // Singleton connection to the DB
     private DBConnection() {}
