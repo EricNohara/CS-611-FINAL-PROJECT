@@ -15,7 +15,7 @@ public class GraderDashboard extends JFrame {
     public GraderDashboard(Grader grader) {
         this.grader = grader;
 
-        setTitle("Teacher Dashboard - " + grader.getName());
+        setTitle("Grader Dashboard - " + grader.getName());
         setSize(1000, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);

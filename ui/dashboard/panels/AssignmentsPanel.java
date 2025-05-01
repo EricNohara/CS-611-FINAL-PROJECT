@@ -25,7 +25,7 @@ import java.util.Date;
 import java.util.List;
 
 // Assignments Tab
-public final class AssignmentsPanel extends JPanel implements Refreshable{
+public final class AssignmentsPanel extends JPanel implements Refreshable {
 
     private final User teacher;
     private final JTabbedPane parentTabs;
@@ -314,7 +314,7 @@ public final class AssignmentsPanel extends JPanel implements Refreshable{
         // Add listeners for course and template selection
         courseComboBox.addActionListener(e1 -> {
             if (useTemplateCheckBox.isSelected()) {
-                updateTemplateDropdown(templateComboBox);
+                updateTemplateDropdown(templateComboBox, courseComboBox);
             }
         });
 
@@ -324,7 +324,7 @@ public final class AssignmentsPanel extends JPanel implements Refreshable{
             templateComboBox.setVisible(useTemplate);
 
             if (useTemplate) {
-                updateTemplateDropdown(templateComboBox);
+                updateTemplateDropdown(templateComboBox, courseComboBox);
             }
         });
 
@@ -840,7 +840,7 @@ public final class AssignmentsPanel extends JPanel implements Refreshable{
 
     private void viewSubmissionsForAssignment() {
         int selectedRow = assignmentTable.getSelectedRow();
-        //System.out.println(selectedRow);
+        // System.out.println(selectedRow);
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this,
                     "Please select an assignment to view submissions",
@@ -855,7 +855,7 @@ public final class AssignmentsPanel extends JPanel implements Refreshable{
         // Get assignment ID and name from the table
         int assignmentId = (int) assignmentTable.getModel().getValueAt(modelRow, 0);
         String assignmentName = (String) assignmentTable.getModel().getValueAt(modelRow, 1);
-        //System.out.println(assignmentName);
+        // System.out.println(assignmentName);
         String courseName = (String) assignmentTable.getModel().getValueAt(modelRow, 2);
 
         // Get assignment from database
@@ -899,7 +899,7 @@ public final class AssignmentsPanel extends JPanel implements Refreshable{
         // Get submissions for this assignment
         SubmissionDAO submissionDAO = SubmissionDAO.getInstance();
         List<Submission> submissions = submissionDAO.readAllCondition("assignment_id", assignmentId);
-        //System.out.println("submission size"+submissions.size());
+        // System.out.println("submission size"+submissions.size());
         // Submissions table
         String[] submissionColumns = { "ID", "Student", "Submitted Date", "Status", "Grade", "Feedback" };
         DefaultTableModel submissionModel = new DefaultTableModel(submissionColumns, 0) {
@@ -1135,7 +1135,6 @@ public final class AssignmentsPanel extends JPanel implements Refreshable{
         });
     }
 
-
     // Helper method to check if a file is a text file
     private boolean isTextFile(File file) {
         // Check file extension first
@@ -1253,29 +1252,57 @@ public final class AssignmentsPanel extends JPanel implements Refreshable{
     }
 
     // Helper method to update the template dropdown based on selected course
-    private void updateTemplateDropdown(JComboBox<AssignmentTemplateItem> templateComboBox) {
+    private void updateTemplateDropdown(JComboBox<AssignmentTemplateItem> templateComboBox,
+            JComboBox<CourseItem> courseDropdown) {
         templateComboBox.removeAllItems();
 
-        // Get the selected course name
-        String selected = (String) courseCombo.getSelectedItem();
-        if (selected == null || "All Courses".equals(selected)) {
-            return; // nothing selected or sentinel value
+        // Get the selected course item
+        CourseItem selectedCourseItem = (CourseItem) courseDropdown.getSelectedItem();
+        if (selectedCourseItem == null) {
+            return;
         }
 
-        // Look-up the Course object
-        Course course = teacherCourses.stream()
-                .filter(c -> c.getName().equals(selected))
-                .findFirst().orElse(null);
-        if (course == null || course.getCourseTemplate() == null)
-            return;
+        // Get the course from the database to ensure we have the most up-to-date data
+        CourseDAO courseDAO = CourseDAO.getInstance();
+        Course course = courseDAO.read(selectedCourseItem.getId());
 
-        CourseTemplate tpl = course.getCourseTemplate();
-        for (AssignmentTemplate at : tpl.getAssignmentTemplates()) {
+        if (course == null) {
+            System.out.println("Course not found: " + selectedCourseItem.getId());
+            return;
+        }
+
+        // If the course template is null but we have a valid template ID, try to load
+        // it
+        if (course.getCourseTemplate() == null && course.getCourseTemplateId() > 0) {
+            CourseTemplateDAO templateDAO = CourseTemplateDAO.getInstance();
+            CourseTemplate template = templateDAO.read(course.getCourseTemplateId());
+            course.setCourseTemplate(template);
+            System.out.println("Loaded course template: " + (template != null ? template.getId() : "null"));
+        }
+
+        // Check if we have a valid course template
+        if (course.getCourseTemplate() == null) {
+            System.out.println("Course has no template: " + course.getName());
+            return;
+        }
+
+        // Get assignment templates from the course template
+        List<AssignmentTemplate> templates = course.getCourseTemplate().getAssignmentTemplates();
+
+        if (templates == null || templates.isEmpty()) {
+            System.out.println(
+                    "No assignment templates found for course template: " + course.getCourseTemplate().getId());
+            return;
+        }
+
+        // Add assignment templates to the dropdown
+        for (AssignmentTemplate at : templates) {
             templateComboBox.addItem(new AssignmentTemplateItem(at));
         }
     }
+
     @Override
     public void refresh() {
-        loadAssignments(null,null);
+        loadAssignments(null, null);
     }
 }
