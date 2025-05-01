@@ -11,6 +11,7 @@ import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.PrintWriter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -96,11 +97,14 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         JButton toggleStatusBtn = new JButton("Toggle Active/Inactive");
         JButton emailBtn = new JButton("Email Student");
         JButton gradesBtn = new JButton("View Grades");
+        JButton exportBtn = new JButton("Export Grades");
+
         actions.add(viewBtn);
         actions.add(removeBtn);
         actions.add(toggleStatusBtn);
         actions.add(emailBtn);
         actions.add(gradesBtn);
+        actions.add(exportBtn);
         add(actions, BorderLayout.SOUTH);
 
         // Listeners
@@ -113,6 +117,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         toggleStatusBtn.addActionListener(e -> toggleStudentStatus());
         emailBtn.addActionListener(e -> emailStudent());
         gradesBtn.addActionListener(e -> viewStudentGrades());
+        exportBtn.addActionListener(e -> exportGrades());
     }
 
     // Helpers
@@ -1188,7 +1193,68 @@ public final class StudentsPanel extends JPanel implements Refreshable {
 
         tabs.addTab(course.getName(), root);
     }
+    private void exportGrades() {
+        if (studentModel.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this,
+                    "There are no grades to export with the current filter.",
+                    "Nothing to Export", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
 
+        JFileChooser fc = new JFileChooser();
+        fc.setDialogTitle("Export Grades");
+        fc.setSelectedFile(new File("grades.csv"));
+        if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION)
+            return;
+
+        File outFile = fc.getSelectedFile();
+
+        UserDAO uDao = UserDAO.getInstance();
+
+        try (PrintWriter pw = new PrintWriter(outFile)) {
+
+            pw.println("Student ID,Student Name,Student Email,Course,CourseId,"
+                    + "Grade");
+
+            for (int r = 0; r < studentModel.getRowCount(); r++) {
+                String studentId = studentModel.getValueAt(r, 0).toString();
+                String studentName = studentModel.getValueAt(r, 1).toString();
+                String studentEmail = studentModel.getValueAt(r, 2).toString();
+                String courseName = studentModel.getValueAt(r, 3).toString();
+                String courseId = studentModel.getValueAt(r, 4).toString();
+                Object gradeObj = studentModel.getValueAt(r, 7);
+                String gradeFormatted;
+
+                try {
+                    double gradeVal = Double.parseDouble(String.valueOf(gradeObj));
+                    gradeFormatted = String.format("%.2f", gradeVal);
+                } catch (Exception e) {
+                    gradeFormatted = ""; // 空字符串表示无效分数
+                }
+
+
+                pw.println(String.join(",",
+                        studentId,
+                        studentName,
+                        studentEmail,
+                        courseName,
+                        courseId,
+                        gradeFormatted
+                        )
+                );
+            }
+
+            JOptionPane.showMessageDialog(this,
+                    "Grades exported successfully to " + outFile.getName(),
+                    "Export Success", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Error exporting grades: " + ex.getMessage(),
+                    "Export Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+  
     @Override
     public void refresh() {
         loadStudentGraderData();
