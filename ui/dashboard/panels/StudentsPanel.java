@@ -70,7 +70,7 @@ public final class StudentsPanel extends JPanel implements Refreshable{
         add(filter, BorderLayout.NORTH);
 
         // Table
-        String[] cols = { "ID", "Name", "Email", "Course", "CourseId","Last Login","Role","Grade" };
+        String[] cols = { "ID", "Name", "Email", "Course", "CourseId","Last Login","Role","Estimated Grade" };
         studentModel = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int r, int c) {
@@ -998,18 +998,18 @@ public final class StudentsPanel extends JPanel implements Refreshable{
 
         // Buttons
         JPanel btns = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton exportBtn = new JButton("Export Grades");
+       // JButton exportBtn = new JButton("Export Grades");
         JButton closeBtn = new JButton("Close");
-        btns.add(exportBtn);
+        //btns.add(exportBtn);
         btns.add(closeBtn);
         root.add(btns, BorderLayout.SOUTH);
 
         closeBtn.addActionListener(e -> dialog.dispose());
-        exportBtn.addActionListener(e -> {
-            JOptionPane.showMessageDialog(dialog,
-                    "Grades exported successfully!",
-                    "Export", JOptionPane.INFORMATION_MESSAGE);
-        });
+//        exportBtn.addActionListener(e -> {
+//            JOptionPane.showMessageDialog(dialog,
+//                    "Grades exported successfully!",
+//                    "Export", JOptionPane.INFORMATION_MESSAGE);
+//        });
 
         dialog.add(root);
         dialog.setVisible(true);
@@ -1025,7 +1025,6 @@ public final class StudentsPanel extends JPanel implements Refreshable{
         List<Assignment> assignments = aDao.readAllCondition("course_id", course.getId());
 
         // Get grade info
-        double earnedSum = 0, maxSum = 0;
         int completed = 0;
 
         String[] cols = { "Assignment", "Type", "Due Date",
@@ -1063,8 +1062,6 @@ public final class StudentsPanel extends JPanel implements Refreshable{
                     gradeStr = String.format("%.0f/%.0f",
                             sub.getPointsEarned(),
                             a.getMaxPoints());
-                    earnedSum += sub.getPointsEarned();
-                    maxSum += a.getMaxPoints();
                     completed++;
                 }
             }
@@ -1078,7 +1075,7 @@ public final class StudentsPanel extends JPanel implements Refreshable{
         }
 
         // Top summary panel
-        double percent = (maxSum > 0) ? 100.0 * earnedSum / maxSum : 0.0;
+        double percent = getStudentGradePercent(studentId,course.getId());
         String letter = getLetterGrade(percent);
 
         JPanel summary = new JPanel(new GridLayout(3, 2, 10, 5));
