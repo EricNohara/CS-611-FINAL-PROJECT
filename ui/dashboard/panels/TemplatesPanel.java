@@ -228,7 +228,7 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
                     // Note: Course template ID will be set after the course template is created
                     // We'll use -1 as a placeholder
                     AssignmentTemplate assignTemplate = new AssignmentTemplate(
-                            -1, weight, type, submissionTypes);
+                            -1, weight / count, type, submissionTypes);
 
                     // Create multiple templates based on count if needed
                     for (int j = 0; j < count; j++) {
