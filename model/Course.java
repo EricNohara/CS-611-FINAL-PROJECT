@@ -7,26 +7,35 @@ public class Course {
     private int courseTemplateId;
     private String name;
     private boolean active;
-    private List<Assignment> assignments = new ArrayList<>();
+    private List<Assignment> assignments;
     private CourseTemplate courseTemplate;
 
     // Constructors
     public Course() {
         this.id = -1;
         this.active = true;
+        this.courseTemplate = null;
+        this.courseTemplateId = -1;
+        this.assignments = new ArrayList<>();
+        this.name = "";
     }
     
     public Course(CourseTemplate courseTemplate, String name) {
         this.id = -1;
         this.courseTemplate = courseTemplate;
-        if (courseTemplate != null) {
-            this.courseTemplateId = courseTemplate.getId();
-        } else {
-            this.courseTemplateId = -1;
-        }
-
+        this.courseTemplateId = courseTemplate != null ? courseTemplate.getId() : -1;
         this.name = name;
         this.active = true;
+        this.assignments = new ArrayList<>();
+    }
+
+    public Course(int id, int courseTemplateId, String name, boolean active, List<Assignment> assignments, CourseTemplate courseTemplate) {
+        this.id = id;
+        this.courseTemplateId = courseTemplateId;
+        this.name = name;
+        this.active = active;
+        this.assignments = assignments;
+        this.courseTemplate = courseTemplate;
     }
     
     // Getters and setters

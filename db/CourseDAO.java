@@ -155,8 +155,10 @@ public class CourseDAO implements CrudDAO<Course> {
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
 
-            stmt.setInt(1, course.getCourseTemplateId());
-            stmt.setString(2, course.getName());
+            if (course.getCourseTemplateId() == -1) stmt.setNull(1, Types.INTEGER);
+            else stmt.setInt(1, course.getCourseTemplateId());
+
+            stmt.setString(2, course.getName() == null ? "" : course.getName());
             stmt.setBoolean(3, course.isActive());
             stmt.setInt(4, course.getId());
 
@@ -194,22 +196,15 @@ public class CourseDAO implements CrudDAO<Course> {
         String name = rs.getString("name");
         boolean active = rs.getBoolean("active");
         
-        Course course = new Course();
-        course.setId(id);
-        course.setName(name);
-        course.setCourseTemplateId(templateId);
-        course.setActive(active);
-        
         // Set course template
         CourseTemplateDAO courseTemplateDAO = CourseTemplateDAO.getInstance();
         CourseTemplate template = courseTemplateDAO.read(templateId);
-        course.setCourseTemplate(template);
         
         // Load assignments for this course
         AssignmentDAO assignmentDAO = AssignmentDAO.getInstance();
-        course.setAssignments(assignmentDAO.readAllCondition("course_id", id));
+        List<Assignment> assignments = assignmentDAO.readAllCondition("course_id", id);
         
-        return course;
+        return new Course(id, templateId, name, active, assignments, template);
     }
     
     // DASHBOARD DATA METHODS
