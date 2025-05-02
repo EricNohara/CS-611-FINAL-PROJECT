@@ -2,6 +2,9 @@ package ui.dashboard.panels;
 
 import db.*;
 import model.*;
+import ui.UIConstants;
+import ui.utils.PaddedCellRenderer;
+import ui.utils.Padding;
 import ui.utils.TemplateItem;
 
 import javax.swing.*;
@@ -88,11 +91,9 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
     private void createNewTemplate() {
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Create New Template",
                 Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setSize(600, 500);
-        dialog.setLocationRelativeTo(this);
 
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Padding.addPanelPaddingDefault(panel);
 
         // Form panel
         JPanel formPanel = new JPanel(new GridBagLayout());
@@ -103,18 +104,19 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
         // Template name
         gbc.gridx = 0;
         gbc.gridy = 0;
-        formPanel.add(new JLabel("Template Name:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Template Name:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
         JTextField templateNameField = new JTextField(30);
         formPanel.add(templateNameField, gbc);
+        Padding.addInputPaddingDefault(templateNameField);
 
         // Assignment templates
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 3;
-        formPanel.add(new JLabel("Assignment Types:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Assignment Types:"), gbc);
 
         // Assignment types table
         String[] assignmentColumns = { "Type", "Weight", "Count", "Submission Types" };
@@ -133,6 +135,10 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
 
         JTable assignmentTable = new JTable(assignmentModel);
         JScrollPane assignmentScrollPane = new JScrollPane(assignmentTable);
+
+        PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
+        PaddedCellRenderer.setDefaultRowHeight(assignmentTable);
+        paddedRenderer.applyCellPadding(assignmentTable);
 
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -267,6 +273,8 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
         });
 
         dialog.add(panel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
     }
 
@@ -307,11 +315,9 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
         // Create edit dialog
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Edit Template",
                 Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setSize(600, 500);
-        dialog.setLocationRelativeTo(this);
 
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Padding.addPanelPaddingDefault(panel);
 
         // Form panel
         JPanel formPanel = new JPanel(new GridBagLayout());
@@ -322,18 +328,19 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
         // Template name
         gbc.gridx = 0;
         gbc.gridy = 0;
-        formPanel.add(new JLabel("Template Name:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Template Name:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
         JTextField templateNameField = new JTextField(selectedTemplate.getName(), 30);
         formPanel.add(templateNameField, gbc);
+        Padding.addInputPaddingDefault(templateNameField);
 
         // Assignment templates table
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 3;
-        formPanel.add(new JLabel("Assignment Types:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Assignment Types:"), gbc);
 
         String[] assignmentColumns = { "Type", "Weight", "Count", "Submission Types" };
         DefaultTableModel assignmentModel = new DefaultTableModel(assignmentColumns, 0);
@@ -364,6 +371,10 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
 
         JTable assignmentTable = new JTable(assignmentModel);
         JScrollPane assignmentScrollPane = new JScrollPane(assignmentTable);
+
+        PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
+        PaddedCellRenderer.setDefaultRowHeight(assignmentTable);
+        paddedRenderer.applyCellPadding(assignmentTable);
 
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -489,6 +500,8 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
         });
 
         dialog.add(panel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
     }
 
@@ -589,8 +602,7 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
         CourseTemplate tpl = dao.readAll().stream()
                 .filter(t -> t.getName().equals(templateName))
                 .findFirst().orElse(null);
-        if (tpl == null)
-            return;
+        if (tpl == null) return;
 
         // --- right panel: header + table ---
         JPanel right = new JPanel(new BorderLayout(5, 5));
@@ -609,6 +621,11 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
         JTable tbl = new JTable(mdl);
         right.add(new JScrollPane(tbl), BorderLayout.CENTER);
 
+        PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
+        PaddedCellRenderer.setDefaultRowHeight(tbl);
+        paddedRenderer.applyCellPadding(tbl);
+
+
         // use the detailed method to fill table + header
         showTemplateDetails(tpl, mdl, header);
 
@@ -618,11 +635,9 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
     private void addAssignmentType(DefaultTableModel model) {
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Add Assignment Type",
                 Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setSize(400, 250);
-        dialog.setLocationRelativeTo(this);
 
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Padding.addPanelPaddingDefault(panel);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -631,39 +646,43 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
         // Type
         gbc.gridx = 0;
         gbc.gridy = 0;
-        panel.add(new JLabel("Type:"), gbc);
+        panel.add(UIConstants.getBoldLabel("Type:"), gbc);
 
         gbc.gridx = 1;
         String[] types = { "HOMEWORK", "QUIZ", "EXAM", "PROJECT" };
         JComboBox<String> typeComboBox = new JComboBox<>(types);
         panel.add(typeComboBox, gbc);
+        Padding.addInputPaddingDefault(typeComboBox);
 
         // Weight
         gbc.gridx = 0;
         gbc.gridy = 1;
-        panel.add(new JLabel("Weight (%):"), gbc);
+        panel.add(UIConstants.getBoldLabel("Weight (%):"), gbc);
 
         gbc.gridx = 1;
         JTextField weightField = new JTextField("10");
         panel.add(weightField, gbc);
+        Padding.addInputPaddingDefault(weightField);
 
         // Count
         gbc.gridx = 0;
         gbc.gridy = 2;
-        panel.add(new JLabel("Count:"), gbc);
+        panel.add(UIConstants.getBoldLabel("Count:"), gbc);
 
         gbc.gridx = 1;
         JTextField countField = new JTextField("1");
         panel.add(countField, gbc);
+        Padding.addInputPaddingDefault(countField);
 
         // Submission types
         gbc.gridx = 0;
         gbc.gridy = 3;
-        panel.add(new JLabel("Submission Types:"), gbc);
+        panel.add(UIConstants.getBoldLabel("Submission Types:"), gbc);
 
         gbc.gridx = 1;
         JTextField submissionTypesField = new JTextField("pdf, docx");
         panel.add(submissionTypesField, gbc);
+        Padding.addInputPaddingDefault(submissionTypesField);
 
         // Buttons
         gbc.gridx = 0;
@@ -707,6 +726,8 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
         });
 
         dialog.add(panel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
     }
 
@@ -722,11 +743,9 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
 
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Edit Assignment Type",
                 Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setSize(400, 250);
-        dialog.setLocationRelativeTo(this);
 
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Padding.addPanelPaddingDefault(panel);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -735,40 +754,44 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
         // Type
         gbc.gridx = 0;
         gbc.gridy = 0;
-        panel.add(new JLabel("Type:"), gbc);
+        panel.add(UIConstants.getBoldLabel("Type:"), gbc);
 
         gbc.gridx = 1;
         String[] types = { "HOMEWORK", "QUIZ", "EXAM", "PROJECT" };
         JComboBox<String> typeComboBox = new JComboBox<>(types);
         typeComboBox.setSelectedItem(model.getValueAt(selectedRow, 0));
         panel.add(typeComboBox, gbc);
+        Padding.addInputPaddingDefault(typeComboBox);
 
         // Weight
         gbc.gridx = 0;
         gbc.gridy = 1;
-        panel.add(new JLabel("Weight (%):"), gbc);
+        panel.add(UIConstants.getBoldLabel("Weight (%):"), gbc);
 
         gbc.gridx = 1;
         JTextField weightField = new JTextField(model.getValueAt(selectedRow, 1).toString());
         panel.add(weightField, gbc);
+        Padding.addInputPaddingDefault(weightField);
 
         // Count
         gbc.gridx = 0;
         gbc.gridy = 2;
-        panel.add(new JLabel("Count:"), gbc);
+        panel.add(UIConstants.getBoldLabel("Count:"), gbc);
 
         gbc.gridx = 1;
         JTextField countField = new JTextField(model.getValueAt(selectedRow, 2).toString());
         panel.add(countField, gbc);
+        Padding.addInputPaddingDefault(countField);
 
         // Submission types
         gbc.gridx = 0;
         gbc.gridy = 3;
-        panel.add(new JLabel("Submission Types:"), gbc);
+        panel.add(UIConstants.getBoldLabel("Submission Types:"), gbc);
 
         gbc.gridx = 1;
         JTextField submissionTypesField = new JTextField(model.getValueAt(selectedRow, 3).toString());
         panel.add(submissionTypesField, gbc);
+        Padding.addInputPaddingDefault(submissionTypesField);
 
         // Buttons
         gbc.gridx = 0;
@@ -816,6 +839,8 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
         });
 
         dialog.add(panel);
+        dialog.setLocationRelativeTo(this);
+        dialog.pack();
         dialog.setVisible(true);
     }
 
