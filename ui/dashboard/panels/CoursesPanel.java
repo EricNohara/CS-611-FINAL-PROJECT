@@ -3,6 +3,7 @@ package ui.dashboard.panels;
 import db.*;
 import model.*;
 import ui.UIConstants;
+import ui.utils.PaddedCellRenderer;
 import ui.utils.Padding;
 import ui.utils.TemplateItem;
 import utils.Hasher; // if used in helper dialogs
@@ -57,6 +58,11 @@ public final class CoursesPanel extends JPanel implements Refreshable{
 
         courseTable = new JTable(courseModel);
         add(new JScrollPane(courseTable), BorderLayout.CENTER);
+
+        PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
+        PaddedCellRenderer.setDefaultRowHeight(courseTable);
+        paddedRenderer.applyCellPadding(courseTable);
+
 
         loadCourseRows(); // fills the table once
 
@@ -532,10 +538,10 @@ public final class CoursesPanel extends JPanel implements Refreshable{
         }
 
         warningMessage.append("\nDeleting this course will:\n");
-        warningMessage.append("• Remove all student enrollments\n");
-        warningMessage.append("• Delete all assignments\n");
+        warningMessage.append("- Remove all student enrollments\n");
+        warningMessage.append("- Delete all assignments\n");
         if (hasSubmissions) {
-            warningMessage.append("• Delete all submissions and grades\n");
+            warningMessage.append("- Delete all submissions and grades\n");
         }
         warningMessage.append("\nThis action cannot be undone.");
 
