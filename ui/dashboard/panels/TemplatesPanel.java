@@ -54,9 +54,7 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
         split.setLeftComponent(new JScrollPane(templateJList));
 
         // right detail panel will be rebuilt in updateTemplateDetails()
-        JPanel placeholder = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        placeholder.add(new JLabel("Select a template to view details"));
-        split.setRightComponent(placeholder);
+        setPlaceholderTemplateDetails(split);
 
         add(split, BorderLayout.CENTER);
 
@@ -65,7 +63,7 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
         /* ----- wire button + list listeners ----- */
         newBtn.addActionListener(e -> createNewTemplate());
         edtBtn.addActionListener(e -> editSelectedTemplate());
-        delBtn.addActionListener(e -> deleteSelectedTemplate());
+        delBtn.addActionListener(e -> deleteSelectedTemplate(split));
 
         templateJList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && templateJList.getSelectedIndex() != -1)
@@ -74,6 +72,11 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
     }
 
     // Helpers
+    private void setPlaceholderTemplateDetails(JSplitPane split) {
+        JPanel placeholder = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        placeholder.add(new JLabel("Select a template to view details"));
+        split.setRightComponent(placeholder);
+    }
 
     // table/list reload helpers
     private void loadTemplateNames() {
@@ -115,13 +118,18 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
 
         // Assignment types table
         String[] assignmentColumns = { "Type", "Weight", "Count", "Submission Types" };
-        DefaultTableModel assignmentModel = new DefaultTableModel(assignmentColumns, 0);
+        DefaultTableModel assignmentModel = new DefaultTableModel(assignmentColumns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return column != 0; // Make "Type" column (index 0) non-editable
+            }
+        };
 
         // Add default rows
         assignmentModel.addRow(new Object[] { "HOMEWORK", "40", "10", "pdf, docx, java" });
-        assignmentModel.addRow(new Object[] { "QUIZ", "20", "5", "online" });
+        assignmentModel.addRow(new Object[] { "QUIZ", "20", "5", "txt, pdf" });
         assignmentModel.addRow(new Object[] { "PROJECT", "20", "1", "zip, jar" });
-        assignmentModel.addRow(new Object[] { "EXAM", "20", "1", "online" });
+        assignmentModel.addRow(new Object[] { "EXAM", "20", "1", "py, c" });
 
         JTable assignmentTable = new JTable(assignmentModel);
         JScrollPane assignmentScrollPane = new JScrollPane(assignmentTable);
@@ -484,7 +492,7 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
         dialog.setVisible(true);
     }
 
-    private void deleteSelectedTemplate() {
+    private void deleteSelectedTemplate(JSplitPane split) {
         if (!(teacher instanceof Teacher)) {
             JOptionPane.showMessageDialog(this,
                     "You do not have permission to delete template.",
@@ -542,6 +550,8 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
                     "Template deleted successfully!",
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE);
+
+            setPlaceholderTemplateDetails(split);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this,
                     "Error deleting template: " + ex.getMessage(),

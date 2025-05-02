@@ -53,14 +53,14 @@ public class DBSetup {
                                                         "FOREIGN KEY (grader_id) REFERENCES users(id) ON DELETE SET NULL," +
                                                         "FOREIGN KEY (assignment_id) REFERENCES assignments(id) ON DELETE CASCADE);";
 
-    public static final String createUserSubmissionsQuery = "CREATE TABLE IF NOT EXISTS user_submissions (" +
+    private static final String createUserSubmissionsQuery = "CREATE TABLE IF NOT EXISTS user_submissions (" +
                                                             "user_id INTEGER," +
                                                             "submission_id INTEGER," +
                                                             "PRIMARY KEY (user_id, submission_id)," +
                                                             "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE," +
                                                             "FOREIGN KEY (submission_id) REFERENCES submissions(id) ON DELETE CASCADE);";
 
-    public static final String createAssignmentsQuery = "CREATE TABLE IF NOT EXISTS assignments (" +
+    private static final String createAssignmentsQuery = "CREATE TABLE IF NOT EXISTS assignments (" +
                                                         "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                                                         "name TEXT NOT NULL," +
                                                         "due_date TIMESTAMP NOT NULL," +
@@ -72,6 +72,16 @@ public class DBSetup {
                                                         "submission_types TEXT," +
                                                         "FOREIGN KEY (assignment_template_id) REFERENCES assignment_templates(id) ON DELETE SET NULL," +
                                                         "FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE);";
+
+    private static final String clearAllTablesQuery = "DELETE FROM user_submissions;" +
+                                                     "DELETE FROM user_courses;" +
+                                                     "DELETE FROM users;" +
+                                                     "DELETE FROM course_templates;" +
+                                                     "DELETE FROM assignment_templates;" +
+                                                     "DELETE FROM courses;" +
+                                                     "DELETE FROM assignments;" +
+                                                     "DELETE FROM submissions;" +
+                                                     "DELETE FROM sqlite_sequence;";
 
     private static final String[] createTableQueries = {
         createUsersQuery, 
@@ -89,7 +99,16 @@ public class DBSetup {
             Statement stmt = connection.createStatement()) {
             for (String query : createTableQueries) stmt.execute(query);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error creating all tables: " + e.getMessage());
+        }
+    }
+
+    public static void clearAllTables() {
+        try (Connection connection = DBConnection.getConnection();
+            Statement stmt = connection.createStatement()) {
+            stmt.execute(clearAllTablesQuery);
+        } catch (SQLException e) {
+            System.err.println("Error clearing all tables: " + e.getMessage());
         }
     }
 }

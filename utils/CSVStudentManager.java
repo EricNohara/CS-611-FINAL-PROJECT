@@ -150,10 +150,10 @@ public class CSVStudentManager {
         return userDAO.readByEmail(row.get(emailIdx));
     }
 
-    public static void main(String[] args) {
-        File testFile = new File("test.csv");
-        int courseId = 2;
+    // public static void main(String[] args) {
+    //     File testFile = new File("test.csv");
+    //     int courseId = 2;
 
-        CSVStudentManager.handleStudentCSVSubmission(testFile, courseId);
-    }
+    //     CSVStudentManager.handleStudentCSVSubmission(testFile, courseId);
+    // }
 }
