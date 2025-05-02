@@ -11,6 +11,7 @@ import model.User;
 import ui.dashboard.TeacherDashboard;
 import ui.dashboard.AdminDashboard;
 import ui.dashboard.GraderDashboard;
+import ui.dashboard.StudentDashboard;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -321,7 +322,6 @@ public class LoginFrame extends JFrame {
     private void openUserDashboard(User user) {
         // Open appropriate window based on user role
         switch (user.getRole()) {
-            /* 
             case STUDENT:
                 // Open student dashboard
                 SwingUtilities.invokeLater(() -> {
@@ -329,7 +329,6 @@ public class LoginFrame extends JFrame {
                     dashboard.setVisible(true);
                 });
                 break;
-               */
             case GRADER:
                 // Open grader dashboard
                 SwingUtilities.invokeLater(() -> {
