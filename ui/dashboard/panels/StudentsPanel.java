@@ -388,7 +388,8 @@ public final class StudentsPanel extends JPanel implements Refreshable {
                 } else {
                     String email = newEmailField.getText().trim();
                     String name = nameField.getText().trim();
-                    String password = new String(passwordField.getPassword());
+                    String rawPassword = new String(passwordField.getPassword());
+                    String hashedPassword = Hasher.hashPassword(rawPassword);
                     if (email.isEmpty()) {
                         JOptionPane.showMessageDialog(dialog,
                                 "Email is required",
@@ -396,7 +397,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
                         return;
                     }
 
-                    if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
+                    if (name.isEmpty() || email.isEmpty() || rawPassword.isEmpty()) {
                         JOptionPane.showMessageDialog(dialog, "All fields are required", "Validation Error",
                                 JOptionPane.ERROR_MESSAGE);
                         return;
@@ -410,7 +411,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
                         return;
                     }
 
-                    Student newStudent = new Student(name, email, password);
+                    Student newStudent = new Student(name, email, hashedPassword);
                     uDao.create(newStudent);
 
                     ucDao.create(new UserCourse(newStudent.getId(), course.getId(), UserCourse.Status.ACTIVE,
