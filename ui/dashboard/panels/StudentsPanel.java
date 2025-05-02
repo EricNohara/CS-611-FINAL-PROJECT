@@ -5,10 +5,16 @@ import model.*;
 import utils.CSVStudentManager;
 import utils.Hasher;
 import ui.utils.StudentGradeResult;
+import ui.UIConstants;
+import ui.utils.PaddedCellRenderer;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
@@ -92,6 +98,12 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         studentTable = new JTable(studentModel);
         add(new JScrollPane(studentTable), BorderLayout.CENTER);
 
+        TableCellRenderer paddedRenderer = new PaddedCellRenderer(UIConstants.TABLE_CELL_PAD);
+        PaddedCellRenderer.setDefaultRowHeight(studentTable);
+        for (int i = 0; i < studentTable.getColumnCount(); i++) {
+            studentTable.getColumnModel().getColumn(i).setCellRenderer(paddedRenderer);
+        }
+
         // Buttons
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton viewBtn = new JButton("View Profile");
@@ -121,8 +133,6 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         gradesBtn.addActionListener(e -> viewStudentGrades());
         exportBtn.addActionListener(e -> exportGrades());
     }
-
-    // Helpers
 
     // Helper method to load students data
     private void loadStudentGraderData(DefaultTableModel model, String courseFilter, String statusFilter,
@@ -730,7 +740,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
                         manager.getNumSkippedLines()),
                 "Import Summary", JOptionPane.INFORMATION_MESSAGE);
 
-        loadStudentGraderData();
+        refresh();
     }
 
     private void viewStudentProfile() {
@@ -860,13 +870,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         // Add button actions
         cancelButton.addActionListener(e -> dialog.dispose());
         String selectedCourse = (String) courseComboBox.getSelectedItem();
-        // Course selectedCourse = null;
-        // for (Course c : courses) {
-        // if (c.getName().equals(courseName)) {
-        // selectedCourse = c;
-        // break;
-        // }
-        // }
+
         if (selectedCourse == null) {
             JOptionPane.showMessageDialog(dialog,
                     "Please choose a valid course.",
@@ -891,14 +895,14 @@ public final class StudentsPanel extends JPanel implements Refreshable {
             }
             UserCourseDAO enrollmentDAO = UserCourseDAO.getInstance();
             enrollmentDAO.delete(userId, courseId);
-            // System.out.println("Removed " + userCourseId + " from " + selectedCourse +
-            // ".");
             JOptionPane.showMessageDialog(dialog,
                     "Student removed from course successfully!",
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE);
             dialog.dispose();
         });
+
+        refresh();
 
         dialog.add(panel);
         dialog.setVisible(true);
