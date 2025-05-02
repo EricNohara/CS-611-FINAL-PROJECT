@@ -29,6 +29,12 @@ public class GradingSystemApp {
                 "First Run Setup", 
                 JOptionPane.INFORMATION_MESSAGE);
         }
+
+        try {
+            UIManager.setLookAndFeel(new javax.swing.plaf.nimbus.NimbusLookAndFeel());
+        } catch (Exception e) {
+            e.printStackTrace(); // Fall back to default if Nimbus fails
+        }
         
         // Start the login window
         SwingUtilities.invokeLater(() -> {
