@@ -32,7 +32,7 @@ public class LoginFrame extends JFrame {
         
         // Set up the frame
         setTitle("Login");
-        setSize(800, 450);
+        setSize(650, 350);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         
