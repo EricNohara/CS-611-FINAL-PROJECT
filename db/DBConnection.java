@@ -10,6 +10,8 @@ public class DBConnection {
     private DBConnection() {}
 
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(DATABASE_URL);
+        Connection conn = DriverManager.getConnection(DATABASE_URL);
+        conn.createStatement().execute("PRAGMA foreign_keys = ON;");
+        return conn;
     }
 }
