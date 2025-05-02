@@ -2,10 +2,12 @@ package ui.dashboard.panels;
 
 import db.*;
 import model.*;
+import utils.CSVStudentManager;
 import utils.Hasher;
 import ui.utils.StudentGradeResult;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.BufferedReader;
@@ -685,6 +687,10 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         // Choose csv file
         JFileChooser fc = new JFileChooser();
         fc.setDialogTitle("Import Students");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("CSV Files", "csv");
+        fc.setFileFilter(filter);
+        fc.setAcceptAllFileFilterUsed(false);
+
         if (fc.showOpenDialog(this) != JFileChooser.APPROVE_OPTION)
             return;
         File csvFile = fc.getSelectedFile();
@@ -704,74 +710,27 @@ public final class StudentsPanel extends JPanel implements Refreshable {
                 "Choose Course", JOptionPane.QUESTION_MESSAGE,
                 null, courses.toArray(), courses.get(0));
 
-        if (target == null)
-            return; // cancelled
+        if (target == null) return; // cancelled
 
-        // read and process csv
-        int enrolled = 0;
-        int alreadyIn = 0;
-        int notFound = 0;
-        int badLines = 0;
+        CSVStudentManager manager = new CSVStudentManager();
+        manager.handleStudentCSVSubmission(csvFile, target.getId());
 
-        UserDAO uDao = UserDAO.getInstance();
-        UserCourseDAO ucDao = UserCourseDAO.getInstance();
+        JOptionPane.showMessageDialog(this,
+                String.format("Import finished from %s\n"
+                        + "Students enrolled    : %d\n"
+                        + "Already enrolled     : %d\n"
+                        + "Created and enrolled      : %d\n"
+                        + "Students removed     : %d\n"
+                        + "Bad / skipped lines  : %d",
+                        csvFile.getName(), 
+                        manager.getNumEnrolled(), 
+                        manager.getNumAlreadyEnrolled(), 
+                        manager.getNumCreatedAndEnrolled(), 
+                        manager.getNumRemoved(),
+                        manager.getNumSkippedLines()),
+                "Import Summary", JOptionPane.INFORMATION_MESSAGE);
 
-        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
-
-            String line;
-            boolean header = true;
-            while ((line = br.readLine()) != null) {
-
-                if (header && line.toLowerCase().startsWith("name")) {
-                    header = false;
-                    continue;
-                }
-                header = false;
-
-                String[] parts = line.split(",", -1);
-                if (parts.length < 2) {
-                    badLines++;
-                    continue;
-                }
-
-                String email = parts[1].trim();
-                if (email.isEmpty()) {
-                    badLines++;
-                    continue;
-                }
-
-                User student = uDao.readByEmail(email);
-                if (student == null || student.getRole() != User.Role.STUDENT) {
-                    notFound++; // skip – account doesn’t exist
-                    continue;
-                }
-
-                if (ucDao.read(student.getId(), target.getId()) != null) {
-                    alreadyIn++; // skip duplicates
-                    continue;
-                }
-
-                ucDao.create(new UserCourse(student.getId(), target.getId(),
-                        UserCourse.Status.ACTIVE, User.Role.STUDENT));
-                enrolled++;
-            }
-
-            JOptionPane.showMessageDialog(this,
-                    String.format("Import finished from %s\n"
-                            + "Students enrolled    : %d\n"
-                            + "Already enrolled     : %d\n"
-                            + "No such account      : %d\n"
-                            + "Bad / skipped lines  : %d",
-                            csvFile.getName(), enrolled, alreadyIn, notFound, badLines),
-                    "Import Summary", JOptionPane.INFORMATION_MESSAGE);
-
-            loadStudentGraderData();
-
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this,
-                    "Error importing students: " + ex.getMessage(),
-                    "Import Failed", JOptionPane.ERROR_MESSAGE);
-        }
+        loadStudentGraderData();
     }
 
     private void viewStudentProfile() {
