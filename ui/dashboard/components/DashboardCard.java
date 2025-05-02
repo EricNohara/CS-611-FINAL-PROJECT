@@ -1,6 +1,9 @@
 package ui.dashboard.components;
 
 import javax.swing.*;
+
+import ui.UIConstants;
+
 import java.awt.*;
 
 // Reusable statistic card (title, big value, short description) used on the Overview tab.
@@ -14,16 +17,16 @@ public final class DashboardCard extends JPanel {
                 BorderFactory.createEmptyBorder(10, 10, 10, 10)));
 
         JLabel titleLbl = new JLabel(title);
-        titleLbl.setFont(new Font("Arial", Font.BOLD, 16));
+        titleLbl.setFont(UIConstants.DEFAULT_FONT_BOLD);
 
         JLabel valueLbl = new JLabel(value, SwingConstants.CENTER);
-        valueLbl.setFont(new Font("Arial", Font.BOLD, 36));
+        valueLbl.setFont(UIConstants.LARGE_FONT_BOLD);
 
         JLabel descLbl  = new JLabel(description);
-        descLbl.setFont(new Font("Arial", Font.PLAIN, 12));
+        descLbl.setFont(UIConstants.SMALL_FONT_ITALIC);
 
-        add(titleLbl , BorderLayout.NORTH);
-        add(valueLbl , BorderLayout.CENTER);
-        add(descLbl  , BorderLayout.SOUTH);
+        add(titleLbl, BorderLayout.NORTH);
+        add(valueLbl, BorderLayout.CENTER);
+        add(descLbl, BorderLayout.SOUTH);
     }
 }

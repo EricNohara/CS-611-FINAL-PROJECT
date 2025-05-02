@@ -12,7 +12,9 @@ import ui.dashboard.panels.OverviewPanel;
 import ui.dashboard.panels.StudentsPanel;
 import ui.dashboard.panels.CoursesPanel;
 import ui.dashboard.panels.TemplatesPanel;
+import ui.utils.Padding;
 import ui.LoginFrame;
+import ui.UIConstants;
 import ui.dashboard.panels.AssignmentsPanel;
 import ui.dashboard.panels.GradingPanel;
 import ui.dashboard.panels.Refreshable;
@@ -27,26 +29,22 @@ public class TeacherDashboard extends JFrame {
         this.teacher = teacher;
 
         setTitle("Teacher Dashboard - " + teacher.getName());
-        setSize(1000, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         // Create main panel
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Padding.addPanelPaddingDefault(mainPanel);
 
         // Create header panel with welcome message and logout button
         JPanel headerPanel = new JPanel(new BorderLayout());
         JLabel welcomeLabel = new JLabel("Welcome, " + teacher.getName() + "!");
-        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        welcomeLabel.setFont(UIConstants.LARGE_FONT_BOLD);
         headerPanel.add(welcomeLabel, BorderLayout.WEST);
 
         //refresh
         JButton refreshButton = new JButton("Refresh");
         refreshButton.addActionListener(e -> refresh());
-
-
-
 
         JButton logoutButton = new JButton("Logout");
 
@@ -97,6 +95,9 @@ public class TeacherDashboard extends JFrame {
 
         // Add main panel to frame
         add(mainPanel);
+
+        pack();
+        setLocationRelativeTo(null);
     }
 
     private void logout() {
