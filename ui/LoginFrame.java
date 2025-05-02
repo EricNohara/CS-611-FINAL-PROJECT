@@ -9,7 +9,7 @@ import model.Student;
 import model.Teacher;
 import model.User;
 import ui.dashboard.TeacherDashboard;
-import ui.utils.InputPadding;
+import ui.utils.Padding;
 import ui.dashboard.AdminDashboard;
 import ui.dashboard.GraderDashboard;
 import ui.dashboard.StudentDashboard;
@@ -48,12 +48,12 @@ public class LoginFrame extends JFrame {
         signUpButton = new JButton("Sign Up");
 
         // Set the padding for inputs
-        InputPadding.addInputPaddingDefault(emailField);
-        InputPadding.addInputPaddingDefault(passwordField);
+        Padding.addInputPaddingDefault(emailField);
+        Padding.addInputPaddingDefault(passwordField);
         
-        // Set up layout
+        // Set up layout with padding
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // top, left, bottom, right
+        Padding.addPanelPaddingDefault(panel);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
@@ -172,7 +172,7 @@ public class LoginFrame extends JFrame {
         signUpDialog.setLocationRelativeTo(this);
         
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // top, left, bottom, right
+        Padding.addPanelPaddingDefault(panel);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -238,11 +238,11 @@ public class LoginFrame extends JFrame {
         buttonPanel.add(cancelButton);
         panel.add(buttonPanel, gbc);
 
-        InputPadding.addInputPaddingDefault(nameField);
-        InputPadding.addInputPaddingDefault(newEmailField);
-        InputPadding.addInputPaddingDefault(newPasswordField);
-        InputPadding.addInputPaddingDefault(confirmPasswordField);
-        InputPadding.addInputPaddingDefault(roleComboBox);
+        Padding.addInputPaddingDefault(nameField);
+        Padding.addInputPaddingDefault(newEmailField);
+        Padding.addInputPaddingDefault(newPasswordField);
+        Padding.addInputPaddingDefault(confirmPasswordField);
+        Padding.addInputPaddingDefault(roleComboBox);
         
         // Create button action
         createButton.addActionListener(new ActionListener() {
