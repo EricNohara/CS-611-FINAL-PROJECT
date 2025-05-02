@@ -17,7 +17,7 @@ public class AssignmentDAO implements CrudDAO<Assignment> {
     // ABSTRACT CRUD OPERATIONS IMPLEMENTATIONS
     @Override
     public void create(Assignment assignment) {
-        String query = "INSERT INTO assignments (name, due_date, max_points, course_id, weight, type,submission_types) VALUES (?, ?, ?, ?,?,?,?)";
+        String query = "INSERT INTO assignments (name, due_date, max_points, course_id, weight, type,submission_types) VALUES (?,?,?,?,?,?,?)";
 
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {

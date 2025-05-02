@@ -24,7 +24,9 @@ public class CourseDAO implements CrudDAO<Course> {
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 
-            stmt.setInt(1, course.getCourseTemplateId());
+            if (course.getCourseTemplateId() == -1) stmt.setNull(1, Types.INTEGER);
+            else stmt.setInt(1, course.getCourseTemplateId());
+
             stmt.setString(2, course.getName());
             stmt.setBoolean(3, course.isActive()); // Add active status
 

@@ -24,11 +24,10 @@ public class SubmissionDAO implements CrudDAO<Submission> {
 
             try (PreparedStatement stmt = connection.prepareStatement(submissionQuery, Statement.RETURN_GENERATED_KEYS)) {
                 stmt.setInt(1, submission.getAssignmentId());
-                if (submission.getGraderId() <= 0) {
-                    stmt.setNull(2, Types.INTEGER);
-                } else {
-                    stmt.setInt(2, submission.getGraderId());
-                }
+
+                if (submission.getGraderId() == -1) stmt.setNull(2, Types.INTEGER);
+                else stmt.setInt(2, submission.getGraderId());
+                
                 stmt.setString(3, submission.getFilepath());
                 stmt.setTimestamp(4, submission.getSubmittedAt());
                 stmt.setDouble(5, submission.getPointsEarned());
