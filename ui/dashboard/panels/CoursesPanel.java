@@ -2,10 +2,13 @@ package ui.dashboard.panels;
 
 import db.*;
 import model.*;
+import ui.UIConstants;
+import ui.utils.Padding;
 import ui.utils.TemplateItem;
 import utils.Hasher; // if used in helper dialogs
 import utils.SubmissionFileManager; // if used later
 
+import javax.naming.ldap.UnsolicitedNotification;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
@@ -16,7 +19,6 @@ import java.util.List;
 
 // Courses tab
 public final class CoursesPanel extends JPanel implements Refreshable{
-
     private final User teacher;
     private final JTabbedPane parentTabs;
 
@@ -34,7 +36,6 @@ public final class CoursesPanel extends JPanel implements Refreshable{
 
     /* ====== UI construction ====== */
     private void buildUI() {
-
         // ---------- top button row ----------
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton newBtn = new JButton("New Course");
@@ -87,11 +88,9 @@ public final class CoursesPanel extends JPanel implements Refreshable{
     private void createNewCourse() {
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Create New Course",
                 Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setSize(500, 400);
-        dialog.setLocationRelativeTo(this);
 
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Padding.addPanelPaddingDefault(panel);
 
         // Form panel
         JPanel formPanel = new JPanel(new GridBagLayout());
@@ -102,18 +101,19 @@ public final class CoursesPanel extends JPanel implements Refreshable{
         // Course name
         gbc.gridx = 0;
         gbc.gridy = 0;
-        formPanel.add(new JLabel("Course Name:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Course Name:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
         JTextField courseNameField = new JTextField(30);
         formPanel.add(courseNameField, gbc);
+        Padding.addInputPaddingDefault(courseNameField);
 
         // Template selection
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Course Template:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Course Template:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
@@ -132,12 +132,13 @@ public final class CoursesPanel extends JPanel implements Refreshable{
 
         JComboBox<TemplateItem> templateComboBox = new JComboBox<>(templateModel);
         formPanel.add(templateComboBox, gbc);
+        Padding.addInputPaddingDefault(templateComboBox);
 
         // Active checkbox
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Active:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Active:"), gbc);
 
         gbc.gridx = 1;
         JCheckBox activeCheckBox = new JCheckBox();
@@ -148,7 +149,7 @@ public final class CoursesPanel extends JPanel implements Refreshable{
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Description:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Description:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 3;
@@ -159,8 +160,10 @@ public final class CoursesPanel extends JPanel implements Refreshable{
         JTextArea descriptionArea = new JTextArea(5, 30);
         descriptionArea.setLineWrap(true);
         descriptionArea.setWrapStyleWord(true);
+        descriptionArea.setFont(UIConstants.DEFAULT_FONT); // assuming you have one
         JScrollPane descScrollPane = new JScrollPane(descriptionArea);
         formPanel.add(descScrollPane, gbc);
+        Padding.addInputPaddingDefault(descriptionArea);
 
         panel.add(formPanel, BorderLayout.CENTER);
 
@@ -236,6 +239,8 @@ public final class CoursesPanel extends JPanel implements Refreshable{
         });
 
         dialog.add(panel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
     }
 
@@ -282,11 +287,9 @@ public final class CoursesPanel extends JPanel implements Refreshable{
         // Create edit dialog
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Edit Course",
                 Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setSize(500, 400);
-        dialog.setLocationRelativeTo(this);
 
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Padding.addPanelPaddingDefault(panel);
 
         // Form panel
         JPanel formPanel = new JPanel(new GridBagLayout());
@@ -297,7 +300,7 @@ public final class CoursesPanel extends JPanel implements Refreshable{
         // Course ID field (display only)
         gbc.gridx = 0;
         gbc.gridy = 0;
-        formPanel.add(new JLabel("Course ID:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Course ID:"), gbc);
 
         gbc.gridx = 1;
         JLabel idLabel = new JLabel(String.valueOf(course.getId()));
@@ -306,16 +309,17 @@ public final class CoursesPanel extends JPanel implements Refreshable{
         // Course name field
         gbc.gridx = 0;
         gbc.gridy = 1;
-        formPanel.add(new JLabel("Course Name:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Course Name:"), gbc);
 
         gbc.gridx = 1;
         JTextField nameField = new JTextField(course.getName(), 30);
         formPanel.add(nameField, gbc);
+        Padding.addInputPaddingDefault(nameField);
 
         // Template selection
         gbc.gridx = 0;
         gbc.gridy = 2;
-        formPanel.add(new JLabel("Course Template:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Course Templates:"), gbc);
 
         gbc.gridx = 1;
 
@@ -341,13 +345,15 @@ public final class CoursesPanel extends JPanel implements Refreshable{
         }
 
         JComboBox<TemplateItem> templateComboBox = new JComboBox<>(templateModel);
+        Padding.addInputPaddingDefault(templateComboBox);
         templateComboBox.setSelectedIndex(selectedIndex);
         formPanel.add(templateComboBox, gbc);
 
         // Active checkbox
         gbc.gridx = 0;
         gbc.gridy = 3;
-        formPanel.add(new JLabel("Active:"), gbc);
+        
+        formPanel.add(UIConstants.getBoldLabel("Active:"), gbc);
 
         gbc.gridx = 1;
         JCheckBox activeCheckBox = new JCheckBox();
@@ -357,7 +363,7 @@ public final class CoursesPanel extends JPanel implements Refreshable{
         // Description (optional in this implementation)
         gbc.gridx = 0;
         gbc.gridy = 4;
-        formPanel.add(new JLabel("Description:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Description:"), gbc);
 
         gbc.gridx = 1;
         gbc.fill = GridBagConstraints.BOTH;
@@ -366,6 +372,8 @@ public final class CoursesPanel extends JPanel implements Refreshable{
         JTextArea descriptionArea = new JTextArea(5, 30);
         descriptionArea.setLineWrap(true);
         descriptionArea.setWrapStyleWord(true);
+        descriptionArea.setFont(UIConstants.DEFAULT_FONT);
+        Padding.addInputPaddingDefault(descriptionArea);
         // If there's a description field in Course class, set the text here
         JScrollPane descScrollPane = new JScrollPane(descriptionArea);
         formPanel.add(descScrollPane, gbc);
@@ -436,6 +444,8 @@ public final class CoursesPanel extends JPanel implements Refreshable{
         });
 
         dialog.add(panel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
     }
 

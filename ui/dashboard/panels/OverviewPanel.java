@@ -17,6 +17,7 @@ public final class OverviewPanel extends JPanel implements Refreshable{
         this.teacher = teacher;
         buildUI();
     }
+    
     private void buildUI() {
         removeAll();
         setLayout(new BorderLayout(10, 10));
@@ -108,6 +109,7 @@ public final class OverviewPanel extends JPanel implements Refreshable{
         revalidate();
         repaint();
     }
+
     @Override
     public void refresh() {
         buildUI();
