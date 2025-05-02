@@ -16,14 +16,6 @@ import ui.dashboard.StudentDashboard;
 import java.awt.*;
 import java.awt.event.*;
 
-import model.Admin;
-import model.Assignment;
-import model.Course;
-import model.CourseTemplate;
-import model.Grader;
-import model.Student;
-import model.Teacher;
-import model.User;
 import utils.Hasher;
 
 public class LoginFrame extends JFrame {
@@ -40,7 +32,7 @@ public class LoginFrame extends JFrame {
         
         // Set up the frame
         setTitle("Login");
-        setSize(350, 200);
+        setSize(800, 450);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         
@@ -54,11 +46,30 @@ public class LoginFrame extends JFrame {
         loginButton = new JButton("Login");
         cancelButton = new JButton("Cancel");
         signUpButton = new JButton("Sign Up");
+
+        // Set the font for each individual component
+        emailLabel.setFont(new Font("SansSerif", Font.PLAIN, UIConstants.FONT_SIZE));
+        passwordLabel.setFont(new Font("SansSerif", Font.PLAIN, UIConstants.FONT_SIZE));
+        emailField.setFont(new Font("SansSerif", Font.PLAIN, UIConstants.FONT_SIZE));
+        passwordField.setFont(new Font("SansSerif", Font.PLAIN, UIConstants.FONT_SIZE));
+        loginButton.setFont(new Font("SansSerif", Font.PLAIN, UIConstants.FONT_SIZE));
+        cancelButton.setFont(new Font("SansSerif", Font.PLAIN, UIConstants.FONT_SIZE));
+        signUpButton.setFont(new Font("SansSerif", Font.PLAIN, UIConstants.FONT_SIZE));
+
+        emailField.setBorder(BorderFactory.createCompoundBorder(
+            emailField.getBorder(),                         // keep existing border
+            BorderFactory.createEmptyBorder(UIConstants.TXT_INPUT_PAD_Y, UIConstants.TXT_INPUT_PAD_X, UIConstants.TXT_INPUT_PAD_Y, UIConstants.TXT_INPUT_PAD_X)   // top, left, bottom, right padding
+        ));
+
+        passwordField.setBorder(BorderFactory.createCompoundBorder(
+            passwordField.getBorder(),
+            BorderFactory.createEmptyBorder(UIConstants.TXT_INPUT_PAD_Y, UIConstants.TXT_INPUT_PAD_X, UIConstants.TXT_INPUT_PAD_Y, UIConstants.TXT_INPUT_PAD_X)
+        ));
         
         // Set up layout
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(10, 10, 10, 10);
         
         // Email row
         gbc.gridx = 0;
@@ -129,6 +140,14 @@ public class LoginFrame extends JFrame {
         
         // Initialize database tables if needed
         DBSetup.createTables();
+    }
+
+    private void setUIFont(Font font) {
+        UIManager.put("Label.font", font);
+        UIManager.put("Button.font", font);
+        UIManager.put("TextField.font", font);
+        UIManager.put("PasswordField.font", font);
+        UIManager.put("ComboBox.font", font);
     }
     
     private void performLogin() {
