@@ -19,7 +19,7 @@ public class CSVStudentManager {
     private static int nameIdx = 0;
     private static int emailIdx = 1;
     private static int roleIdx = 2;
-    private static String defaultPassword = "default";
+    public static String defaultPassword = "default";
     private static String defaultPasswordHash = Hasher.hashPassword(defaultPassword);
 
     // instance vars

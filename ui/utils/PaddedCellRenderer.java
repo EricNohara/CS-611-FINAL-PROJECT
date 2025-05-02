@@ -9,10 +9,9 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class PaddedCellRenderer extends DefaultTableCellRenderer {
-    private final int padding;
+    private static final int padding = UIConstants.TABLE_CELL_PAD;
 
-    public PaddedCellRenderer(int padding) {
-        this.padding = padding;
+    public PaddedCellRenderer() {
         setOpaque(true); // Required for background color to show
         setVerticalAlignment(SwingConstants.CENTER); // Vertically center the text
     }
@@ -29,5 +28,11 @@ public class PaddedCellRenderer extends DefaultTableCellRenderer {
 
     public static void setDefaultRowHeight (JTable table) {
         table.setRowHeight(table.getRowHeight() + 2 * UIConstants.TABLE_CELL_PAD);
+    }
+
+    public void applyCellPadding(JTable table) {
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(this);
+        }
     }
 }

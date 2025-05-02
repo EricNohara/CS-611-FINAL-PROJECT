@@ -7,6 +7,7 @@ import utils.Hasher;
 import ui.utils.StudentGradeResult;
 import ui.UIConstants;
 import ui.utils.PaddedCellRenderer;
+import ui.utils.Padding;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -98,11 +99,9 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         studentTable = new JTable(studentModel);
         add(new JScrollPane(studentTable), BorderLayout.CENTER);
 
-        TableCellRenderer paddedRenderer = new PaddedCellRenderer(UIConstants.TABLE_CELL_PAD);
+        PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
         PaddedCellRenderer.setDefaultRowHeight(studentTable);
-        for (int i = 0; i < studentTable.getColumnCount(); i++) {
-            studentTable.getColumnModel().getColumn(i).setCellRenderer(paddedRenderer);
-        }
+        paddedRenderer.applyCellPadding(studentTable);
 
         // Buttons
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -207,11 +206,9 @@ public final class StudentsPanel extends JPanel implements Refreshable {
     private void addStudent() {
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Add Student to Course",
                 Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setSize(450, 300);
-        dialog.setLocationRelativeTo(this);
 
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Padding.addPanelPaddingDefault(panel);
 
         // Form panel
         JPanel formPanel = new JPanel(new GridBagLayout());
@@ -223,7 +220,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Course:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Course:"), gbc);
 
         CourseDAO courseDAO = CourseDAO.getInstance();
         List<Course> teacherCourses = courseDAO.getCoursesForTeacher(teacher.getId());
@@ -254,6 +251,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         gbc.gridx = 1;
         gbc.gridy = 0;
         formPanel.add(courseComboBox, gbc);
+        Padding.addInputPaddingDefault(courseComboBox);
 
         // Student selection method
         gbc.gridx = 0;
@@ -282,11 +280,12 @@ public final class StudentsPanel extends JPanel implements Refreshable {
 
         gbc2.gridx = 0;
         gbc2.gridy = 0;
-        existingPanel.add(new JLabel("Email:"), gbc2);
+        existingPanel.add(UIConstants.getBoldLabel("Email:"), gbc2);
 
         gbc2.gridx = 1;
         JTextField emailField = new JTextField(20);
         existingPanel.add(emailField, gbc2);
+        Padding.addInputPaddingDefault(emailField);
 
         // New student panel
         GridBagConstraints gbc3 = new GridBagConstraints();
@@ -295,27 +294,21 @@ public final class StudentsPanel extends JPanel implements Refreshable {
 
         gbc3.gridx = 0;
         gbc3.gridy = 0;
-        newPanel.add(new JLabel("Name:"), gbc3);
+        newPanel.add(UIConstants.getBoldLabel("Name:"), gbc3);
 
         gbc3.gridx = 1;
         JTextField nameField = new JTextField(20);
         newPanel.add(nameField, gbc3);
+        Padding.addInputPaddingDefault(nameField);
 
         gbc3.gridx = 0;
         gbc3.gridy = 1;
-        newPanel.add(new JLabel("Email:"), gbc3);
+        newPanel.add(UIConstants.getBoldLabel("Email:"), gbc3);
 
         gbc3.gridx = 1;
         JTextField newEmailField = new JTextField(20);
         newPanel.add(newEmailField, gbc3);
-
-        gbc3.gridx = 0;
-        gbc3.gridy = 2;
-        newPanel.add(new JLabel("Password:"), gbc3);
-
-        gbc3.gridx = 1;
-        JPasswordField passwordField = new JPasswordField(20);
-        newPanel.add(passwordField, gbc3);
+        Padding.addInputPaddingDefault(newEmailField);
 
         // Add student panels to a card layout
         JPanel cardPanel = new JPanel(new CardLayout());
@@ -400,7 +393,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
                 } else {
                     String email = newEmailField.getText().trim();
                     String name = nameField.getText().trim();
-                    String rawPassword = new String(passwordField.getPassword());
+                    String rawPassword = CSVStudentManager.defaultPassword;
                     String hashedPassword = Hasher.hashPassword(rawPassword);
                     if (email.isEmpty()) {
                         JOptionPane.showMessageDialog(dialog,
@@ -445,17 +438,17 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         });
 
         dialog.add(panel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
     }
 
     private void addGrader() {
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Add Grader to Course",
                 Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setSize(450, 300);
-        dialog.setLocationRelativeTo(this);
 
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Padding.addPanelPaddingDefault(panel);
 
         // Form panel
         JPanel formPanel = new JPanel(new GridBagLayout());
@@ -467,7 +460,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Course:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Course:"), gbc);
 
         CourseDAO courseDAO = CourseDAO.getInstance();
         List<Course> teacherCourses = courseDAO.getCoursesForTeacher(teacher.getId());
@@ -494,6 +487,8 @@ public final class StudentsPanel extends JPanel implements Refreshable {
             }
             return lbl;
         });
+
+        Padding.addInputPaddingDefault(courseComboBox);
 
         gbc.gridx = 1;
         gbc.gridy = 0;
@@ -526,11 +521,12 @@ public final class StudentsPanel extends JPanel implements Refreshable {
 
         gbc2.gridx = 0;
         gbc2.gridy = 0;
-        existingPanel.add(new JLabel("Email:"), gbc2);
+        existingPanel.add(UIConstants.getBoldLabel("Email:"), gbc2);
 
         gbc2.gridx = 1;
         JTextField emailField = new JTextField(20);
         existingPanel.add(emailField, gbc2);
+        Padding.addInputPaddingDefault(emailField);
 
         // New Grader panel
         GridBagConstraints gbc3 = new GridBagConstraints();
@@ -539,27 +535,21 @@ public final class StudentsPanel extends JPanel implements Refreshable {
 
         gbc3.gridx = 0;
         gbc3.gridy = 0;
-        newPanel.add(new JLabel("Name:"), gbc3);
+        newPanel.add(UIConstants.getBoldLabel("Name:"), gbc3);
 
         gbc3.gridx = 1;
         JTextField nameField = new JTextField(20);
         newPanel.add(nameField, gbc3);
+        Padding.addInputPaddingDefault(nameField);
 
         gbc3.gridx = 0;
         gbc3.gridy = 1;
-        newPanel.add(new JLabel("Email:"), gbc3);
+        newPanel.add(UIConstants.getBoldLabel("Email:"), gbc3);
 
         gbc3.gridx = 1;
         JTextField newEmailField = new JTextField(20);
         newPanel.add(newEmailField, gbc3);
-
-        gbc3.gridx = 0;
-        gbc3.gridy = 2;
-        newPanel.add(new JLabel("Password:"), gbc3);
-
-        gbc3.gridx = 1;
-        JPasswordField passwordField = new JPasswordField(20);
-        newPanel.add(passwordField, gbc3);
+        Padding.addInputPaddingDefault(newEmailField);
 
         // Add student panels to a card layout
         JPanel cardPanel = new JPanel(new CardLayout());
@@ -644,7 +634,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
                 } else {
                     String email = newEmailField.getText().trim();
                     String name = nameField.getText().trim();
-                    String password = new String(passwordField.getPassword());
+                    String password = CSVStudentManager.defaultPassword;
                     if (email.isEmpty()) {
                         JOptionPane.showMessageDialog(dialog,
                                 "Email is required",
@@ -688,6 +678,8 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         });
 
         dialog.add(panel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
     }
 
@@ -1020,17 +1012,12 @@ public final class StudentsPanel extends JPanel implements Refreshable {
 
         // Button dialog shell
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this),
-                "Student Grades – " + studentName,
+                "Student Grades - " + studentName,
                 Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setSize(700, 500);
-        dialog.setLocationRelativeTo(this);
 
         JPanel root = new JPanel(new BorderLayout(10, 10));
-        root.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        JLabel hdr = new JLabel("Student: " + studentName);
-        hdr.setFont(hdr.getFont().deriveFont(Font.BOLD, 14f));
-        root.add(hdr, BorderLayout.NORTH);
+        Padding.addPanelPaddingDefault(root);
+        root.add(UIConstants.getBoldLabel("Student: " + studentName), BorderLayout.NORTH);
 
         // one tab per course that (a) belongs to the teacher and (b) the student is
         // enrolled in
@@ -1067,6 +1054,8 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         });
 
         dialog.add(root);
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
     }
 
@@ -1146,7 +1135,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         summary.add(new JLabel(completed + " / " + assignments.size()));
 
         summary.add(new JLabel("Last Submission:"));
-        summary.add(new JLabel(lastSub == null ? "—"
+        summary.add(new JLabel(lastSub == null ? "-"
                 : lastSub.getSubmittedAt().toLocalDateTime().toLocalDate()
                         + " (" + aDao.read(lastSub.getAssignmentId()).getName() + ")"));
 
