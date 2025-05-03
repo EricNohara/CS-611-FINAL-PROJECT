@@ -1,6 +1,8 @@
 package model;
 import java.util.List;
 
+import ui.utils.AssignmentTemplateItem;
+
 public class AssignmentTemplate {
     private int id;
     private int courseTemplateId;
@@ -24,6 +26,14 @@ public class AssignmentTemplate {
         this.weight = weight;
         this.type = type;
         this.submissionTypes = submissionTypes;
+    }
+
+    public AssignmentTemplate(AssignmentTemplateItem item, int courseTemplateId) {
+        this.id = item.getId();
+        this.courseTemplateId = courseTemplateId;
+        this.weight = item.getWeight();
+        this.type = item.getType();
+        this.submissionTypes = item.getSubmissionTypes();
     }
 
     // GETTERS

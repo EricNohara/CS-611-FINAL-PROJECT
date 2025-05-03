@@ -65,12 +65,10 @@ public class DBSetup {
                                                         "name TEXT NOT NULL," +
                                                         "due_date TIMESTAMP NOT NULL," +
                                                         "max_points REAL NOT NULL," +
-                                                        "assignment_template_id INTEGER," +
                                                         "course_id INTEGER NOT NULL," +
                                                         "weight REAL NOT NULL," +
                                                         "type INTEGER NOT NULL," +
                                                         "submission_types TEXT," +
-                                                        "FOREIGN KEY (assignment_template_id) REFERENCES assignment_templates(id) ON DELETE SET NULL," +
                                                         "FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE);";
 
     private static final String clearAllTablesQuery = "DELETE FROM user_submissions;" +

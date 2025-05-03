@@ -11,30 +11,27 @@ public class AssignmentTemplateItem {
     private List<String> submissionTypes;
     
     public AssignmentTemplateItem(AssignmentTemplate template) {
-        this.id = template.getId();
-        this.type = template.getType();
-        this.weight = template.getWeight();
-        this.submissionTypes = template.getSubmissionTypes();
+        if (template == null) {
+            this.id = -1;
+            this.type = null;
+            this.weight = -1.0;
+            this.submissionTypes = null;
+        } else {
+            this.id = template.getId();
+            this.type = template.getType();
+            this.weight = template.getWeight();
+            this.submissionTypes = template.getSubmissionTypes();
+        }
     }
     
-    public int getId() {
-        return id;
-    }
-    
-    public Assignment.Type getType() {
-        return type;
-    }
-    
-    public double getWeight() {
-        return weight;
-    }
-    
-    public List<String> getSubmissionTypes() {
-        return submissionTypes;
-    }
+    public int getId() { return id; }
+    public Assignment.Type getType() { return type; }
+    public double getWeight() { return weight; }
+    public List<String> getSubmissionTypes() { return submissionTypes; }
     
     @Override
     public String toString() {
+        if (this.type == null) return "None";
         return type.toString() + " (" + (weight * 100) + "%)";
     }
 }

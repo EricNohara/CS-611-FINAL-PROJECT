@@ -2,10 +2,13 @@ package ui.dashboard.panels;
 
 import db.*;
 import model.*;
-
+import ui.UIConstants;
 import ui.utils.AssignmentTemplateItem;
 import ui.utils.CourseItem;
 import ui.utils.GradingUtils;
+import ui.utils.PaddedCellRenderer;
+import ui.utils.Padding;
+import ui.utils.TemplateItem;
 import utils.SubmissionFileManager;
 
 import javax.swing.*;
@@ -94,6 +97,11 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
         assignmentTable = new JTable(assignmentModel);
         add(new JScrollPane(assignmentTable), BorderLayout.CENTER);
 
+        PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
+        PaddedCellRenderer.setDefaultRowHeight(assignmentTable);
+        paddedRenderer.applyCellPadding(assignmentTable);
+
+
         // Buttons at bottom
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton editBtn = new JButton("Edit");
@@ -150,11 +158,9 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
     private void createNewAssignment() {
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Create New Assignment",
                 Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setSize(500, 550);
-        dialog.setLocationRelativeTo(this);
 
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Padding.addPanelPaddingDefault(panel);
 
         // Form panel
         JPanel formPanel = new JPanel(new GridBagLayout());
@@ -165,18 +171,19 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
         // Title
         gbc.gridx = 0;
         gbc.gridy = 0;
-        formPanel.add(new JLabel("Title:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Title:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
         JTextField titleField = new JTextField(30);
         formPanel.add(titleField, gbc);
+        Padding.addInputPaddingDefault(titleField);
 
         // Course
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Course:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Course:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
@@ -192,45 +199,40 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
 
         JComboBox<CourseItem> courseComboBox = new JComboBox<>(courseModel);
         formPanel.add(courseComboBox, gbc);
+        Padding.addInputPaddingDefault(courseComboBox);
 
         // Type
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Type:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Type:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
         String[] assignmentTypes = { "HOMEWORK", "QUIZ", "EXAM", "PROJECT" };
         JComboBox<String> typeComboBox = new JComboBox<>(assignmentTypes);
         formPanel.add(typeComboBox, gbc);
+        Padding.addInputPaddingDefault(typeComboBox);
 
-        // Assignment Template section (optional)
+        // Assignment Template section (always visible)
         gbc.gridx = 0;
         gbc.gridy = 3;
-        gbc.gridwidth = 3;
-        JCheckBox useTemplateCheckBox = new JCheckBox("Use Assignment Template");
-        formPanel.add(useTemplateCheckBox, gbc);
-
-        // Assignment Template dropdown (initially hidden)
-        gbc.gridx = 0;
-        gbc.gridy = 4;
         gbc.gridwidth = 1;
-        JLabel templateLabel = new JLabel("Template:");
-        templateLabel.setVisible(false);
+        JLabel templateLabel = UIConstants.getBoldLabel("Assignment Template:");
         formPanel.add(templateLabel, gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
         JComboBox<AssignmentTemplateItem> templateComboBox = new JComboBox<>();
-        templateComboBox.setVisible(false);
         formPanel.add(templateComboBox, gbc);
+        Padding.addInputPaddingDefault(templateComboBox);
+        updateTemplateDropdown(templateComboBox, courseComboBox);
 
         // Due date
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Due Date:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Due Date:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
@@ -249,57 +251,49 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
         JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(dueDateSpinner, "yyyy-MM-dd HH:mm");
         dueDateSpinner.setEditor(dateEditor);
         formPanel.add(dueDateSpinner, gbc);
+        Padding.addInputPaddingDefault(dateEditor);
 
         // Max points
         gbc.gridx = 0;
         gbc.gridy = 6;
         gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Max Points:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Max Points:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
         JTextField pointsField = new JTextField("100", 5);
         formPanel.add(pointsField, gbc);
+        Padding.addInputPaddingDefault(pointsField);
 
         // Weight
         gbc.gridx = 0;
         gbc.gridy = 7;
         gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Weight (%):"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Weight (%):"), gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
         JTextField weightField = new JTextField("10", 5);
         formPanel.add(weightField, gbc);
+        Padding.addInputPaddingDefault(weightField);
 
         // Submission types
         gbc.gridx = 0;
         gbc.gridy = 8;
         gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Submission Types:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Submission Types:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
         JTextField submissionTypesField = new JTextField("pdf, docx, java", 20);
         formPanel.add(submissionTypesField, gbc);
-
-        // Description
-        gbc.gridx = 0;
-        gbc.gridy = 9;
-        gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Description:"), gbc);
+        Padding.addInputPaddingDefault(submissionTypesField);
 
         gbc.gridx = 1;
         gbc.gridy = 9;
         gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weighty = 1.0;
-
-        JTextArea descriptionArea = new JTextArea(5, 30);
-        descriptionArea.setLineWrap(true);
-        descriptionArea.setWrapStyleWord(true);
-        JScrollPane descScrollPane = new JScrollPane(descriptionArea);
-        formPanel.add(descScrollPane, gbc);
 
         panel.add(formPanel, BorderLayout.CENTER);
 
@@ -311,21 +305,26 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
         buttonPanel.add(createButton);
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
+        if (templateComboBox.getSelectedItem() != null) {
+            AssignmentTemplateItem selectedTemplate = (AssignmentTemplateItem) templateComboBox.getSelectedItem();
+
+            // Update fields based on selected template
+            if (selectedTemplate.getType() != null) {
+                // Disable editing for type, weight, and submission types
+                typeComboBox.setEnabled(false);
+                weightField.setEditable(false);
+                submissionTypesField.setEditable(false);
+            } else {
+                // Re-enable editing if template has no type
+                typeComboBox.setEnabled(true);
+                weightField.setEditable(true);
+                submissionTypesField.setEditable(true);
+            }
+        }
+
         // Add listeners for course and template selection
         courseComboBox.addActionListener(e1 -> {
-            if (useTemplateCheckBox.isSelected()) {
-                updateTemplateDropdown(templateComboBox, courseComboBox);
-            }
-        });
-
-        useTemplateCheckBox.addActionListener(e2 -> {
-            boolean useTemplate = useTemplateCheckBox.isSelected();
-            templateLabel.setVisible(useTemplate);
-            templateComboBox.setVisible(useTemplate);
-
-            if (useTemplate) {
-                updateTemplateDropdown(templateComboBox, courseComboBox);
-            }
+            updateTemplateDropdown(templateComboBox, courseComboBox);
         });
 
         templateComboBox.addActionListener(e3 -> {
@@ -333,10 +332,21 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
                 AssignmentTemplateItem selectedTemplate = (AssignmentTemplateItem) templateComboBox.getSelectedItem();
 
                 // Update fields based on selected template
-                if (selectedTemplate != null) {
+                if (selectedTemplate.getType() != null) {
+                    // Set values from the template
                     typeComboBox.setSelectedItem(selectedTemplate.getType().toString());
                     weightField.setText(String.format("%.1f", selectedTemplate.getWeight() * 100));
                     submissionTypesField.setText(String.join(", ", selectedTemplate.getSubmissionTypes()));
+
+                    // Disable editing for type, weight, and submission types
+                    typeComboBox.setEnabled(false);
+                    weightField.setEditable(false);
+                    submissionTypesField.setEditable(false);
+                } else {
+                    // Re-enable editing if template has no type
+                    typeComboBox.setEnabled(true);
+                    weightField.setEditable(true);
+                    submissionTypesField.setEditable(true);
                 }
             }
         });
@@ -370,6 +380,10 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
                 String typeStr = (String) typeComboBox.getSelectedItem();
                 Assignment.Type type = Assignment.Type.valueOf(typeStr);
 
+                // Get selected template
+                AssignmentTemplateItem selectedTemplate = (AssignmentTemplateItem) templateComboBox.getSelectedItem();
+                AssignmentTemplate assignmentTemplate = AssignmentTemplateDAO.getInstance().read(selectedTemplate.getId());
+
                 // Get due date
                 Date dueDate = (Date) dueDateSpinner.getValue();
                 Timestamp dueDateTimestamp = new Timestamp(dueDate.getTime());
@@ -380,31 +394,29 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
                     throw new NumberFormatException("Max points must be positive");
                 }
 
-                // Get weight
-                double weight = Double.parseDouble(weightField.getText()) / 100.0; // Convert to decimal
-                if (weight <= 0) {
-                    throw new NumberFormatException("Weight must be positive");
-                }
-
-                // Get submission types
-                String submissionTypesText = submissionTypesField.getText().trim();
-                List<String> submissionTypes = new ArrayList<>();
-                if (!submissionTypesText.isEmpty()) {
-                    String[] types = submissionTypesText.split(",");
-                    for (String t : types) {
-                        submissionTypes.add(t.trim());
-                    }
-                }
-
-                // Get description (this would be stored in a field in Assignment if available)
-                String description = descriptionArea.getText().trim();
-
                 // Create assignment object - using the correct constructor signature
-                // Assignment(int id, String name, Timestamp dueDate, double maxPoints, int
-                // courseId, double weight, Type type, List<String> submissionTypes)
-                // Note: We use -1 for ID since it will be assigned by the database
-                Assignment assignment = new Assignment(
-                        -1, title, dueDateTimestamp, maxPoints, courseId, weight, type, submissionTypes);
+                Assignment assignment;
+                if (assignmentTemplate != null) {
+                    assignment = new Assignment(title, dueDateTimestamp, maxPoints, assignmentTemplate, courseId);
+                } else {
+                    // Get weight
+                    double weight = Double.parseDouble(weightField.getText()) / 100.0; // Convert to decimal
+                    if (weight <= 0) {
+                        throw new NumberFormatException("Weight must be positive");
+                    }
+
+                    // Get submission types
+                    String submissionTypesText = submissionTypesField.getText().trim();
+                    List<String> submissionTypes = new ArrayList<>();
+                    if (!submissionTypesText.isEmpty()) {
+                        String[] types = submissionTypesText.split(",");
+                        for (String t : types) {
+                            submissionTypes.add(t.trim());
+                        }
+                    }
+
+                    assignment = new Assignment(-1, title, dueDateTimestamp, maxPoints, courseId, weight, type, submissionTypes);
+                }
 
                 // Save to database
                 AssignmentDAO assignmentDAO = AssignmentDAO.getInstance();
@@ -439,6 +451,8 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
         });
 
         dialog.add(panel);
+        dialog.setLocationRelativeTo(this);
+        dialog.pack();
         dialog.setVisible(true);
     }
 
@@ -600,24 +614,11 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
         JTextField submissionTypesField = new JTextField(String.join(", ", assignment.getSubmissionTypes()), 20);
         formPanel.add(submissionTypesField, gbc);
 
-        // Description (this would be implemented if Assignment had a description field)
-        gbc.gridx = 0;
-        gbc.gridy = 8;
-        gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Description:"), gbc);
-
         gbc.gridx = 1;
         gbc.gridy = 8;
         gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weighty = 1.0;
-
-        JTextArea descriptionArea = new JTextArea(5, 30);
-        descriptionArea.setLineWrap(true);
-        descriptionArea.setWrapStyleWord(true);
-        // If Assignment had a description field, we would set it here
-        JScrollPane descScrollPane = new JScrollPane(descriptionArea);
-        formPanel.add(descScrollPane, gbc);
 
         panel.add(formPanel, BorderLayout.CENTER);
 
@@ -672,9 +673,6 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
                     }
                 }
 
-                // Get description (would be implemented if Assignment had a description field)
-                String description = descriptionArea.getText().trim();
-
                 // Update assignment object
                 assignment.setName(title);
                 assignment.setType(type);
@@ -682,7 +680,6 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
                 assignment.setMaxPoints(maxPoints);
                 assignment.setWeight(weight);
                 assignment.setSubmissionTypes(submissionTypes);
-                // If Assignment had a description field, we would set it here
 
                 // Save to database
                 tc.editAssignment(assignment);
@@ -787,10 +784,10 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
 
         message.append("Deleting this assignment will:\n");
         if (hasSubmissions) {
-            message.append("• Delete all student submissions for this assignment\n");
-            message.append("• Remove all grades associated with this assignment\n");
+            message.append("- Delete all student submissions for this assignment\n");
+            message.append("- Remove all grades associated with this assignment\n");
         }
-        message.append("• Remove the assignment from the course\n\n");
+        message.append("- Remove the assignment from the course\n\n");
         message.append("This action cannot be undone. Do you want to continue?");
 
         // Confirm deletion
@@ -1252,53 +1249,43 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
     }
 
     // Helper method to update the template dropdown based on selected course
-    private void updateTemplateDropdown(JComboBox<AssignmentTemplateItem> templateComboBox,
-            JComboBox<CourseItem> courseDropdown) {
+    private void updateTemplateDropdown(JComboBox<AssignmentTemplateItem> templateComboBox, JComboBox<CourseItem> courseDropdown) {
         templateComboBox.removeAllItems();
-
+    
         // Get the selected course item
         CourseItem selectedCourseItem = (CourseItem) courseDropdown.getSelectedItem();
         if (selectedCourseItem == null) {
+            templateComboBox.addItem(new AssignmentTemplateItem(null));
+            templateComboBox.setEnabled(false);
             return;
         }
-
-        // Get the course from the database to ensure we have the most up-to-date data
+    
+        // Get the course from the database
         CourseDAO courseDAO = CourseDAO.getInstance();
         Course course = courseDAO.read(selectedCourseItem.getId());
-
-        if (course == null) {
-            System.out.println("Course not found: " + selectedCourseItem.getId());
+    
+        if (course == null || course.getCourseTemplate() == null) {
+            System.err.println("Course or course template not found for course: " + selectedCourseItem.getId());
+            templateComboBox.addItem(new AssignmentTemplateItem(null));
+            templateComboBox.setEnabled(false);
             return;
         }
-
-        // If the course template is null but we have a valid template ID, try to load
-        // it
-        if (course.getCourseTemplate() == null && course.getCourseTemplateId() > 0) {
-            CourseTemplateDAO templateDAO = CourseTemplateDAO.getInstance();
-            CourseTemplate template = templateDAO.read(course.getCourseTemplateId());
-            course.setCourseTemplate(template);
-            System.out.println("Loaded course template: " + (template != null ? template.getId() : "null"));
-        }
-
-        // Check if we have a valid course template
-        if (course.getCourseTemplate() == null) {
-            System.out.println("Course has no template: " + course.getName());
-            return;
-        }
-
-        // Get assignment templates from the course template
+    
+        // Get assignment templates
         List<AssignmentTemplate> templates = course.getCourseTemplate().getAssignmentTemplates();
-
+    
         if (templates == null || templates.isEmpty()) {
-            System.out.println(
-                    "No assignment templates found for course template: " + course.getCourseTemplate().getId());
+            System.err.println("No assignment templates found for course template: " + course.getCourseTemplate().getId());
+            templateComboBox.addItem(new AssignmentTemplateItem(null));
+            templateComboBox.setEnabled(false);
             return;
         }
-
-        // Add assignment templates to the dropdown
+    
+        // Add actual assignment templates
         for (AssignmentTemplate at : templates) {
             templateComboBox.addItem(new AssignmentTemplateItem(at));
         }
+        templateComboBox.setEnabled(true);
     }
 
     @Override
