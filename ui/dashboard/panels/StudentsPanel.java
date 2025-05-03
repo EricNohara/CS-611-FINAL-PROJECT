@@ -1059,10 +1059,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         dialog.setVisible(true);
     }
 
-    private void addCourseGradeTab(JTabbedPane tabs,
-            Course course,
-            int studentId) {
-
+    private void addCourseGradeTab(JTabbedPane tabs,Course course,int studentId) {
         AssignmentDAO aDao = AssignmentDAO.getInstance();
         SubmissionDAO sDao = SubmissionDAO.getInstance();
 
@@ -1072,8 +1069,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         double earnedSum = 0, maxSum = 0;
         int completed = 0;
 
-        String[] cols = { "Assignment", "Type", "Due Date",
-                "Grade", "Comments" };
+        String[] cols = { "Assignment", "Type", "Due Date", "Grade", "Comments" };
         DefaultTableModel model = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int r, int c) {
@@ -1142,7 +1138,11 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         JPanel root = new JPanel(new BorderLayout(10, 10));
         root.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         root.add(summary, BorderLayout.NORTH);
-        root.add(new JScrollPane(new JTable(model)), BorderLayout.CENTER);
+        JTable table = new JTable(model);
+        PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
+        PaddedCellRenderer.setDefaultRowHeight(table);
+        paddedRenderer.applyCellPadding(table);
+        root.add(new JScrollPane(table), BorderLayout.CENTER);
 
         tabs.addTab(course.getName(), root);
     }

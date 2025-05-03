@@ -883,11 +883,9 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
         // Create submissions dialog
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Submissions for ",
                 Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setSize(900, 600);
-        dialog.setLocationRelativeTo(this);
 
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Padding.addPanelPaddingDefault(panel);
 
         // Header panel
         JPanel headerPanel = new JPanel(new GridLayout(3, 2, 10, 5));
@@ -975,6 +973,10 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
         JTable submissionTable = new JTable(submissionModel);
         submissionTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         submissionTable.setAutoCreateRowSorter(true);
+
+        PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
+        PaddedCellRenderer.setDefaultRowHeight(submissionTable);
+        paddedRenderer.applyCellPadding(submissionTable);
 
         // Set preferred column widths
         submissionTable.getColumnModel().getColumn(0).setPreferredWidth(50); // ID
@@ -1131,6 +1133,8 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
         panel.add(buttonPanel, BorderLayout.NORTH);
 
         dialog.add(panel);
+        dialog.setLocationRelativeTo(this);
+        dialog.pack();
         dialog.setVisible(true);
     }
 

@@ -1,6 +1,7 @@
 package ui.dashboard.panels;
 
 import ui.dashboard.components.DashboardCard;
+import ui.utils.PaddedCellRenderer;
 import db.*;
 import model.*;
 import javax.swing.*;
@@ -103,6 +104,11 @@ public final class OverviewPanel extends JPanel implements Refreshable{
 
         JTable tbl = new JTable(model);
         activityPanel.add(new JScrollPane(tbl), BorderLayout.CENTER);
+
+        PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
+        PaddedCellRenderer.setDefaultRowHeight(tbl);
+        paddedRenderer.applyCellPadding(tbl);
+
 
         add(activityPanel, BorderLayout.CENTER);
 

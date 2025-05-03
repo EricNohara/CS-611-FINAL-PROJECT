@@ -5,6 +5,7 @@ import db.SubmissionDAO;
 import db.UserCourseDAO;
 import db.UserDAO;
 import model.*;
+import ui.UIConstants;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -30,32 +31,40 @@ public final class GradingUtils {
 
     private static void buildDialog(Component parent, Submission submission, Assignment assignment, GradingContext gradingContext, boolean enableGrading) {
         List<String> studentNames = loadStudentNames(submission);
-        System.out.println("check student name"+studentNames.size());
-        JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(parent), enableGrading ? "Grade Submission" : "View Submission", Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setSize(900, 700);
-        dialog.setLocationRelativeTo(parent);
-
+        System.out.println("check student name" + studentNames.size());
+    
+        JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(parent), 
+            enableGrading ? "Grade Submission" : "View Submission", 
+            Dialog.ModalityType.APPLICATION_MODAL);
+    
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
+        Padding.addPanelPaddingDefault(panel);
+    
         JPanel headerPanel = buildSubmissionInfoPanel(submission, assignment, studentNames);
         panel.add(headerPanel, BorderLayout.NORTH);
-
-        JSplitPane mainSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        mainSplitPane.setDividerLocation(450);
-
-        JPanel submissionPanel = buildSubmissionPanel(submission);
-        mainSplitPane.setLeftComponent(submissionPanel);
-
-        JPanel rightPanel = enableGrading ? buildGradingPanel(assignment) : new JPanel();
-        mainSplitPane.setRightComponent(rightPanel);
-
-        panel.add(mainSplitPane, BorderLayout.CENTER);
-
-        JPanel buttonPanel = buildButtonPanel(dialog, submission, gradingContext, assignment, rightPanel);
+    
+        if (enableGrading) {
+            JSplitPane mainSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+            mainSplitPane.setDividerLocation(450);
+    
+            JPanel submissionPanel = buildSubmissionPanel(submission);
+            mainSplitPane.setLeftComponent(submissionPanel);
+    
+            JPanel rightPanel = buildGradingPanel(assignment);
+            mainSplitPane.setRightComponent(rightPanel);
+    
+            panel.add(mainSplitPane, BorderLayout.CENTER);
+        } else {
+            JPanel submissionPanel = buildSubmissionPanel(submission);
+            panel.add(submissionPanel, BorderLayout.CENTER);
+        }
+    
+        JPanel buttonPanel = buildButtonPanel(dialog, submission, gradingContext, assignment, null);
         panel.add(buttonPanel, BorderLayout.SOUTH);
-
+    
         dialog.add(panel);
+        dialog.setLocationRelativeTo(parent);
+        dialog.pack();
         dialog.setVisible(true);
     }
 
@@ -97,7 +106,11 @@ public final class GradingUtils {
 
         JTextArea contentArea = new JTextArea();
         contentArea.setEditable(false);
-        contentArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+        contentArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
+
+        contentArea.setLineWrap(true);
+        contentArea.setWrapStyleWord(true); // wrap at word boundaries, not mid-word
+
         loadFileContent(submission, contentArea);
 
         panel.add(new JScrollPane(contentArea), BorderLayout.CENTER);
@@ -132,6 +145,7 @@ public final class GradingUtils {
         String[] columns = {"Criteria", "Points", "Max Points"};
         DefaultTableModel model = new DefaultTableModel(columns, 0);
 
+        // EDIT THIS LATER
         switch (assignment.getType()) {
             case HOMEWORK:
                 model.addRow(new Object[]{"Correctness", 0, assignment.getMaxPoints() * 0.7});
@@ -155,10 +169,15 @@ public final class GradingUtils {
             }
         };
 
+        PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
+        PaddedCellRenderer.setDefaultRowHeight(table);
+        paddedRenderer.applyCellPadding(table);
+
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
 
         JTextArea feedbackArea = new JTextArea(6, 30);
         feedbackArea.setBorder(BorderFactory.createTitledBorder("Feedback"));
+        feedbackArea.setFont(UIConstants.DEFAULT_FONT);
         panel.add(new JScrollPane(feedbackArea), BorderLayout.SOUTH);
 
         panel.putClientProperty("rubricModel", model);
