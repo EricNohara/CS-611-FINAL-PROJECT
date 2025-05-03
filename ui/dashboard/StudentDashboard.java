@@ -2,9 +2,11 @@ package ui.dashboard;
 
 import model.Student;
 import ui.LoginFrame;
+import ui.UIConstants;
 import ui.dashboard.panels.Refreshable;
 import ui.dashboard.panels.StudentAssignmentsPanel;
 import ui.dashboard.panels.StudentCoursesPanel;
+import ui.utils.Padding;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,17 +19,15 @@ public class StudentDashboard extends JFrame {
         this.student = student;
 
         setTitle("Student Dashboard - " + student.getName());
-        setSize(1000, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
 
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Padding.addPanelPaddingDefault(mainPanel);
 
         // Header panel
         JPanel headerPanel = new JPanel(new BorderLayout());
         JLabel welcomeLabel = new JLabel("Welcome, " + student.getName() + "!");
-        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        welcomeLabel.setFont(UIConstants.LARGE_FONT_BOLD);
         headerPanel.add(welcomeLabel, BorderLayout.WEST);
 
         JButton refreshButton = new JButton("Refresh");
@@ -65,6 +65,8 @@ public class StudentDashboard extends JFrame {
         refreshButton.addActionListener(e -> refresh());
 
         add(mainPanel);
+        pack();
+        setLocationRelativeTo(null);
     }
 
     private void logout() {

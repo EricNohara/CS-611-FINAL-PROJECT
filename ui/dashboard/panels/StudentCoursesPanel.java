@@ -5,7 +5,10 @@ import db.UserCourseDAO;
 import model.Course;
 import model.Student;
 import model.UserCourse;
+import ui.UIConstants;
 import ui.dashboard.panels.Refreshable;
+import ui.utils.PaddedCellRenderer;
+import ui.utils.Padding;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -21,7 +24,7 @@ public class StudentCoursesPanel extends JPanel implements Refreshable {
     public StudentCoursesPanel(Student student) {
         super(new BorderLayout(10, 10));
         this.student = student;
-        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Padding.addPanelPaddingDefault(this);
         buildUI();
         loadCourses();
     }
@@ -44,6 +47,10 @@ public class StudentCoursesPanel extends JPanel implements Refreshable {
         };
         courseTable = new JTable(courseModel);
         add(new JScrollPane(courseTable), BorderLayout.CENTER);
+
+        PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
+        PaddedCellRenderer.setDefaultRowHeight(courseTable);
+        paddedRenderer.applyCellPadding(courseTable);
 
         enrollButton.addActionListener(e -> showEnrollDialog());
         refreshButton.addActionListener(e -> refresh());
@@ -70,11 +77,9 @@ public class StudentCoursesPanel extends JPanel implements Refreshable {
     private void showEnrollDialog() {
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Enroll in Course",
                 Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setSize(400, 250);
-        dialog.setLocationRelativeTo(this);
 
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Padding.addPanelPaddingDefault(panel);
 
         JPanel form = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -83,11 +88,12 @@ public class StudentCoursesPanel extends JPanel implements Refreshable {
 
         gbc.gridx = 0;
         gbc.gridy = 0;
-        form.add(new JLabel("Course ID:"), gbc);
+        form.add(UIConstants.getBoldLabel("Course ID:"), gbc);
 
         gbc.gridx = 1;
         JTextField courseIdField = new JTextField(10);
         form.add(courseIdField, gbc);
+        Padding.addInputPaddingDefault(courseIdField);
 
         panel.add(form, BorderLayout.CENTER);
 
@@ -131,6 +137,8 @@ public class StudentCoursesPanel extends JPanel implements Refreshable {
         });
 
         dialog.add(panel);
+        dialog.setLocationRelativeTo(this);
+        dialog.pack();
         dialog.setVisible(true);
     }
 

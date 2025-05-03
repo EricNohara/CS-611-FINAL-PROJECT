@@ -10,6 +10,8 @@ import model.Student;
 import model.Submission;
 import model.UserCourse;
 import ui.dashboard.panels.Refreshable;
+import ui.utils.PaddedCellRenderer;
+import ui.utils.Padding;
 import utils.SubmissionFileManager;
 
 import javax.swing.*;
@@ -29,7 +31,7 @@ public class StudentAssignmentsPanel extends JPanel implements Refreshable {
     public StudentAssignmentsPanel(Student student) {
         super(new BorderLayout(10, 10));
         this.student = student;
-        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Padding.addPanelPaddingDefault(this);
         buildUI();
         loadAssignments();
     }
@@ -52,6 +54,10 @@ public class StudentAssignmentsPanel extends JPanel implements Refreshable {
         };
         assignmentTable = new JTable(assignmentModel);
         add(new JScrollPane(assignmentTable), BorderLayout.CENTER);
+
+        PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
+        PaddedCellRenderer.setDefaultRowHeight(assignmentTable);
+        paddedRenderer.applyCellPadding(assignmentTable);
 
         submitButton.addActionListener(e -> submitSelectedAssignment());
         refreshButton.addActionListener(e -> refresh());
