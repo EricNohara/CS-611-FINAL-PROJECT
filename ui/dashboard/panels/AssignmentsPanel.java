@@ -495,11 +495,9 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
         // Create edit dialog
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Edit Assignment",
                 Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setSize(500, 550);
-        dialog.setLocationRelativeTo(this);
 
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Padding.addPanelPaddingDefault(panel);
 
         // Form panel
         JPanel formPanel = new JPanel(new GridBagLayout());
@@ -510,7 +508,7 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
         // Assignment ID (read-only)
         gbc.gridx = 0;
         gbc.gridy = 0;
-        formPanel.add(new JLabel("Assignment ID:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Assignment ID:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
@@ -521,18 +519,19 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Title:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Title:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
         JTextField titleField = new JTextField(assignment.getName(), 30);
         formPanel.add(titleField, gbc);
+        Padding.addInputPaddingDefault(titleField);
 
         // Course (read-only)
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Course:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Course:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
@@ -549,7 +548,7 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Type:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Type:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
@@ -557,12 +556,13 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
         JComboBox<String> typeComboBox = new JComboBox<>(assignmentTypes);
         typeComboBox.setSelectedItem(assignment.getType().toString());
         formPanel.add(typeComboBox, gbc);
+        Padding.addInputPaddingDefault(typeComboBox);
 
         // Due date
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Due Date:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Due Date:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
@@ -580,39 +580,50 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
         JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(dueDateSpinner, "yyyy-MM-dd HH:mm");
         dueDateSpinner.setEditor(dateEditor);
         formPanel.add(dueDateSpinner, gbc);
+        Padding.addInputPaddingDefault(dateEditor);
 
         // Max points
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Max Points:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Max Points:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
         JTextField pointsField = new JTextField(String.valueOf(assignment.getMaxPoints()), 5);
         formPanel.add(pointsField, gbc);
+        Padding.addInputPaddingDefault(pointsField);
 
         // Weight
         gbc.gridx = 0;
         gbc.gridy = 6;
         gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Weight (%):"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Weight (%):"), gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
         JTextField weightField = new JTextField(String.format("%.1f", assignment.getWeight() * 100), 5);
         formPanel.add(weightField, gbc);
+        Padding.addInputPaddingDefault(weightField);
 
         // Submission types
         gbc.gridx = 0;
         gbc.gridy = 7;
         gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Submission Types:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Submission Types:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridwidth = 2;
         JTextField submissionTypesField = new JTextField(String.join(", ", assignment.getSubmissionTypes()), 20);
         formPanel.add(submissionTypesField, gbc);
+        Padding.addInputPaddingDefault(submissionTypesField);
+
+        // Disable editing of certain fields if course has no template
+        if (course.getCourseTemplate() != null) {
+            typeComboBox.setEnabled(false);
+            weightField.setEditable(false);
+            submissionTypesField.setEditable(false);
+        }
 
         gbc.gridx = 1;
         gbc.gridy = 8;
@@ -713,6 +724,8 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
         });
 
         dialog.add(panel);
+        dialog.setLocationRelativeTo(this);
+        dialog.pack();
         dialog.setVisible(true);
     }
 
