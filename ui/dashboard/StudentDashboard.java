@@ -3,6 +3,7 @@ package ui.dashboard;
 import model.Student;
 import ui.LoginFrame;
 import ui.UIConstants;
+import ui.dashboard.panels.ChangePasswordPanel;
 import ui.dashboard.panels.Refreshable;
 import ui.dashboard.panels.StudentAssignmentsPanel;
 import ui.dashboard.panels.StudentCoursesPanel;
@@ -46,6 +47,8 @@ public class StudentDashboard extends JFrame {
 
         // View and submit assignments
         tabbedPane.addTab("Assignments", new StudentAssignmentsPanel(student));
+
+        tabbedPane.addTab("Change Password", new ChangePasswordPanel(student));
 
         tabbedPane.addChangeListener(e -> {
             Component selected = tabbedPane.getSelectedComponent();

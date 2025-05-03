@@ -18,6 +18,7 @@ import ui.utils.Padding;
 import ui.LoginFrame;
 import ui.UIConstants;
 import ui.dashboard.panels.AssignmentsPanel;
+import ui.dashboard.panels.ChangePasswordPanel;
 import ui.dashboard.panels.GradingPanel;
 import ui.dashboard.panels.Refreshable;
 
@@ -79,6 +80,8 @@ public class TeacherDashboard extends JFrame {
         tabbedPane.addTab("Assignment Stats", new TeacherAssignmentStatsPanel(teacher));
 
         tabbedPane.addTab("Grade Stats", new TeacherOverallStatsPanel(teacher));
+
+        tabbedPane.addTab("Change Password", new ChangePasswordPanel(teacher));
 
         //refresh
         tabbedPane.addChangeListener(e -> {
