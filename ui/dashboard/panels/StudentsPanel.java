@@ -4,22 +4,16 @@ import db.*;
 import model.*;
 import utils.CSVStudentManager;
 import utils.Hasher;
-import ui.utils.StudentGradeResult;
 import ui.UIConstants;
 import ui.utils.PaddedCellRenderer;
 import ui.utils.Padding;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 
 import java.awt.*;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.Comparator;
 import java.util.List;
@@ -33,7 +27,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
 
     private final Teacher teacher;
     private final JTabbedPane parentTabs;
-    private final List<Course> teacherCourses;
+    private List<Course> teacherCourses;
 
     // UI widgets we reuse in helpers
     private DefaultTableModel studentModel;
@@ -47,8 +41,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         this.parentTabs = parentTabs;
 
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        teacherCourses = CourseDAO.getInstance()
-                .getCoursesForTeacher(teacher.getId());
+        teacherCourses = CourseDAO.getInstance().getCoursesForTeacher(teacher.getId());
 
         buildUI();
         loadStudentGraderData(); // initial fill
@@ -63,6 +56,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
 
         courseCombo = new JComboBox<>();
         courseCombo.addItem("All Courses");
+        teacherCourses = CourseDAO.getInstance().getCoursesForTeacher(this.teacher.getId());
         teacherCourses.forEach(c -> courseCombo.addItem(c.getName()));
         filter.add(courseCombo);
 
@@ -97,6 +91,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
             }
         };
         studentTable = new JTable(studentModel);
+        studentTable.getTableHeader().setReorderingAllowed(false);
         add(new JScrollPane(studentTable), BorderLayout.CENTER);
         studentTable.getTableHeader().setFont(studentTable.getTableHeader().getFont().deriveFont(Font.BOLD));
 
@@ -159,16 +154,14 @@ public final class StudentsPanel extends JPanel implements Refreshable {
                 boolean enrolled = allUserCourses.stream()
                         .anyMatch(uc -> uc.getUserId() == user.getId() && uc.getCourseId() == course.getId());
 
-                if (!enrolled)
-                    continue;
+                if (!enrolled) continue;
 
                 if (courseFilter != null && !"All Courses".equals(courseFilter) &&
                         !course.getName().equals(courseFilter))
                     continue;
 
                 UserCourse uc = userCourseDAO.read(user.getId(), course.getId());
-                if (uc == null)
-                    continue;
+                if (uc == null) continue;
 
                 if (!"All".equals(statusFilter)) {
                     boolean active = uc.getStatus() == UserCourse.Status.ACTIVE;
@@ -792,7 +785,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
                 "User status updated to: " + newStatus,
                 "Success", JOptionPane.INFORMATION_MESSAGE);
 
-        loadStudentGraderData();
+        refresh();
     }
 
     private void removeStudentFromCourse() {
@@ -1141,6 +1134,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
 
         tabs.addTab(course.getName(), root);
     }
+
     private void exportGrades() {
         if (studentModel.getRowCount() == 0) {
             JOptionPane.showMessageDialog(this,
@@ -1177,7 +1171,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
                     double gradeVal = Double.parseDouble(String.valueOf(gradeObj));
                     gradeFormatted = String.format("%.2f", gradeVal);
                 } catch (Exception e) {
-                    gradeFormatted = ""; // 空字符串表示无效分数
+                    gradeFormatted = "";
                 }
 
 
