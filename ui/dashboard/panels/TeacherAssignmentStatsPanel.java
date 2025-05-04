@@ -13,6 +13,8 @@ import model.User;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.io.File;
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.List;
 
@@ -51,12 +53,14 @@ public class TeacherAssignmentStatsPanel extends JPanel implements Refreshable {
         });
 
         JButton loadBtn = new JButton("Load Stats");
-
+        JButton exportBtn = new JButton("Export to CSV");
+       
         topPanel.add(new JLabel("Course:"));
         topPanel.add(courseComboBox);
         topPanel.add(new JLabel("Assignment:"));
         topPanel.add(assignmentComboBox);
         topPanel.add(loadBtn);
+        topPanel.add(exportBtn);
 
         add(topPanel, BorderLayout.NORTH);
 
@@ -95,6 +99,8 @@ public class TeacherAssignmentStatsPanel extends JPanel implements Refreshable {
 
         courseComboBox.addActionListener(e -> loadAssignments());
         loadBtn.addActionListener(e -> loadStats());
+
+        exportBtn.addActionListener(e -> exportAssignmentStatsToCSV());
     }
 
     private void loadCourses() {
@@ -213,6 +219,46 @@ public class TeacherAssignmentStatsPanel extends JPanel implements Refreshable {
             g2.drawString(label, i * barWidth + 5, h - 2);
         }
     }
+
+    private void exportAssignmentStatsToCSV() {
+        if (statsModel.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this,
+                    "No data to export.",
+                    "Export Failed", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        JFileChooser fc = new JFileChooser();
+        fc.setDialogTitle("Export Assignment Statistics");
+        fc.setSelectedFile(new File("assignment_stats.csv"));
+        if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION)
+            return;
+
+        try (PrintWriter pw = new PrintWriter(fc.getSelectedFile())) {
+            for (int i = 0; i < statsModel.getColumnCount(); i++) {
+                pw.print(statsModel.getColumnName(i));
+                if (i < statsModel.getColumnCount() - 1) pw.print(",");
+            }
+            pw.println();
+
+            for (int r = 0; r < statsModel.getRowCount(); r++) {
+                for (int c = 0; c < statsModel.getColumnCount(); c++) {
+                    pw.print(statsModel.getValueAt(r, c));
+                    if (c < statsModel.getColumnCount() - 1) pw.print(",");
+                }
+                pw.println();
+            }
+
+            JOptionPane.showMessageDialog(this,
+                    "Assignment statistics exported successfully!",
+                    "Export Success", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Error exporting data: " + ex.getMessage(),
+                    "Export Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
 
     @Override
     public void refresh() {

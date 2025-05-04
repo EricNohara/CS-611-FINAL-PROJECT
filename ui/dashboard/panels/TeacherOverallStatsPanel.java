@@ -13,6 +13,8 @@ import model.User;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.io.File;
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,10 +38,12 @@ public class TeacherOverallStatsPanel extends JPanel implements Refreshable {
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         courseComboBox = new JComboBox<>();
         JButton loadBtn = new JButton("Load Overall Stats");
+        JButton exportBtn = new JButton("Export to CSV");
 
         topPanel.add(new JLabel("Course:"));
         topPanel.add(courseComboBox);
         topPanel.add(loadBtn);
+        topPanel.add(exportBtn);
         add(topPanel, BorderLayout.NORTH);
 
         String[] columns = {"Student ID", "Student Name", "Overall Grade %"};
@@ -62,6 +66,7 @@ public class TeacherOverallStatsPanel extends JPanel implements Refreshable {
         add(statsSummary, BorderLayout.SOUTH);
 
         loadBtn.addActionListener(e -> loadStats());
+        exportBtn.addActionListener(e -> exportStatsToCSV());
     }
 
     private void loadCourses() {
@@ -131,6 +136,42 @@ public class TeacherOverallStatsPanel extends JPanel implements Refreshable {
         meanLabel.setText(String.format("Mean: %.2f%%", mean));
         stdDevLabel.setText(String.format("Std Dev: %.2f%%", stdDev));
         medianLabel.setText(String.format("Median: %.2f%%", median));
+    }
+
+    private void exportStatsToCSV() {
+        if (statsModel.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this, "No data to export.", "Export Failed", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        JFileChooser fc = new JFileChooser();
+        fc.setDialogTitle("Export Course Grade Stats");
+        fc.setSelectedFile(new File("course_overall_stats.csv"));
+        if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
+
+        try (PrintWriter pw = new PrintWriter(fc.getSelectedFile())) {
+            for (int i = 0; i < statsModel.getColumnCount(); i++) {
+                pw.print(statsModel.getColumnName(i));
+                if (i < statsModel.getColumnCount() - 1) pw.print(",");
+            }
+            pw.println();
+
+            for (int r = 0; r < statsModel.getRowCount(); r++) {
+                for (int c = 0; c < statsModel.getColumnCount(); c++) {
+                    pw.print(statsModel.getValueAt(r, c));
+                    if (c < statsModel.getColumnCount() - 1) pw.print(",");
+                }
+                pw.println();
+            }
+
+            JOptionPane.showMessageDialog(this,
+                    "Course grade statistics exported successfully!",
+                    "Export Success", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Error exporting data: " + ex.getMessage(),
+                    "Export Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     @Override
