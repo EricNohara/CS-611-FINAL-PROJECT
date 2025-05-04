@@ -6,6 +6,7 @@ import javax.swing.table.DefaultTableModel;
 import model.Admin;
 
 import ui.LoginFrame;
+import ui.dashboard.panels.ChangePasswordPanel;
 import ui.dashboard.panels.CourseManagementPanel;
 import ui.dashboard.panels.SystemSettingsPanel;
 import ui.dashboard.panels.UserManagementPanel;
@@ -54,6 +55,8 @@ public class AdminDashboard extends JFrame {
 
         // System settings panel
         tabbedPane.addTab("System Settings", new SystemSettingsPanel(admin));
+
+        tabbedPane.addTab("Change Password", new ChangePasswordPanel(admin));
 
         mainPanel.add(tabbedPane, BorderLayout.CENTER);
 

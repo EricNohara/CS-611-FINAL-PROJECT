@@ -3,6 +3,8 @@ package db;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import model.User;
 import model.UserCourse;
@@ -138,4 +140,14 @@ public class UserCourseDAO implements CrudDAO<UserCourse> {
 
         return new UserCourse(userId, courseId, status, role);
     }
+
+    public List<User> getUsersInCourseByRole(int courseId, User.Role role) {
+    UserDAO userDAO = UserDAO.getInstance();
+    return readAll().stream()
+            .filter(uc -> uc.getCourseId() == courseId && uc.getRole() == role)
+            .map(uc -> userDAO.read(uc.getUserId()))
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+}
+
 }

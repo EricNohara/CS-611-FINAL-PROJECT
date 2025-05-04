@@ -59,6 +59,8 @@ public class GraderDashboard extends JFrame {
         // Grading panel
         tabbedPane.addTab("Grading", new GradingPanel(grader, tabbedPane));
 
+        tabbedPane.addTab("Change Password", new ChangePasswordPanel(grader));
+
 
         //refresh
         tabbedPane.addChangeListener(e -> {

@@ -10,12 +10,15 @@ import model.Teacher;
 
 import ui.dashboard.panels.OverviewPanel;
 import ui.dashboard.panels.StudentsPanel;
+import ui.dashboard.panels.TeacherAssignmentStatsPanel;
+import ui.dashboard.panels.TeacherOverallStatsPanel;
 import ui.dashboard.panels.CoursesPanel;
 import ui.dashboard.panels.TemplatesPanel;
 import ui.utils.Padding;
 import ui.LoginFrame;
 import ui.UIConstants;
 import ui.dashboard.panels.AssignmentsPanel;
+import ui.dashboard.panels.ChangePasswordPanel;
 import ui.dashboard.panels.GradingPanel;
 import ui.dashboard.panels.Refreshable;
 
@@ -73,6 +76,12 @@ public class TeacherDashboard extends JFrame {
 
         // Students panel
         tabbedPane.addTab("Students", new StudentsPanel(teacher, tabbedPane));
+
+        tabbedPane.addTab("Assignment Stats", new TeacherAssignmentStatsPanel(teacher));
+
+        tabbedPane.addTab("Grade Stats", new TeacherOverallStatsPanel(teacher));
+
+        tabbedPane.addTab("Change Password", new ChangePasswordPanel(teacher));
 
         //refresh
         tabbedPane.addChangeListener(e -> {
