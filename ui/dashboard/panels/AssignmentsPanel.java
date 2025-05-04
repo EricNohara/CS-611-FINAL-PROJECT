@@ -122,6 +122,11 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
         editBtn.addActionListener(e -> editSelectedAssignment());
         delBtn.addActionListener(e -> deleteSelectedAssignment());
         subsBtn.addActionListener(e -> viewSubmissionsForAssignment());
+
+        boolean isTeacher = this.teacher.getRole() == User.Role.TEACHER;
+        newBtn.setVisible(isTeacher);
+        editBtn.setVisible(isTeacher);
+        delBtn.setVisible(isTeacher);
     }
 
     // Data loaders
