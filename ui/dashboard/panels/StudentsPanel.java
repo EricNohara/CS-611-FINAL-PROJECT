@@ -686,7 +686,6 @@ public final class StudentsPanel extends JPanel implements Refreshable {
 
     // Import students from csv
     private void importStudents() {
-
         // Choose csv file
         JFileChooser fc = new JFileChooser();
         fc.setDialogTitle("Import Students");
@@ -812,11 +811,9 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         // Show course selection dialog
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Remove User from Course",
                 Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setSize(400, 200);
-        dialog.setLocationRelativeTo(this);
 
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Padding.addPanelPaddingDefault(panel);
 
         // Form panel
         JPanel formPanel = new JPanel(new GridBagLayout());
@@ -827,7 +824,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         // Student name
         gbc.gridx = 0;
         gbc.gridy = 0;
-        formPanel.add(new JLabel("User:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("User:"), gbc);
 
         gbc.gridx = 1;
         JLabel nameLabel = new JLabel(userName);
@@ -837,18 +834,21 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
-        formPanel.add(new JLabel("Course:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Course Name:"), gbc);
 
         gbc.gridx = 1;
-        JComboBox<String> courseComboBox = new JComboBox<>();
+        String selectedCourse = studentTable.getValueAt(selectedRow, 4).toString();
+        JLabel courseLabel = new JLabel((String) studentTable.getValueAt(selectedRow, 3).toString());
+        formPanel.add(courseLabel, gbc);
 
-        // Get courses from student's enrollment (from table data)
-        String courses = studentTable.getValueAt(selectedRow, 4).toString();
-        for (String course : courses.split(" ")) {
-            courseComboBox.addItem(course);
-        }
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        formPanel.add(UIConstants.getBoldLabel("Course ID:"), gbc);
 
-        formPanel.add(courseComboBox, gbc);
+        gbc.gridx = 1;
+        JLabel courseIDLabel = new JLabel(selectedCourse);
+        formPanel.add(courseIDLabel, gbc);
 
         panel.add(formPanel, BorderLayout.CENTER);
 
@@ -862,18 +862,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
 
         // Add button actions
         cancelButton.addActionListener(e -> dialog.dispose());
-        String selectedCourse = (String) courseComboBox.getSelectedItem();
-
-        if (selectedCourse == null) {
-            JOptionPane.showMessageDialog(dialog,
-                    "Please choose a valid course.",
-                    "Validation Error",
-                    JOptionPane.ERROR_MESSAGE);
-            return;
-        }
         int userId = (Integer) studentTable.getValueAt(selectedRow, 0);
-        System.out.println("Selected course raw: [" + selectedCourse + "]");
-
         int courseId = Integer.parseInt((String) selectedCourse);
 
         removeButton.addActionListener(e -> {
@@ -895,10 +884,11 @@ public final class StudentsPanel extends JPanel implements Refreshable {
             dialog.dispose();
         });
 
-        refresh();
-
         dialog.add(panel);
+        dialog.setLocationRelativeTo(this);
+        dialog.pack();
         dialog.setVisible(true);
+        refresh();
     }
 
     private void emailStudent() {
@@ -918,11 +908,11 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         // Open email dialog
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Email Student",
                 Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setSize(500, 400);
+        dialog.setSize(800, 600);
         dialog.setLocationRelativeTo(this);
 
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Padding.addPanelPaddingDefault(panel);
 
         // Form panel
         JPanel formPanel = new JPanel(new GridBagLayout());
@@ -933,7 +923,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         // To field
         gbc.gridx = 0;
         gbc.gridy = 0;
-        formPanel.add(new JLabel("To:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("To:"), gbc);
 
         gbc.gridx = 1;
         JLabel toLabel = new JLabel(studentName + " <" + studentEmail + ">");
@@ -942,11 +932,12 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         // Subject field
         gbc.gridx = 0;
         gbc.gridy = 1;
-        formPanel.add(new JLabel("Subject:"), gbc);
+        formPanel.add(UIConstants.getBoldLabel("Subject:"), gbc);
 
         gbc.gridx = 1;
         JTextField subjectField = new JTextField(30);
         formPanel.add(subjectField, gbc);
+        Padding.addInputPaddingDefault(subjectField);
 
         // Message field
         gbc.gridx = 0;
@@ -958,8 +949,10 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         JTextArea messageArea = new JTextArea();
         messageArea.setLineWrap(true);
         messageArea.setWrapStyleWord(true);
+        messageArea.setFont(UIConstants.DEFAULT_FONT);
         JScrollPane messageScrollPane = new JScrollPane(messageArea);
         formPanel.add(messageScrollPane, gbc);
+        Padding.addInputPaddingDefault(messageArea);
 
         panel.add(formPanel, BorderLayout.CENTER);
 
