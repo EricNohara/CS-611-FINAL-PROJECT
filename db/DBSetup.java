@@ -1,4 +1,6 @@
 package db;
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -71,16 +73,6 @@ public class DBSetup {
                                                         "submission_types TEXT," +
                                                         "FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE);";
 
-    private static final String clearAllTablesQuery = "DELETE FROM user_submissions;" +
-                                                     "DELETE FROM user_courses;" +
-                                                     "DELETE FROM users;" +
-                                                     "DELETE FROM course_templates;" +
-                                                     "DELETE FROM assignment_templates;" +
-                                                     "DELETE FROM courses;" +
-                                                     "DELETE FROM assignments;" +
-                                                     "DELETE FROM submissions;" +
-                                                     "DELETE FROM sqlite_sequence;";
-
     private static final String[] createTableQueries = {
         createUsersQuery, 
         createCourseTemplatesQuery, 
@@ -101,12 +93,22 @@ public class DBSetup {
         }
     }
 
-    public static void clearAllTables() {
-        try (Connection connection = DBConnection.getConnection();
-            Statement stmt = connection.createStatement()) {
-            stmt.execute(clearAllTablesQuery);
-        } catch (SQLException e) {
-            System.err.println("Error clearing all tables: " + e.getMessage());
+    public static void checkForPendingRestore() {
+        File pending = new File("./data/database_restore_pending.db");
+        File dbFile = new File("./data/database.db");
+
+        if (pending.exists()) {
+            try {
+                java.nio.file.Files.move(
+                    pending.toPath(),
+                    dbFile.toPath(),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                );
+                System.out.println("Database restored from pending backup.");
+            } catch (IOException e) {
+                System.err.println("Failed to restore pending backup: " + e.getMessage());
+            }
         }
     }
+
 }

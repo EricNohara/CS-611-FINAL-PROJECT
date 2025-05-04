@@ -13,5 +13,5 @@ public class DBConnection {
         Connection conn = DriverManager.getConnection(DATABASE_URL);
         conn.createStatement().execute("PRAGMA foreign_keys = ON;");
         return conn;
-    }
+    }    
 }
