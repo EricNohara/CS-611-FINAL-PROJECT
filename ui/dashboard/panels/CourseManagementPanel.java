@@ -2,6 +2,9 @@ package ui.dashboard.panels;
 
 import db.*;
 import model.*;
+import ui.UIConstants;
+import ui.utils.PaddedCellRenderer;
+import ui.utils.Padding;
 import ui.utils.TemplateItem;
 
 import javax.swing.*;
@@ -54,6 +57,11 @@ public final class CourseManagementPanel extends JPanel {
         courseTable.setAutoCreateRowSorter(true);
         courseTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         add(new JScrollPane(courseTable), BorderLayout.CENTER);
+        courseTable.getTableHeader().setFont(courseTable.getTableHeader().getFont().deriveFont(Font.BOLD));
+
+        PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
+        PaddedCellRenderer.setDefaultRowHeight(courseTable);
+        paddedRenderer.applyCellPadding(courseTable);
 
         // Bottom filter
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -161,11 +169,9 @@ public final class CourseManagementPanel extends JPanel {
     private void showAddCourseDialog() {
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Add New Course",
                 Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setSize(450, 300);
-        dialog.setLocationRelativeTo(this);
 
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Padding.addPanelPaddingDefault(panel);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -174,21 +180,23 @@ public final class CourseManagementPanel extends JPanel {
         // Course name field
         gbc.gridx = 0;
         gbc.gridy = 0;
-        panel.add(new JLabel("Course Name:"), gbc);
+        panel.add(UIConstants.getBoldLabel("Course Name:"), gbc);
 
         gbc.gridx = 1;
         JTextField nameField = new JTextField(20);
         panel.add(nameField, gbc);
+        Padding.addInputPaddingDefault(nameField);
 
         // Course template selection
         gbc.gridx = 0;
         gbc.gridy = 1;
-        panel.add(new JLabel("Course Template:"), gbc);
+        panel.add(UIConstants.getBoldLabel("Course Template:"), gbc);
 
         gbc.gridx = 1;
         JComboBox<TemplateItem> templateComboBox = new JComboBox<>();
         // Add a "None" option
         templateComboBox.addItem(new TemplateItem(-1, "None"));
+        Padding.addInputPaddingDefault(templateComboBox);
 
         // Get course templates from database
         try {
@@ -209,7 +217,7 @@ public final class CourseManagementPanel extends JPanel {
         // Active checkbox
         gbc.gridx = 0;
         gbc.gridy = 2;
-        panel.add(new JLabel("Active:"), gbc);
+        panel.add(UIConstants.getBoldLabel("Active:"), gbc);
 
         gbc.gridx = 1;
         JCheckBox activeCheckBox = new JCheckBox();
@@ -285,6 +293,8 @@ public final class CourseManagementPanel extends JPanel {
         cancelButton.addActionListener(e -> dialog.dispose());
 
         dialog.add(panel);
+        dialog.setLocationRelativeTo(this);
+        dialog.pack();
         dialog.setVisible(true);
     }
 
@@ -320,11 +330,9 @@ public final class CourseManagementPanel extends JPanel {
             // Create edit dialog
             JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Edit Course",
                     Dialog.ModalityType.APPLICATION_MODAL);
-            dialog.setSize(450, 300);
-            dialog.setLocationRelativeTo(this);
 
             JPanel panel = new JPanel(new GridBagLayout());
-            panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            Padding.addPanelPaddingDefault(panel);
 
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -333,7 +341,7 @@ public final class CourseManagementPanel extends JPanel {
             // Course ID field (display only)
             gbc.gridx = 0;
             gbc.gridy = 0;
-            panel.add(new JLabel("Course ID:"), gbc);
+            panel.add(UIConstants.getBoldLabel("Course ID:"), gbc);
 
             gbc.gridx = 1;
             JLabel idLabel = new JLabel(String.valueOf(course.getId()));
@@ -342,19 +350,21 @@ public final class CourseManagementPanel extends JPanel {
             // Course name field
             gbc.gridx = 0;
             gbc.gridy = 1;
-            panel.add(new JLabel("Course Name:"), gbc);
+            panel.add(UIConstants.getBoldLabel("Course Name:"), gbc);
 
             gbc.gridx = 1;
             JTextField nameField = new JTextField(course.getName(), 20);
             panel.add(nameField, gbc);
+            Padding.addInputPaddingDefault(nameField);
 
             // Course template selection
             gbc.gridx = 0;
             gbc.gridy = 2;
-            panel.add(new JLabel("Course Template:"), gbc);
+            panel.add(UIConstants.getBoldLabel("Course Template:"), gbc);
 
             gbc.gridx = 1;
             JComboBox<TemplateItem> templateComboBox = new JComboBox<>();
+            Padding.addInputPaddingDefault(templateComboBox);
             // Add a "None" option
             templateComboBox.addItem(new TemplateItem(-1, "None"));
 
@@ -378,7 +388,7 @@ public final class CourseManagementPanel extends JPanel {
             // Active checkbox
             gbc.gridx = 0;
             gbc.gridy = 3;
-            panel.add(new JLabel("Active:"), gbc);
+            panel.add(UIConstants.getBoldLabel("Active:"), gbc);
 
             gbc.gridx = 1;
             JCheckBox activeCheckBox = new JCheckBox();
@@ -454,6 +464,8 @@ public final class CourseManagementPanel extends JPanel {
             cancelButton.addActionListener(e -> dialog.dispose());
 
             dialog.add(panel);
+            dialog.setLocationRelativeTo(this);
+            dialog.pack();
             dialog.setVisible(true);
 
         } catch (Exception e) {
@@ -546,15 +558,13 @@ public final class CourseManagementPanel extends JPanel {
             // Create detail dialog
             JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Course Details - " + course.getName(),
                     Dialog.ModalityType.APPLICATION_MODAL);
-            dialog.setSize(800, 600);
-            dialog.setLocationRelativeTo(this);
 
             // Create tabbed pane for different details
             JTabbedPane detailsTabs = new JTabbedPane();
 
             // Course info panel
             JPanel infoPanel = new JPanel(new BorderLayout(10, 10));
-            infoPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            Padding.addPanelPaddingDefault(infoPanel);
 
             // Basic info section
             JPanel basicInfoPanel = new JPanel(new GridLayout(4, 2, 10, 10));
@@ -605,6 +615,11 @@ public final class CourseManagementPanel extends JPanel {
             JScrollPane studentScrollPane = new JScrollPane(studentTable);
             studentsPanel.add(studentScrollPane, BorderLayout.CENTER);
 
+            studentTable.getTableHeader().setFont(studentTable.getTableHeader().getFont().deriveFont(Font.BOLD));
+            PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
+            PaddedCellRenderer.setDefaultRowHeight(studentTable);
+            paddedRenderer.applyCellPadding(studentTable);
+
             infoPanel.add(studentsPanel, BorderLayout.CENTER);
 
             // Add info panel to tabs
@@ -612,7 +627,7 @@ public final class CourseManagementPanel extends JPanel {
 
             // Assignments panel
             JPanel assignmentsPanel = new JPanel(new BorderLayout(10, 10));
-            assignmentsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            Padding.addPanelPaddingDefault(assignmentsPanel);
 
             // Get assignments for this course
             AssignmentDAO assignmentDAO = AssignmentDAO.getInstance();
@@ -640,6 +655,11 @@ public final class CourseManagementPanel extends JPanel {
             JTable assignmentTable = new JTable(assignmentModel);
             JScrollPane assignmentScrollPane = new JScrollPane(assignmentTable);
             assignmentsPanel.add(assignmentScrollPane, BorderLayout.CENTER);
+            assignmentTable.getTableHeader().setFont(assignmentTable.getTableHeader().getFont().deriveFont(Font.BOLD));
+
+            PaddedCellRenderer.setDefaultRowHeight(assignmentTable);
+            paddedRenderer.applyCellPadding(assignmentTable);
+
 
             // Add assignments panel to tabs
             detailsTabs.addTab("Assignments", assignmentsPanel);
@@ -655,7 +675,8 @@ public final class CourseManagementPanel extends JPanel {
             buttonPanel.add(closeButton);
 
             dialog.add(buttonPanel, BorderLayout.SOUTH);
-
+            dialog.setLocationRelativeTo(this);
+            dialog.pack();
             dialog.setVisible(true);
 
         } catch (Exception e) {

@@ -1,6 +1,8 @@
 package ui.dashboard.panels;
 
 import model.Admin;
+import ui.utils.Padding;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -54,14 +56,17 @@ public final class SystemSettingsPanel extends JPanel {
         appSettingsPanel.add(new JLabel("Default File Upload Path:"));
         JTextField uploadPathField = new JTextField("./uploads/");
         appSettingsPanel.add(uploadPathField);
+        Padding.addInputPaddingDefault(uploadPathField);
 
         appSettingsPanel.add(new JLabel("Max Upload Size (MB):"));
         JTextField maxUploadField = new JTextField("50");
         appSettingsPanel.add(maxUploadField);
+        Padding.addInputPaddingDefault(maxUploadField);
 
         appSettingsPanel.add(new JLabel("Session Timeout (minutes):"));
         JTextField timeoutField = new JTextField("30");
         appSettingsPanel.add(timeoutField);
+        Padding.addInputPaddingDefault(timeoutField);
 
         appSettingsPanel.add(new JLabel("Enable Debug Logging:"));
         JCheckBox debugCheckbox = new JCheckBox();

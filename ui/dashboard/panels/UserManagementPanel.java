@@ -3,6 +3,9 @@ package ui.dashboard.panels;
 import db.*;
 import model.*;
 import ui.LoginFrame; // if the panel needs it for actions
+import ui.UIConstants;
+import ui.utils.PaddedCellRenderer;
+import ui.utils.Padding;
 import ui.utils.TemplateItem; // remove if unused
 import utils.Hasher;
 
@@ -43,11 +46,13 @@ public final class UserManagementPanel extends JPanel {
         String[] roles = { "All Roles", "STUDENT", "GRADER", "TEACHER", "ADMIN" };
         JComboBox<String> roleFilter = new JComboBox<>(roles);
         filterPanel.add(roleFilter);
+        Padding.addInputPaddingDefault(roleFilter);
 
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         searchPanel.add(new JLabel("Search:"));
 
         JTextField searchField = new JTextField(20);
+        Padding.addInputPaddingDefault(searchField);
         JButton searchBtn = new JButton("Search");
         searchPanel.add(searchField);
         searchPanel.add(searchBtn);
@@ -90,6 +95,11 @@ public final class UserManagementPanel extends JPanel {
         userTable = new JTable(tableModel);
         userTable.setAutoCreateRowSorter(true);
         add(new JScrollPane(userTable), BorderLayout.CENTER);
+        userTable.getTableHeader().setFont(userTable.getTableHeader().getFont().deriveFont(Font.BOLD));
+
+        PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
+        PaddedCellRenderer.setDefaultRowHeight(userTable);
+        paddedRenderer.applyCellPadding(userTable);
 
         // Listeners
         addBtn.addActionListener(e -> showAddUserDialog());
@@ -180,11 +190,9 @@ public final class UserManagementPanel extends JPanel {
         // Show dialog to add a new user
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Add New User",
                 Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setSize(400, 300);
-        dialog.setLocationRelativeTo(this);
 
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Padding.addPanelPaddingDefault(panel);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -193,39 +201,43 @@ public final class UserManagementPanel extends JPanel {
         // Name field
         gbc.gridx = 0;
         gbc.gridy = 0;
-        panel.add(new JLabel("Name:"), gbc);
+        panel.add(UIConstants.getBoldLabel("Name:"), gbc);
 
         gbc.gridx = 1;
         JTextField nameField = new JTextField(20);
         panel.add(nameField, gbc);
+        Padding.addInputPaddingDefault(nameField);
 
         // Email field
         gbc.gridx = 0;
         gbc.gridy = 1;
-        panel.add(new JLabel("Email:"), gbc);
+        panel.add(UIConstants.getBoldLabel("Email:"), gbc);
 
         gbc.gridx = 1;
         JTextField emailField = new JTextField(20);
         panel.add(emailField, gbc);
+        Padding.addInputPaddingDefault(emailField);
 
         // Password field
         gbc.gridx = 0;
         gbc.gridy = 2;
-        panel.add(new JLabel("Password:"), gbc);
+        panel.add(UIConstants.getBoldLabel("Password:"), gbc);
 
         gbc.gridx = 1;
         JPasswordField passwordField = new JPasswordField(20);
         panel.add(passwordField, gbc);
+        Padding.addInputPaddingDefault(passwordField);
 
         // Role dropdown
         gbc.gridx = 0;
         gbc.gridy = 3;
-        panel.add(new JLabel("Role:"), gbc);
+        panel.add(UIConstants.getBoldLabel("Role:"), gbc);
 
         gbc.gridx = 1;
         String[] roles = { "STUDENT", "GRADER", "TEACHER" };
         JComboBox<String> roleComboBox = new JComboBox<>(roles);
         panel.add(roleComboBox, gbc);
+        Padding.addInputPaddingDefault(roleComboBox);
 
         // Buttons
         gbc.gridx = 0;
@@ -300,6 +312,8 @@ public final class UserManagementPanel extends JPanel {
         cancelButton.addActionListener(e -> dialog.dispose());
 
         dialog.add(panel);
+        dialog.setLocationRelativeTo(this);
+        dialog.pack();
         dialog.setVisible(true);
     }
 
@@ -332,11 +346,9 @@ public final class UserManagementPanel extends JPanel {
         // Create edit dialog
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Edit User",
                 Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setSize(400, 350);
-        dialog.setLocationRelativeTo(this);
 
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Padding.addPanelPaddingDefault(panel);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -345,7 +357,7 @@ public final class UserManagementPanel extends JPanel {
         // ID field (display only)
         gbc.gridx = 0;
         gbc.gridy = 0;
-        panel.add(new JLabel("ID:"), gbc);
+        panel.add(UIConstants.getBoldLabel("ID:"), gbc);
 
         gbc.gridx = 1;
         JLabel idLabel = new JLabel(String.valueOf(user.getId()));
@@ -354,29 +366,32 @@ public final class UserManagementPanel extends JPanel {
         // Name field
         gbc.gridx = 0;
         gbc.gridy = 1;
-        panel.add(new JLabel("Name:"), gbc);
+        panel.add(UIConstants.getBoldLabel("Name:"), gbc);
 
         gbc.gridx = 1;
         JTextField nameField = new JTextField(user.getName(), 20);
         panel.add(nameField, gbc);
+        Padding.addInputPaddingDefault(nameField);
 
         // Email field
         gbc.gridx = 0;
         gbc.gridy = 2;
-        panel.add(new JLabel("Email:"), gbc);
+        panel.add(UIConstants.getBoldLabel("Email:"), gbc);
 
         gbc.gridx = 1;
         JTextField emailField = new JTextField(user.getEmail(), 20);
         panel.add(emailField, gbc);
+        Padding.addInputPaddingDefault(emailField);
 
         // Role field (display only)
         gbc.gridx = 0;
         gbc.gridy = 3;
-        panel.add(new JLabel("Role:"), gbc);
+        panel.add(UIConstants.getBoldLabel("Role:"), gbc);
 
         gbc.gridx = 1;
         JLabel roleLabel = new JLabel(user.getRole().toString());
         panel.add(roleLabel, gbc);
+        Padding.addInputPaddingDefault(roleLabel);
 
         // Change password checkbox
         gbc.gridx = 0;
@@ -389,7 +404,7 @@ public final class UserManagementPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.gridwidth = 1;
-        JLabel passwordLabel = new JLabel("New Password:");
+        JLabel passwordLabel = UIConstants.getBoldLabel("New Password:");
         passwordLabel.setVisible(false);
         panel.add(passwordLabel, gbc);
 
@@ -397,10 +412,11 @@ public final class UserManagementPanel extends JPanel {
         JPasswordField passwordField = new JPasswordField(20);
         passwordField.setVisible(false);
         panel.add(passwordField, gbc);
+        Padding.addInputPaddingDefault(passwordField);
 
         gbc.gridx = 0;
         gbc.gridy = 6;
-        JLabel confirmLabel = new JLabel("Confirm Password:");
+        JLabel confirmLabel = UIConstants.getBoldLabel("Confirm Password:");
         confirmLabel.setVisible(false);
         panel.add(confirmLabel, gbc);
 
@@ -408,11 +424,12 @@ public final class UserManagementPanel extends JPanel {
         JPasswordField confirmField = new JPasswordField(20);
         confirmField.setVisible(false);
         panel.add(confirmField, gbc);
+        Padding.addInputPaddingDefault(confirmField);
 
         // Created date (display only)
         gbc.gridx = 0;
         gbc.gridy = 7;
-        panel.add(new JLabel("Created:"), gbc);
+        panel.add(UIConstants.getBoldLabel("Created:"), gbc);
 
         gbc.gridx = 1;
         JLabel createdLabel = new JLabel(user.getCreatedAt() != null ? user.getCreatedAt().toString() : "N/A");
@@ -421,7 +438,7 @@ public final class UserManagementPanel extends JPanel {
         // Last updated (display only)
         gbc.gridx = 0;
         gbc.gridy = 8;
-        panel.add(new JLabel("Last Updated:"), gbc);
+        panel.add(UIConstants.getBoldLabel("Last Updated:"), gbc);
 
         gbc.gridx = 1;
         JLabel updatedLabel = new JLabel(user.getLastUpdated() != null ? user.getLastUpdated().toString() : "N/A");
@@ -518,6 +535,7 @@ public final class UserManagementPanel extends JPanel {
         cancelButton.addActionListener(e -> dialog.dispose());
 
         dialog.add(panel);
+        dialog.setLocationRelativeTo(this);
         dialog.pack(); // Adjust size to content
         dialog.setVisible(true);
     }

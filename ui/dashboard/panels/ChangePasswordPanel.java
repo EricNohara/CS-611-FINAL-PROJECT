@@ -1,6 +1,7 @@
 package ui.dashboard.panels;
 
 import model.User;
+import ui.utils.Padding;
 import utils.Hasher;
 
 import javax.swing.*;
@@ -32,6 +33,10 @@ public class ChangePasswordPanel extends JPanel {
         JPasswordField currentPassField = new JPasswordField(20);
         JPasswordField newPassField = new JPasswordField(20);
         JPasswordField confirmPassField = new JPasswordField(20);
+
+        Padding.addInputPaddingDefault(currentPassField);
+        Padding.addInputPaddingDefault(newPassField);
+        Padding.addInputPaddingDefault(confirmPassField);
 
         JButton changeBtn = new JButton("Change Password");
 
