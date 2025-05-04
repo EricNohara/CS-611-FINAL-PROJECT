@@ -96,6 +96,7 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
         };
         assignmentTable = new JTable(assignmentModel);
         add(new JScrollPane(assignmentTable), BorderLayout.CENTER);
+        assignmentTable.getTableHeader().setFont(assignmentTable.getTableHeader().getFont().deriveFont(Font.BOLD));
 
         PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
         PaddedCellRenderer.setDefaultRowHeight(assignmentTable);

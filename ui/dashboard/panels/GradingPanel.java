@@ -84,6 +84,7 @@ public final class GradingPanel extends JPanel implements Refreshable {
         };
         submissionTable = new JTable(submissionModel);
         add(new JScrollPane(submissionTable), BorderLayout.CENTER);
+        submissionTable.getTableHeader().setFont(submissionTable.getTableHeader().getFont().deriveFont(Font.BOLD));
 
         PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
         PaddedCellRenderer.setDefaultRowHeight(submissionTable);

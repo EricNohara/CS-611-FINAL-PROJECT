@@ -9,6 +9,7 @@ import model.Course;
 import model.Submission;
 import model.Teacher;
 import model.User;
+import ui.utils.PaddedCellRenderer;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -55,6 +56,11 @@ public class TeacherOverallStatsPanel extends JPanel implements Refreshable {
         };
         statsTable = new JTable(statsModel);
         add(new JScrollPane(statsTable), BorderLayout.CENTER);
+        statsTable.getTableHeader().setFont(statsTable.getTableHeader().getFont().deriveFont(Font.BOLD));
+
+        PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
+        PaddedCellRenderer.setDefaultRowHeight(statsTable);
+        paddedRenderer.applyCellPadding(statsTable);
 
         JPanel statsSummary = new JPanel(new GridLayout(1, 3));
         meanLabel = new JLabel("Mean: -");

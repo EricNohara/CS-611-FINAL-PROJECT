@@ -98,6 +98,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         };
         studentTable = new JTable(studentModel);
         add(new JScrollPane(studentTable), BorderLayout.CENTER);
+        studentTable.getTableHeader().setFont(studentTable.getTableHeader().getFont().deriveFont(Font.BOLD));
 
         PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
         PaddedCellRenderer.setDefaultRowHeight(studentTable);
@@ -1139,6 +1140,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         root.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         root.add(summary, BorderLayout.NORTH);
         JTable table = new JTable(model);
+        table.getTableHeader().setFont(table.getTableHeader().getFont().deriveFont(Font.BOLD));
         PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
         PaddedCellRenderer.setDefaultRowHeight(table);
         paddedRenderer.applyCellPadding(table);
