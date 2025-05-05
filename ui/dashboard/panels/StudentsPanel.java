@@ -28,11 +28,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
 
     private final Teacher teacher;
     private final JTabbedPane parentTabs;
-<<<<<<< HEAD
     private final List<Course> teacherCourses = new ArrayList<>();
-=======
-    private List<Course> teacherCourses;
->>>>>>> 74ccd354ca60ee59af8262fd007910b5c4941c60
 
     // UI widgets we reuse in helpers
     private DefaultTableModel studentModel;
@@ -61,8 +57,6 @@ public final class StudentsPanel extends JPanel implements Refreshable {
 
         courseCombo = new JComboBox<>();
         courseCombo.addItem("All Courses");
-        teacherCourses = CourseDAO.getInstance().getCoursesForTeacher(this.teacher.getId());
-        teacherCourses.forEach(c -> courseCombo.addItem(c.getName()));
         filter.add(courseCombo);
 
         filter.add(Box.createHorizontalStrut(10));
