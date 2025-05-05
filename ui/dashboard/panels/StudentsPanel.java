@@ -24,6 +24,7 @@ import java.io.PrintWriter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 import static ui.utils.StudentGradeResult.getLetterGrade;
 import static ui.utils.StudentGradeResult.getStudentGradePercent;
@@ -33,7 +34,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
 
     private final Teacher teacher;
     private final JTabbedPane parentTabs;
-    private final List<Course> teacherCourses;
+    private final List<Course> teacherCourses = new ArrayList<>();
 
     // UI widgets we reuse in helpers
     private DefaultTableModel studentModel;
@@ -47,8 +48,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
         this.parentTabs = parentTabs;
 
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        teacherCourses = CourseDAO.getInstance()
-                .getCoursesForTeacher(teacher.getId());
+        teacherCourses.addAll(CourseDAO.getInstance().getCoursesForTeacher(teacher.getId()));
 
         buildUI();
         loadStudentGraderData(); // initial fill
@@ -202,6 +202,16 @@ public final class StudentsPanel extends JPanel implements Refreshable {
                 (String) statusCombo.getSelectedItem(),
                 teacherCourses);
     }
+
+    private void refreshCourseDropdown() {
+        teacherCourses.clear();
+        teacherCourses.addAll(CourseDAO.getInstance().getCoursesForTeacher(teacher.getId()));
+    
+        courseCombo.removeAllItems();
+        courseCombo.addItem("All Courses");
+        teacherCourses.forEach(c -> courseCombo.addItem(c.getName()));
+    }
+    
 
     private void addStudent() {
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Add Student to Course",
@@ -1210,6 +1220,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
   
     @Override
     public void refresh() {
+        refreshCourseDropdown();
         loadStudentGraderData();
     }
 }
