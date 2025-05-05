@@ -2,7 +2,9 @@ package ui.dashboard;
 
 import model.Grader;
 import ui.LoginFrame;
+import ui.UIConstants;
 import ui.dashboard.panels.*;
+import ui.utils.Padding;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,18 +18,16 @@ public class GraderDashboard extends JFrame {
         this.grader = grader;
 
         setTitle("Grader Dashboard - " + grader.getName());
-        setSize(1000, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
 
         // Create main panel
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Padding.addPanelPaddingDefault(mainPanel);
 
         // Create header panel with welcome message and logout button
         JPanel headerPanel = new JPanel(new BorderLayout());
         JLabel welcomeLabel = new JLabel("Welcome, " + grader.getName() + "!");
-        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        welcomeLabel.setFont(UIConstants.LARGE_FONT_BOLD);
         headerPanel.add(welcomeLabel, BorderLayout.WEST);
 
         //refresh
@@ -83,6 +83,8 @@ public class GraderDashboard extends JFrame {
 
         // Add main panel to frame
         add(mainPanel);
+        setLocationRelativeTo(null);
+        pack();
     }
 
     private void logout() {

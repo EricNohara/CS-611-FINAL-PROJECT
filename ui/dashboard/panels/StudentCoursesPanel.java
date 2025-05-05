@@ -47,6 +47,7 @@ public class StudentCoursesPanel extends JPanel implements Refreshable {
         };
         courseTable = new JTable(courseModel);
         add(new JScrollPane(courseTable), BorderLayout.CENTER);
+        courseTable.getTableHeader().setFont(courseTable.getTableHeader().getFont().deriveFont(Font.BOLD));
 
         PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
         PaddedCellRenderer.setDefaultRowHeight(courseTable);

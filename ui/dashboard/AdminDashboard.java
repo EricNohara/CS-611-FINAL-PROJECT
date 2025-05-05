@@ -6,10 +6,12 @@ import javax.swing.table.DefaultTableModel;
 import model.Admin;
 
 import ui.LoginFrame;
+import ui.UIConstants;
 import ui.dashboard.panels.ChangePasswordPanel;
 import ui.dashboard.panels.CourseManagementPanel;
 import ui.dashboard.panels.SystemSettingsPanel;
 import ui.dashboard.panels.UserManagementPanel;
+import ui.utils.Padding;
 
 import java.awt.*;
 
@@ -23,18 +25,16 @@ public class AdminDashboard extends JFrame {
         this.admin = admin;
 
         setTitle("Admin Dashboard - " + admin.getName());
-        setSize(1000, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
 
         // Create main panel
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Padding.addPanelPaddingDefault(mainPanel);
 
         // Welcome panel
         JPanel welcomePanel = new JPanel(new BorderLayout());
         JLabel welcomeLabel = new JLabel("Welcome, " + admin.getName() + " (Administrator)");
-        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        welcomeLabel.setFont(UIConstants.LARGE_FONT_BOLD);
         welcomePanel.add(welcomeLabel, BorderLayout.WEST);
 
         JButton logoutButton = new JButton("Logout");
@@ -71,6 +71,8 @@ public class AdminDashboard extends JFrame {
 
         // Add main panel to frame
         add(mainPanel);
+        setLocationRelativeTo(null);
+        pack();
     }
 
     private void logout() {

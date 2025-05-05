@@ -58,6 +58,8 @@ public final class CoursesPanel extends JPanel implements Refreshable{
 
         courseTable = new JTable(courseModel);
         add(new JScrollPane(courseTable), BorderLayout.CENTER);
+        courseTable.getTableHeader().setFont(courseTable.getTableHeader().getFont().deriveFont(Font.BOLD));
+
 
         PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
         PaddedCellRenderer.setDefaultRowHeight(courseTable);
@@ -70,6 +72,11 @@ public final class CoursesPanel extends JPanel implements Refreshable{
         newBtn.addActionListener(e -> createNewCourse());
         editBtn.addActionListener(e -> editSelectedCourse());
         delBtn.addActionListener(e -> deleteSelectedCourse());
+
+        boolean isTeacher = this.teacher.getRole() == User.Role.TEACHER;
+        newBtn.setVisible(isTeacher);
+        editBtn.setVisible(isTeacher);
+        delBtn.setVisible(isTeacher);
     }
 
     /* ====== table refresh ====== */

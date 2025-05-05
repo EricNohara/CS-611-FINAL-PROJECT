@@ -12,6 +12,7 @@ import utils.Hasher;
 public class GradingSystemApp {
     public void run() {
         // Initialize database
+        DBSetup.checkForPendingRestore();
         DBSetup.createTables();
         
         // Check if any users exist, if not create default admin

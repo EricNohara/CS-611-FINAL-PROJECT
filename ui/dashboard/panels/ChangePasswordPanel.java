@@ -1,6 +1,8 @@
 package ui.dashboard.panels;
 
 import model.User;
+import ui.UIConstants;
+import ui.utils.Padding;
 import utils.Hasher;
 
 import javax.swing.*;
@@ -25,13 +27,17 @@ public class ChangePasswordPanel extends JPanel {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel currentPassLabel = new JLabel("Current Password:");
-        JLabel newPassLabel = new JLabel("New Password:");
-        JLabel confirmPassLabel = new JLabel("Confirm New Password:");
+        JLabel currentPassLabel = UIConstants.getBoldLabel("Current Password:");
+        JLabel newPassLabel = UIConstants.getBoldLabel("New Password:");
+        JLabel confirmPassLabel = UIConstants.getBoldLabel("Confirm New Password:");
 
         JPasswordField currentPassField = new JPasswordField(20);
         JPasswordField newPassField = new JPasswordField(20);
         JPasswordField confirmPassField = new JPasswordField(20);
+
+        Padding.addInputPaddingDefault(currentPassField);
+        Padding.addInputPaddingDefault(newPassField);
+        Padding.addInputPaddingDefault(confirmPassField);
 
         JButton changeBtn = new JButton("Change Password");
 

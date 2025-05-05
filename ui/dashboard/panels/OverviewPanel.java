@@ -104,6 +104,8 @@ public final class OverviewPanel extends JPanel implements Refreshable{
 
         JTable tbl = new JTable(model);
         activityPanel.add(new JScrollPane(tbl), BorderLayout.CENTER);
+        tbl.getTableHeader().setFont(tbl.getTableHeader().getFont().deriveFont(Font.BOLD));
+
 
         PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
         PaddedCellRenderer.setDefaultRowHeight(tbl);

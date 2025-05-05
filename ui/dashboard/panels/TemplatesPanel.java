@@ -135,6 +135,8 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
 
         JTable assignmentTable = new JTable(assignmentModel);
         JScrollPane assignmentScrollPane = new JScrollPane(assignmentTable);
+        assignmentTable.getTableHeader().setFont(assignmentTable.getTableHeader().getFont().deriveFont(Font.BOLD));
+
 
         PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
         PaddedCellRenderer.setDefaultRowHeight(assignmentTable);
@@ -371,6 +373,8 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
 
         JTable assignmentTable = new JTable(assignmentModel);
         JScrollPane assignmentScrollPane = new JScrollPane(assignmentTable);
+        assignmentTable.getTableHeader().setFont(assignmentTable.getTableHeader().getFont().deriveFont(Font.BOLD));
+
 
         PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
         PaddedCellRenderer.setDefaultRowHeight(assignmentTable);
@@ -620,6 +624,8 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
         };
         JTable tbl = new JTable(mdl);
         right.add(new JScrollPane(tbl), BorderLayout.CENTER);
+        tbl.getTableHeader().setFont(tbl.getTableHeader().getFont().deriveFont(Font.BOLD));
+
 
         PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
         PaddedCellRenderer.setDefaultRowHeight(tbl);

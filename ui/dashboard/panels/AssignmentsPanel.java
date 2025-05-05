@@ -96,6 +96,7 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
         };
         assignmentTable = new JTable(assignmentModel);
         add(new JScrollPane(assignmentTable), BorderLayout.CENTER);
+        assignmentTable.getTableHeader().setFont(assignmentTable.getTableHeader().getFont().deriveFont(Font.BOLD));
 
         PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
         PaddedCellRenderer.setDefaultRowHeight(assignmentTable);
@@ -121,6 +122,11 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
         editBtn.addActionListener(e -> editSelectedAssignment());
         delBtn.addActionListener(e -> deleteSelectedAssignment());
         subsBtn.addActionListener(e -> viewSubmissionsForAssignment());
+
+        boolean isTeacher = this.teacher.getRole() == User.Role.TEACHER;
+        newBtn.setVisible(isTeacher);
+        editBtn.setVisible(isTeacher);
+        delBtn.setVisible(isTeacher);
     }
 
     // Data loaders
@@ -973,6 +979,7 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
         JTable submissionTable = new JTable(submissionModel);
         submissionTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         submissionTable.setAutoCreateRowSorter(true);
+        submissionTable.getTableHeader().setFont(submissionTable.getTableHeader().getFont().deriveFont(Font.BOLD));
 
         PaddedCellRenderer paddedRenderer = new PaddedCellRenderer();
         PaddedCellRenderer.setDefaultRowHeight(submissionTable);

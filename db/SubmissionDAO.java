@@ -86,21 +86,20 @@ public class SubmissionDAO implements CrudDAO<Submission> {
     @Override
     public List<Submission> readAllCondition(String columnName, Object value) {
         String query = "SELECT * FROM submissions WHERE " + columnName.trim() + " = ?";
-        //System.out.println("SQL = " + query + ", param = " + value);
+        List<Submission> submissions = new ArrayList<>();
 
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
     
             stmt.setObject(1, value);
             ResultSet rs = stmt.executeQuery();
-            List<Submission> submissions = new ArrayList<>();
-    
+            
             while (rs.next()) submissions.add(buildFromResultSet(rs));
             return submissions;
         } catch (SQLException e) {
             System.err.println("Error reading submissions: " + e.getMessage());
         }
-        return null;
+        return submissions;
     }
 //    private List<Integer> loadCollaboratorsForSubmission(int submissionId) {
 //        List<Integer> collaboratorIds = new ArrayList<>();
