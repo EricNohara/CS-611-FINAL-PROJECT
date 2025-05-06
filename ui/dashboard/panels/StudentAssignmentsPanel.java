@@ -46,7 +46,7 @@ public class StudentAssignmentsPanel extends JPanel implements Refreshable {
 
         add(topPanel, BorderLayout.NORTH);
 
-        String[] columns = { "ID", "Title", "Course", "Type", "Due Date", "Max Points", "Status" };
+        String[] columns = { "ID", "Title", "Course", "Type", "Due Date", "Max Points", "Status", "Grade" };
         assignmentModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int col) {
@@ -70,26 +70,54 @@ public class StudentAssignmentsPanel extends JPanel implements Refreshable {
         CourseDAO courseDAO = CourseDAO.getInstance();
         AssignmentDAO assignmentDAO = AssignmentDAO.getInstance();
         UserCourseDAO userCourseDAO = UserCourseDAO.getInstance();
-
+        SubmissionDAO submissionDAO = SubmissionDAO.getInstance();
+    
         List<UserCourse> enrollments = userCourseDAO.readAll().stream()
                 .filter(uc -> uc.getUserId() == student.getId())
                 .collect(Collectors.toList());
-
+    
         for (UserCourse uc : enrollments) {
             Course course = courseDAO.read(uc.getCourseId());
             if (course == null)
                 continue;
-
+    
             List<Assignment> assignments = assignmentDAO.readAllCondition("course_id", course.getId());
+    
             for (Assignment a : assignments) {
-                boolean open = a.getDueDate().after(new Timestamp(System.currentTimeMillis()));
+                // Get submissions for this assignment
+                List<Submission> submissions = submissionDAO.readAllCondition("assignment_id", a.getId());
+    
+                // Find the student's submission
+                Optional<Submission> studentSubmission = submissions.stream()
+                        .filter(s -> s.getCollaboratorIds().contains(student.getId()))
+                        .findFirst();
+    
+                String status;
+                String gradeDisplay = "—";
+    
+                if (studentSubmission.isPresent()) {
+                    Submission submission = studentSubmission.get();
+                    if (submission.getStatus() == Submission.Status.GRADED) {
+                        gradeDisplay = String.format("%.2f", submission.getGrade());
+                        status = "Submitted";
+                    } else {
+                        status = "Submitted";
+                    }
+                } else if (a.getDueDate().after(new Timestamp(System.currentTimeMillis()))) {
+                    status = "Open";
+                } else {
+                    status = "Closed";
+                }
+    
                 assignmentModel.addRow(new Object[] {
                         a.getId(), a.getName(), course.getName(), a.getType().toString(),
-                        a.getDueDate(), a.getMaxPoints(), open ? "Open" : "Closed"
+                        a.getDueDate(), a.getMaxPoints(), status, gradeDisplay
                 });
             }
         }
     }
+    
+    
 
     private void submitSelectedAssignment() {
         int selectedRow = assignmentTable.getSelectedRow();
