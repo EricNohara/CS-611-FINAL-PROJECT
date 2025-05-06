@@ -43,15 +43,17 @@ public final class GradingUtils {
         JPanel headerPanel = buildSubmissionInfoPanel(submission, assignment, studentNames);
         panel.add(headerPanel, BorderLayout.NORTH);
     
+        JPanel gradingPanel = null;
+    
         if (enableGrading) {
             JSplitPane mainSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
             mainSplitPane.setDividerLocation(450);
     
             JPanel submissionPanel = buildSubmissionPanel(submission);
-            mainSplitPane.setLeftComponent(submissionPanel);
+            gradingPanel = buildGradingPanel(assignment); 
     
-            JPanel rightPanel = buildGradingPanel(assignment);
-            mainSplitPane.setRightComponent(rightPanel);
+            mainSplitPane.setLeftComponent(submissionPanel);
+            mainSplitPane.setRightComponent(gradingPanel);
     
             panel.add(mainSplitPane, BorderLayout.CENTER);
         } else {
@@ -59,7 +61,7 @@ public final class GradingUtils {
             panel.add(submissionPanel, BorderLayout.CENTER);
         }
     
-        JPanel buttonPanel = buildButtonPanel(dialog, submission, gradingContext, assignment, null);
+        JPanel buttonPanel = buildButtonPanel(dialog, submission, gradingContext, assignment, gradingPanel);
         panel.add(buttonPanel, BorderLayout.SOUTH);
     
         dialog.add(panel);
@@ -67,6 +69,7 @@ public final class GradingUtils {
         dialog.pack();
         dialog.setVisible(true);
     }
+    
 
     private static List<String> loadStudentNames(Submission submission) {
         UserDAO userDAO = UserDAO.getInstance();
