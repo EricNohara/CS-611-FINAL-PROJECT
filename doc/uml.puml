@@ -1,0 +1,98 @@
+@startuml
+
+' Interfaces
+interface CourseManager
+interface AdminOperations
+interface GradingStrategy
+interface SubmissionUploader
+interface SubmissionGrader
+
+' Abstract class or base class
+class User {
+    +id: int
+    +name: String
+    +email: String
+    +passwordHash: String
+    +role: int
+}
+
+' Subclasses of User
+class Admin
+class Student
+class Teacher
+class Grader
+
+User <|-- Admin
+User <|-- Student
+User <|-- Teacher
+User <|-- Grader
+
+' Main domain classes
+class Course {
+    +id: int
+    +name: String
+    +active: boolean
+}
+
+class CourseTemplate {
+    +id: int
+    +name: String
+}
+
+class Assignment {
+    +id: int
+    +name: String
+    +dueDate: Timestamp
+    +maxPoints: float
+    +type: int
+    +submissionTypes: String
+}
+
+class AssignmentTemplate {
+    +id: int
+    +weight: float
+    +type: int
+    +submissionTypes: String
+}
+
+class Submission {
+    +id: int
+    +submittedAt: Timestamp
+    +pointsEarned: float
+    +grade: float
+    +status: int
+    +filepath: String
+}
+
+class UserCourse {
+    +userId: int
+    +courseId: int
+    +status: int
+    +role: int
+}
+
+' Grading strategies
+class PassFailGradingStrategy
+class ProportionalGradingStrategy
+
+GradingStrategy <|.. PassFailGradingStrategy
+GradingStrategy <|.. ProportionalGradingStrategy
+
+' Class - Interface implementations
+Admin ..|> AdminOperations
+Course ..|> CourseManager
+Grader ..|> SubmissionGrader
+Student ..|> SubmissionUploader
+
+' Associations
+Course "1" --> "many" Assignment
+CourseTemplate --> Course
+AssignmentTemplate --> Assignment
+Course --> "many" UserCourse
+User --> "many" UserCourse
+Assignment --> "many" Submission
+Submission --> "1" Grader : gradedBy
+Submission --> "1" Teacher : gradedBy
+Submission --> Assignment
+
+@enduml
