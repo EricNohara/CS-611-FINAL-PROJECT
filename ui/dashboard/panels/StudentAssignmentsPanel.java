@@ -15,6 +15,7 @@ import ui.utils.Padding;
 import utils.SubmissionFileManager;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.File;
@@ -100,9 +101,21 @@ public class StudentAssignmentsPanel extends JPanel implements Refreshable {
 
         int assignmentId = (int) assignmentModel.getValueAt(selectedRow, 0);
         String assignmentTitle = (String) assignmentModel.getValueAt(selectedRow, 1);
+        Assignment assignment = AssignmentDAO.getInstance().read(assignmentId);
 
+        if (assignment == null) return;
+
+        List<String> extensions = assignment.getSubmissionTypes();
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Select file to submit for: " + assignmentTitle);
+
+        if (extensions != null && !extensions.isEmpty()) {
+            String[] extensionArr = extensions.toArray(new String[0]);
+            FileNameExtensionFilter filter = new FileNameExtensionFilter(String.join(", ", extensionArr), extensionArr);
+            fileChooser.setFileFilter(filter);
+            fileChooser.setAcceptAllFileFilterUsed(false);
+        }
+
         int result = fileChooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
