@@ -659,7 +659,7 @@ public final class StudentsPanel extends JPanel implements Refreshable {
                         return;
                     }
 
-                    Grader newGrader = new Grader(name, email, password);
+                    Grader newGrader = new Grader(name, email, Hasher.hashPassword(password));
                     uDao.create(newGrader);
 
                     ucDao.create(new UserCourse(newGrader.getId(), course.getId(), UserCourse.Status.ACTIVE,
