@@ -9,6 +9,7 @@ import ui.utils.GradingUtils;
 import ui.utils.PaddedCellRenderer;
 import ui.utils.Padding;
 import ui.utils.TemplateItem;
+import utils.FileExtensionValidator;
 import utils.SubmissionFileManager;
 
 import javax.swing.*;
@@ -413,13 +414,12 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
 
                     // Get submission types
                     String submissionTypesText = submissionTypesField.getText().trim();
-                    List<String> submissionTypes = new ArrayList<>();
-                    if (!submissionTypesText.isEmpty()) {
-                        String[] types = submissionTypesText.split(",");
-                        for (String t : types) {
-                            submissionTypes.add(t.trim());
-                        }
-                    }
+                    List<String> submissionTypes = FileExtensionValidator.parseValidExtensions(submissionTypesText);
+
+                    if (!FileExtensionValidator.isValid(submissionTypesText)) {
+                        submissionTypesField.setText(String.join(", ", submissionTypes));
+                        throw new Exception("Invalid submission types detected!");
+                    } 
 
                     assignment = new Assignment(-1, title, dueDateTimestamp, maxPoints, courseId, weight, type, submissionTypes);
                 }
