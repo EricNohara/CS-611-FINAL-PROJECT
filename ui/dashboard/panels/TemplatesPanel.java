@@ -6,6 +6,7 @@ import ui.UIConstants;
 import ui.utils.PaddedCellRenderer;
 import ui.utils.Padding;
 import ui.utils.TemplateItem;
+import utils.FileExtensionValidator;
 
 import javax.swing.*;
 import javax.swing.event.TableModelListener;
@@ -213,6 +214,21 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
                 // Get assignment templates from the table
                 List<AssignmentTemplate> assignmentTemplates = new ArrayList<>();
 
+                boolean isValid = true;
+
+                // validity checking
+                for (int i = 0; i < assignmentModel.getRowCount(); i++) {
+                    String submissionTypesStr = (String) assignmentModel.getValueAt(i, 3);
+                    List<String> submissionTypes = FileExtensionValidator.parseValidExtensions(submissionTypesStr);
+
+                    if (!FileExtensionValidator.isValid(submissionTypesStr)) {
+                        assignmentModel.setValueAt(String.join(", ", submissionTypes), i, 3);
+                        isValid = false;
+                    }
+                }
+
+                if (!isValid) throw new Exception("Invalid submission type file extension detected!");
+
                 for (int i = 0; i < assignmentModel.getRowCount(); i++) {
                     String typeStr = (String) assignmentModel.getValueAt(i, 0);
                     String weightStr = assignmentModel.getValueAt(i, 1).toString();
@@ -222,21 +238,12 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
                     Assignment.Type type = Assignment.Type.valueOf(typeStr);
                     double weight = Double.parseDouble(weightStr) / 100.0; // Convert from percentage to decimal
                     int count = Integer.parseInt(countStr);
-
-                    // Parse submission types
-                    List<String> submissionTypes = new ArrayList<>();
-                    if (submissionTypesStr != null && !submissionTypesStr.isEmpty()) {
-                        String[] types = submissionTypesStr.split(",");
-                        for (String t : types) {
-                            submissionTypes.add(t.trim());
-                        }
-                    }
+                    List<String> submissionTypes = FileExtensionValidator.parseValidExtensions(submissionTypesStr);
 
                     // Create assignment template
                     // Note: Course template ID will be set after the course template is created
                     // We'll use -1 as a placeholder
-                    AssignmentTemplate assignTemplate = new AssignmentTemplate(
-                            -1, weight / count, type, submissionTypes);
+                    AssignmentTemplate assignTemplate = new AssignmentTemplate(-1, weight / count, type, submissionTypes);
 
                     // Create multiple templates based on count if needed
                     for (int j = 0; j < count; j++) {
