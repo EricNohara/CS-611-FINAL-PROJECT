@@ -288,7 +288,7 @@ public class CourseDAO implements CrudDAO<Course> {
     }
     
     public int getTotalStudentsCount(int teacherId) {
-        String query = "SELECT COUNT(DISTINCT u.id) FROM users u " +
+        String query = "SELECT COUNT(u.id) FROM users u " +
                        "JOIN user_courses uc ON u.id = uc.user_id " +
                        "JOIN courses c ON uc.course_id = c.id " +
                        "JOIN user_courses tc ON c.id = tc.course_id " +
