@@ -11,7 +11,9 @@ import java.awt.*;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 // Grading tab
@@ -142,42 +144,42 @@ public final class GradingPanel extends JPanel implements Refreshable {
 
     // Helper method to load submissions data
     private void loadSubmissionsData(DefaultTableModel model, String courseFilter, String assignmentFilter,
-            String statusFilter, List<Course> teacherCourses) {
-        // Clear existing data
+                                 String statusFilter, List<Course> teacherCourses) {
         model.setRowCount(0);
 
-        // Get submissions from database
         SubmissionDAO submissionDAO = SubmissionDAO.getInstance();
         List<Submission> allSubmissions = submissionDAO.readAll();
-        //System.out.println("all submission"+allSubmissions.size());
-        // Get assignments
         AssignmentDAO assignmentDAO = AssignmentDAO.getInstance();
-
-        // Get users
         UserDAO userDAO = UserDAO.getInstance();
 
-        // Filter and add submissions to table
-        for (Submission submission : allSubmissions) {
-            // Get assignment
-            Assignment assignment = assignmentDAO.read(submission.getAssignmentId());
-            if (assignment == null)
-                continue;
+        // Key: (studentId, assignmentId) -> latest Submission
+        Map<String, Submission> latestSubmissions = new HashMap<>();
 
-            // Check if assignment belongs to one of teacher's courses
+        for (Submission submission : allSubmissions) {
+            if (submission.getCollaboratorIds().isEmpty()) continue;
+            int studentId = submission.getCollaboratorIds().get(0);
+            String key = studentId + "-" + submission.getAssignmentId();
+
+            // Get the most recent submission for each student-assignment pair
+            Submission existing = latestSubmissions.get(key);
+            if (existing == null || submission.getSubmittedAt().after(existing.getSubmittedAt())) {
+                latestSubmissions.put(key, submission);
+            }
+        }
+
+        for (Submission submission : latestSubmissions.values()) {
+            Assignment assignment = assignmentDAO.read(submission.getAssignmentId());
+            if (assignment == null) continue;
+
             boolean isTeachersCourse = teacherCourses.stream()
                     .anyMatch(c -> c.getId() == assignment.getCourseId());
+            if (!isTeachersCourse) continue;
 
-            if (!isTeachersCourse)
-                continue;
-
-            // Find course
             Course course = teacherCourses.stream()
                     .filter(c -> c.getId() == assignment.getCourseId())
                     .findFirst()
                     .orElse(null);
-
-            if (course == null)
-                continue;
+            if (course == null) continue;
 
             // Apply course filter
             if (courseFilter != null && !"All Courses".equals(courseFilter) &&
@@ -197,17 +199,10 @@ public final class GradingPanel extends JPanel implements Refreshable {
                 continue;
             }
 
-            // Get student info
-            if (submission.getCollaboratorIds().isEmpty())
-                continue;
+            int studentId = submission.getCollaboratorIds().get(0);
+            User student = userDAO.read(studentId);
+            if (student == null) continue;
 
-            int firstStudentId = submission.getCollaboratorIds().get(0);
-            User student = userDAO.read(firstStudentId);
-
-            if (student == null)
-                continue;
-
-            // Format grade
             String gradeDisplay = "-";
             if (submission.getStatus() == Submission.Status.GRADED) {
                 gradeDisplay = String.format("%.0f/%.0f",
@@ -226,6 +221,7 @@ public final class GradingPanel extends JPanel implements Refreshable {
             model.addRow(rowData);
         }
     }
+
 
     private void viewSubmission(Submission submission, Assignment assignment) {
         GradingUtils.showSubmissionDialog(this, submission, assignment);
