@@ -31,7 +31,7 @@ public final class GradingUtils {
 
     private static void buildDialog(Component parent, Submission submission, Assignment assignment, GradingContext gradingContext, boolean enableGrading) {
         List<String> studentNames = loadStudentNames(submission);
-        System.out.println("check student name" + studentNames.size());
+        //System.out.println("check student name" + studentNames.size());
     
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(parent), 
             enableGrading ? "Grade Submission" : "View Submission", 
@@ -248,10 +248,18 @@ public final class GradingUtils {
 
             double totalPoints = 0;
             for (int i = 0; i < model.getRowCount(); i++) {
-                Object val = model.getValueAt(i, 1);
+                Object val = model.getValueAt(i, 1); // 得分
+                Object max = model.getValueAt(i, 2); // 最大得分
                 if (val != null) {
                     try {
-                        totalPoints += Double.parseDouble(val.toString());
+                        double points = Double.parseDouble(val.toString());
+                        if (max != null && points > Double.parseDouble(max.toString())) {
+                            JOptionPane.showMessageDialog(dialog,
+                                    "Row " + (i + 1) + ": Points exceed maximum allowed.",
+                                    "Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                        totalPoints += points;
                     } catch (NumberFormatException ex) {
                         System.out.println("Invalid number at row " + i + ": " + val);
                     }
