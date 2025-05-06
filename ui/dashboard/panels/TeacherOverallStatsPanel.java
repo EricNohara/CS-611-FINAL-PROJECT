@@ -145,15 +145,16 @@ public class TeacherOverallStatsPanel extends JPanel implements Refreshable {
         for (User student : students) {
             double totalEarned = 0, totalMax = 0;
             for (Assignment a : assignments) {
-                List<Submission> subs = SubmissionDAO.getInstance()
+                Optional<Submission> mostRecentGradedSub = SubmissionDAO.getInstance()
                         .readAllCondition("assignment_id", a.getId()).stream()
                         .filter(sub -> sub.getCollaboratorIds().contains(student.getId())
                                 && sub.getStatus() == Submission.Status.GRADED)
-                        .collect(Collectors.toList());
-                if (!subs.isEmpty()) {
-                    totalEarned += subs.get(0).getPointsEarned();
+                        .max(Comparator.comparing(Submission::getSubmittedAt)); 
+                if (mostRecentGradedSub.isPresent()) {
+                    totalEarned += mostRecentGradedSub.get().getPointsEarned();
                     totalMax += a.getMaxPoints();
                 }
+
             }
 
             if (totalMax > 0) {
