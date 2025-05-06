@@ -456,6 +456,21 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
             }
 
             try {
+                boolean isValid = true;
+
+                // validity checking
+                for (int i = 0; i < assignmentModel.getRowCount(); i++) {
+                    String submissionTypesStr = (String) assignmentModel.getValueAt(i, 3);
+                    List<String> submissionTypes = FileExtensionValidator.parseValidExtensions(submissionTypesStr);
+
+                    if (!FileExtensionValidator.isValid(submissionTypesStr)) {
+                        assignmentModel.setValueAt(String.join(", ", submissionTypes), i, 3);
+                        isValid = false;
+                    }
+                }
+
+                if (!isValid) throw new Exception("Invalid submission type file extension detected!");
+
                 // Create updated assignment templates
                 List<AssignmentTemplate> newAssignmentTemplates = new ArrayList<>();
                 for (int i = 0; i < assignmentModel.getRowCount(); i++) {
@@ -470,7 +485,7 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
 
                     // Parse submission types
                     String submissionTypesStr = (String) assignmentModel.getValueAt(i, 3);
-                    List<String> submissionTypes = Arrays.asList(submissionTypesStr.split(",\\s*"));
+                    List<String> submissionTypes = FileExtensionValidator.parseValidExtensions(submissionTypesStr);
 
                     // Create a template for each count
                     for (int j = 0; j < count; j++) {
