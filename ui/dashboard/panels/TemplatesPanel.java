@@ -484,17 +484,19 @@ public final class TemplatesPanel extends JPanel implements Refreshable {
                 tc.editCourseTemplate(selectedTemplate);
 
                 // Update UI
-                DefaultListModel<String> model = (DefaultListModel<String>) templateJList.getModel();
-                int index = templateJList.getSelectedIndex();
-                if (index != -1) {
-                    model.set(index, templateName);
-                }
-
                 JOptionPane.showMessageDialog(dialog,
                         "Template updated successfully!",
                         "Success",
                         JOptionPane.INFORMATION_MESSAGE);
                 dialog.dispose();
+
+                DefaultListModel<String> model = new DefaultListModel<>();
+                List<CourseTemplate> updatedTemplates = CourseTemplateDAO.getInstance().readAll();
+                for (CourseTemplate template : updatedTemplates) {
+                    model.addElement(template.getName());
+                }
+                templateJList.setModel(model);
+                templateJList.setSelectedValue(templateName, true);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(dialog,
                         "Error updating template: " + ex.getMessage(),
