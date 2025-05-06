@@ -142,12 +142,23 @@ public class UserCourseDAO implements CrudDAO<UserCourse> {
     }
 
     public List<User> getUsersInCourseByRole(int courseId, User.Role role) {
-    UserDAO userDAO = UserDAO.getInstance();
-    return readAll().stream()
-            .filter(uc -> uc.getCourseId() == courseId && uc.getRole() == role)
-            .map(uc -> userDAO.read(uc.getUserId()))
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
-}
+        UserDAO userDAO = UserDAO.getInstance();
+        return readAll().stream()
+                .filter(uc -> uc.getCourseId() == courseId && uc.getRole() == role)
+                .map(uc -> userDAO.read(uc.getUserId()))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
 
+    public List<User> getActiveUsersInCourseByRole(int courseId, User.Role role) {
+        UserDAO userDAO = UserDAO.getInstance();
+        return readAll().stream()
+                .filter(uc -> uc.getCourseId() == courseId
+                        && uc.getRole() == role
+                        && uc.getStatus() == UserCourse.Status.ACTIVE)
+                .map(uc -> userDAO.read(uc.getUserId()))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+    
 }

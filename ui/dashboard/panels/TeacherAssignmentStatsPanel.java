@@ -127,22 +127,22 @@ public class TeacherAssignmentStatsPanel extends JPanel implements Refreshable {
         Course course = (Course) courseComboBox.getSelectedItem();
         Assignment assignment = (Assignment) assignmentComboBox.getSelectedItem();
         if (course == null || assignment == null) return;
-
+    
         List<Submission> submissions = SubmissionDAO.getInstance()
                 .readAllCondition("assignment_id", assignment.getId());
-
+    
         Map<Integer, Double> studentScores = new HashMap<>();
         for (Submission s : submissions) {
             if (s.getStatus() == Submission.Status.GRADED && !s.getCollaboratorIds().isEmpty()) {
                 studentScores.put(s.getCollaboratorIds().get(0), s.getPointsEarned());
             }
         }
-
-        List<User> students = UserCourseDAO.getInstance()
-                .getUsersInCourseByRole(course.getId(), User.Role.STUDENT);
+    
+        List<User> activeStudents = UserCourseDAO.getInstance()
+                .getActiveUsersInCourseByRole(course.getId(), User.Role.STUDENT); // new method
+    
         List<Double> allScores = new ArrayList<>();
-
-        for (User student : students) {
+        for (User student : activeStudents) {
             double score = studentScores.getOrDefault(student.getId(), 0.0);
             allScores.add(score);
             statsModel.addRow(new Object[] {
@@ -152,10 +152,11 @@ public class TeacherAssignmentStatsPanel extends JPanel implements Refreshable {
                     assignment.getMaxPoints()
             });
         }
-
+    
         updateStatsLabels(allScores);
         chartPanel.repaint();
     }
+    
 
     private void updateStatsLabels(List<Double> scores) {
         if (scores.isEmpty()) {
