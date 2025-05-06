@@ -4,11 +4,7 @@ import db.AssignmentDAO;
 import db.CourseDAO;
 import db.SubmissionDAO;
 import db.UserCourseDAO;
-import model.Assignment;
-import model.Course;
-import model.Submission;
-import model.Teacher;
-import model.User;
+import model.*;
 import ui.utils.PaddedCellRenderer;
 
 import javax.swing.*;
@@ -55,7 +51,7 @@ public class TeacherAssignmentStatsPanel extends JPanel implements Refreshable {
 
         JButton loadBtn = new JButton("Load Stats");
         JButton exportBtn = new JButton("Export to CSV");
-       
+
         topPanel.add(new JLabel("Course:"));
         topPanel.add(courseComboBox);
         topPanel.add(new JLabel("Assignment:"));
@@ -80,9 +76,6 @@ public class TeacherAssignmentStatsPanel extends JPanel implements Refreshable {
         PaddedCellRenderer.setDefaultRowHeight(statsTable);
         paddedRenderer.applyCellPadding(statsTable);
 
-
-        JPanel bottomPanel = new JPanel(new BorderLayout());
-
         chartPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -90,23 +83,21 @@ public class TeacherAssignmentStatsPanel extends JPanel implements Refreshable {
                 drawHistogram((Graphics2D) g);
             }
         };
-        chartPanel.setPreferredSize(new Dimension(500, 200));
-        bottomPanel.add(chartPanel, BorderLayout.CENTER);
+        chartPanel.setPreferredSize(new Dimension(600, 200));
+        chartPanel.setBackground(Color.WHITE);
+        add(chartPanel, BorderLayout.SOUTH);
 
-        JPanel statsSummary = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel statsSummary = new JPanel(new GridLayout(1, 3));
         meanLabel = new JLabel("Mean: -");
         stdDevLabel = new JLabel("Std Dev: -");
         medianLabel = new JLabel("Median: -");
         statsSummary.add(meanLabel);
         statsSummary.add(stdDevLabel);
         statsSummary.add(medianLabel);
-
-        bottomPanel.add(statsSummary, BorderLayout.SOUTH);
-        add(bottomPanel, BorderLayout.SOUTH);
+        add(statsSummary, BorderLayout.EAST);
 
         courseComboBox.addActionListener(e -> loadAssignments());
         loadBtn.addActionListener(e -> loadStats());
-
         exportBtn.addActionListener(e -> exportAssignmentStatsToCSV());
     }
 
@@ -216,14 +207,14 @@ public class TeacherAssignmentStatsPanel extends JPanel implements Refreshable {
 
         g2.setColor(Color.BLUE);
         for (int i = 0; i < bins.length; i++) {
-            int barHeight = (int) (((double) bins[i] / maxCount) * (h - 20));
-            g2.fillRect(i * barWidth, h - barHeight - 10, barWidth - 4, barHeight);
+            int barHeight = (int) (((double) bins[i] / maxCount) * (h - 30));
+            g2.fillRect(i * barWidth + 4, h - barHeight - 20, barWidth - 8, barHeight);
         }
 
         g2.setColor(Color.BLACK);
         for (int i = 0; i < bins.length; i++) {
-            String label = String.format("%d-%d%%", i * 10, (i + 1) * 10);
-            g2.drawString(label, i * barWidth + 5, h - 2);
+            String label = String.format("%d-%d%%", i * 10, (i + 1) * 10 - 1);
+            g2.drawString(label, i * barWidth + 4, h - 5);
         }
     }
 
@@ -265,7 +256,6 @@ public class TeacherAssignmentStatsPanel extends JPanel implements Refreshable {
                     "Export Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
 
     @Override
     public void refresh() {

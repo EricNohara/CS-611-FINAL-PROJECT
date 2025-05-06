@@ -4,11 +4,7 @@ import db.AssignmentDAO;
 import db.CourseDAO;
 import db.SubmissionDAO;
 import db.UserCourseDAO;
-import model.Assignment;
-import model.Course;
-import model.Submission;
-import model.Teacher;
-import model.User;
+import model.*;
 import ui.utils.PaddedCellRenderer;
 
 import javax.swing.*;
@@ -23,9 +19,13 @@ import java.util.stream.Collectors;
 public class TeacherOverallStatsPanel extends JPanel implements Refreshable {
     private final Teacher teacher;
     private JComboBox<Course> courseComboBox;
+    private JComboBox<String> strategyComboBox;
+    private JTextField thresholdField;
+    private JLabel thresholdLabel;
     private DefaultTableModel statsModel;
     private JTable statsTable;
     private JLabel meanLabel, stdDevLabel, medianLabel;
+    private JPanel chartPanel;
 
     public TeacherOverallStatsPanel(Teacher teacher) {
         super(new BorderLayout(10, 10));
@@ -38,16 +38,30 @@ public class TeacherOverallStatsPanel extends JPanel implements Refreshable {
     private void buildUI() {
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         courseComboBox = new JComboBox<>();
+        strategyComboBox = new JComboBox<>(new String[] { "Proportional", "Pass/Fail (60%)" });
+        thresholdLabel = new JLabel("Pass Threshold:");
+        thresholdField = new JTextField("60", 5); // default 60%
+        thresholdField.setEnabled(false);
+
+        strategyComboBox.addActionListener(e -> {
+            String selected = (String) strategyComboBox.getSelectedItem();
+            thresholdField.setEnabled("Pass/Fail (60%)".equals(selected));
+        });
+
         JButton loadBtn = new JButton("Load Overall Stats");
         JButton exportBtn = new JButton("Export to CSV");
 
         topPanel.add(new JLabel("Course:"));
         topPanel.add(courseComboBox);
+        topPanel.add(new JLabel("Strategy:"));
+        topPanel.add(strategyComboBox);
+        topPanel.add(thresholdLabel);
+        topPanel.add(thresholdField);
         topPanel.add(loadBtn);
         topPanel.add(exportBtn);
         add(topPanel, BorderLayout.NORTH);
 
-        String[] columns = {"Student ID", "Student Name", "Overall Grade %"};
+        String[] columns = { "Student ID", "Student Name", "Overall Grade" };
         statsModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int col) {
@@ -69,7 +83,18 @@ public class TeacherOverallStatsPanel extends JPanel implements Refreshable {
         statsSummary.add(meanLabel);
         statsSummary.add(stdDevLabel);
         statsSummary.add(medianLabel);
-        add(statsSummary, BorderLayout.SOUTH);
+        add(statsSummary, BorderLayout.EAST);
+
+        chartPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                drawOverallGradeHistogram((Graphics2D) g);
+            }
+        };
+        chartPanel.setPreferredSize(new Dimension(600, 200));
+        chartPanel.setBackground(Color.WHITE);
+        add(chartPanel, BorderLayout.SOUTH);
 
         loadBtn.addActionListener(e -> loadStats());
         exportBtn.addActionListener(e -> exportStatsToCSV());
@@ -83,42 +108,113 @@ public class TeacherOverallStatsPanel extends JPanel implements Refreshable {
         }
     }
 
+    private GradingStrategy getSelectedStrategy(double threshold) {
+        String selected = (String) strategyComboBox.getSelectedItem();
+        if ("Pass/Fail (60%)".equals(selected)) {
+            return new PassFailGradingStrategy(threshold / 100.0);
+        } else {
+            return new ProportionalGradingStrategy();
+        }
+    }
+
     private void loadStats() {
         statsModel.setRowCount(0);
         Course course = (Course) courseComboBox.getSelectedItem();
-        if (course == null) return;
+        if (course == null)
+            return;
 
-        List<Assignment> assignments = AssignmentDAO.getInstance()
-                .readAllCondition("course_id", course.getId());
-        List<User> students = UserCourseDAO.getInstance()
-                .getUsersInCourseByRole(course.getId(), User.Role.STUDENT);
+        double thresholdVal = 60.0;
+        try {
+            thresholdVal = Double.parseDouble(thresholdField.getText());
+            if (thresholdVal < 0 || thresholdVal > 100)
+                throw new NumberFormatException("Out of range");
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this,
+                    "Invalid pass threshold. Please enter a value between 0 and 100.",
+                    "Threshold Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-        List<Double> percentages = new ArrayList<>();
+        GradingStrategy strategy = getSelectedStrategy(thresholdVal);
+
+        List<Assignment> assignments = AssignmentDAO.getInstance().readAllCondition("course_id", course.getId());
+        List<User> students = UserCourseDAO.getInstance().getUsersInCourseByRole(course.getId(), User.Role.STUDENT);
+
+        List<Double> rawScores = new ArrayList<>();
 
         for (User student : students) {
             double totalEarned = 0, totalMax = 0;
             for (Assignment a : assignments) {
                 List<Submission> subs = SubmissionDAO.getInstance()
                         .readAllCondition("assignment_id", a.getId()).stream()
-                        .filter(sub -> sub.getCollaboratorIds().contains(student.getId()) && sub.getStatus() == Submission.Status.GRADED)
+                        .filter(sub -> sub.getCollaboratorIds().contains(student.getId())
+                                && sub.getStatus() == Submission.Status.GRADED)
                         .collect(Collectors.toList());
                 if (!subs.isEmpty()) {
                     totalEarned += subs.get(0).getPointsEarned();
                     totalMax += a.getMaxPoints();
                 }
             }
+
             if (totalMax > 0) {
-                double percent = totalEarned / totalMax * 100;
-                percentages.add(percent);
-                statsModel.addRow(new Object[]{
+                double grade = strategy.calculateGrade(totalEarned, totalMax);
+                rawScores.add(grade);
+                String displayGrade = (strategy instanceof ProportionalGradingStrategy)
+                        ? String.format("%.2f%%", grade * 100)
+                        : (grade == 1.0 ? "Pass" : "Fail");
+
+                statsModel.addRow(new Object[] {
                         student.getId(),
                         student.getName(),
-                        String.format("%.2f%%", percent)
+                        displayGrade
                 });
             }
         }
 
+        List<Double> percentages = rawScores.stream().map(g -> g * 100).collect(Collectors.toList());
         updateStatsLabels(percentages);
+        chartPanel.repaint(); // Redraw histogram
+    }
+
+    private void drawOverallGradeHistogram(Graphics2D g2) {
+        int w = chartPanel.getWidth();
+        int h = chartPanel.getHeight();
+
+        List<Double> scores = new ArrayList<>();
+        for (int i = 0; i < statsModel.getRowCount(); i++) {
+            Object val = statsModel.getValueAt(i, 2);
+            if (val instanceof String && ((String) val).endsWith("%")) {
+                try {
+                    double percent = Double.parseDouble(((String) val).replace("%", ""));
+                    scores.add(percent);
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
+
+        if (scores.isEmpty())
+            return;
+
+        int[] bins = new int[10];
+        for (double score : scores) {
+            int bin = Math.min((int) (score / 10), 9);
+            bins[bin]++;
+        }
+
+        int barWidth = w / bins.length;
+        int maxCount = Arrays.stream(bins).max().orElse(1);
+
+        g2.setColor(Color.BLUE);
+        for (int i = 0; i < bins.length; i++) {
+            int barHeight = (int) (((double) bins[i] / maxCount) * (h - 30));
+            g2.fillRect(i * barWidth + 4, h - barHeight - 20, barWidth - 8, barHeight);
+        }
+
+        g2.setColor(Color.BLACK);
+        for (int i = 0; i < bins.length; i++) {
+            String label = String.format("%d-%d%%", i * 10, (i + 1) * 10 - 1);
+            g2.drawString(label, i * barWidth + 4, h - 5);
+        }
     }
 
     private void updateStatsLabels(List<Double> scores) {
@@ -153,19 +249,22 @@ public class TeacherOverallStatsPanel extends JPanel implements Refreshable {
         JFileChooser fc = new JFileChooser();
         fc.setDialogTitle("Export Course Grade Stats");
         fc.setSelectedFile(new File("course_overall_stats.csv"));
-        if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
+        if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION)
+            return;
 
         try (PrintWriter pw = new PrintWriter(fc.getSelectedFile())) {
             for (int i = 0; i < statsModel.getColumnCount(); i++) {
                 pw.print(statsModel.getColumnName(i));
-                if (i < statsModel.getColumnCount() - 1) pw.print(",");
+                if (i < statsModel.getColumnCount() - 1)
+                    pw.print(",");
             }
             pw.println();
 
             for (int r = 0; r < statsModel.getRowCount(); r++) {
                 for (int c = 0; c < statsModel.getColumnCount(); c++) {
                     pw.print(statsModel.getValueAt(r, c));
-                    if (c < statsModel.getColumnCount() - 1) pw.print(",");
+                    if (c < statsModel.getColumnCount() - 1)
+                        pw.print(",");
                 }
                 pw.println();
             }
