@@ -5,3 +5,4 @@ out/
 .idea/
 *.xml
 *.iml
+*.env
