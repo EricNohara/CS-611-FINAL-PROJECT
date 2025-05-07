@@ -226,3 +226,5 @@ find out -type f -name "*.class" -delete                                        
 - [Java Regex](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html)
 - [Java File Storage](https://docs.oracle.com/javase/8/docs/api/java/io/File.html)
 - [Schema Generator](https://dbdiagram.io/home)
+- [Dotenv in Java](https://medium.com/@cdimascio/dotenv-for-java-and-jvm-languages-43ee0e683549)
+- [Java Mail API](https://www.oracle.com/java/technologies/javamail-api.html)
