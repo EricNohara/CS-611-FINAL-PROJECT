@@ -123,32 +123,9 @@
 
 ---
 
-- Grading system
-- Support for file upload, or just text boxes
-- Support for autogravder?
-- Users and accounts
-  - Student vs Teacher vs Admin
-- Have different courses
-  - Create, enroll, invite to course
-- Create assignments
-  - Deadlines
-  - Scoring
-- Way to view submissions
-- Group submissions
-  - Attaching more than one user to submission
-- Sorting courses/displaying only active courses
-- Categorize assignments/submissions
-- Assign pages for submissions
-- Creating rubric
-- Grade statistics
-- Interface to grade from rubric
-- Publish grades
-- Different interfaces for different users
-
-# Notes from Q&A
+## Notes from Q&A
 
 - Teacher view of grading system
-
   - Teachers usually teach same course over different semesters
   - Content of class might change, but breakdown of assignments and exams remain the same
     - Every single semester/class has to be built from the beginning
@@ -161,7 +138,7 @@
   - Keep grade statistics
   - Ease of changing assignments/grades
   - Can assign different roles to different users
-  - Similarity checker
+  - Similarity checker if we have time
 
 ---
 
