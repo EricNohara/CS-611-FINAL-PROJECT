@@ -149,16 +149,16 @@ Ensure you have cloned the repository and have all required files, including the
 ### Windows
 
 ```
-javac -cp ".;lib/sqlite-jdbc-3.49.1.0.jar" -d out *.java db/*.java model/*.java utils/*.java ui/*.java    // compile
-java -cp "out;lib/sqlite-jdbc-3.49.1.0.jar" Main                                                          // run
+javac -cp ".;lib/sqlite-jdbc-3.49.1.0.jar;lib/javax.mail.jar;lib/dotenv-java-2.3.2.jar" -d out *.java db/*.java model/*.java utils/*.java ui/*.java    // compile
+java -cp "out;lib/sqlite-jdbc-3.49.1.0.jar;lib/javax.mail.jar;lib/dotenv-java-2.3.2.jar" Main                                                          // run
 del /s /q out\*.class                                                                                     // clean
 ```
 
 ### Linux/Mac
 
 ```
-javac -cp ".:lib/sqlite-jdbc-3.49.1.0.jar" -d out *.java db/*.java model/*.java utils/*.java ui/*.java    // compile
-java -cp "out:lib/sqlite-jdbc-3.49.1.0.jar" Main                                                          // run
+javac -cp ".:lib/sqlite-jdbc-3.49.1.0.jar;lib/javax.mail.jar;lib/dotenv-java-2.3.2.jar" -d out *.java db/*.java model/*.java utils/*.java ui/*.java    // compile
+java -cp "out:lib/sqlite-jdbc-3.49.1.0.jar;lib/javax.mail.jar;lib/dotenv-java-2.3.2.jar" Main                                                          // run
 find out -type f -name "*.class" -delete                                                                  // clean
 ```
 
