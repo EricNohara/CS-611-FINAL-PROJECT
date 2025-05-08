@@ -12,7 +12,7 @@
 
 - **Name:** Juling Fan
 - **Email:** juling7@bu.edu
-- **BUID:** ...
+- **BUID:** U30407259
 
 ---
 
