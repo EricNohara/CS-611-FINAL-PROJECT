@@ -175,6 +175,15 @@ find out -type f -name "*.class" -delete
 
 ---
 
+## Future Work
+
+- Add a way to allow students to add collaborators to submissions
+- Add more email notifications
+- Expand the student dashboard
+- Allow a teacher to change the role of a user rather than having to create a new one
+
+---
+
 ## Testing Strategy
 
 - **Testing DB Operations:**
