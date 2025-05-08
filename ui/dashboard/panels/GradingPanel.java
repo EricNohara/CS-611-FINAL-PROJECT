@@ -4,6 +4,7 @@ import db.*;
 import model.*;
 import ui.utils.GradingUtils;
 import ui.utils.PaddedCellRenderer;
+import utils.EmailSender;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -12,6 +13,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -369,11 +371,22 @@ public final class GradingPanel extends JPanel implements Refreshable {
         allAsg.forEach(lm::addElement);
 
         JList<Assignment> list = new JList<>(lm);
-        list.setCellRenderer((lst, val, idx, s, fs) -> {
-            Course crs = teacherCourses.stream()
-                    .filter(c -> c.getId() == val.getCourseId())
-                    .findFirst().orElse(null);
-            return new JLabel(crs.getName() + ": " + val.getName());
+        list.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(
+                    JList<?> list, Object value, int index,
+                    boolean isSelected, boolean cellHasFocus) {
+        
+                Assignment asg = (Assignment) value;
+                Course crs = teacherCourses.stream()
+                        .filter(c -> c.getId() == asg.getCourseId())
+                        .findFirst().orElse(null);
+                String labelText = (crs != null ? crs.getName() : "Unknown") + ": " + asg.getName();
+        
+                JLabel label = (JLabel) super.getListCellRendererComponent(
+                        list, labelText, index, isSelected, cellHasFocus);
+                return label;
+            }
         });
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
@@ -402,15 +415,24 @@ public final class GradingPanel extends JPanel implements Refreshable {
                 if (sub.getStatus() != Submission.Status.GRADED)
                     continue; // only graded ones
 
-                if (sub.getGrade() < 0) { // not yet published
+                if (sub.getGrade() >= 0) { // not yet published
                     double percent = 100.0 * sub.getPointsEarned() / asg.getMaxPoints();
                     sub.setGrade(percent); // store percentage as released grade
                     sDao.update(sub);
                     released++;
 
                     if (notifyChk.isSelected()) {
-                        // placeholder: integrate your email service here
                         // EmailService.notifyStudent(sub.getCollaboratorIds(), asg, percent);
+                        List<Integer> collaborators = sub.getCollaboratorIds();
+                        List<String> emails = new ArrayList<>();
+                        UserDAO userDAO = UserDAO.getInstance();
+
+                        for (Integer id : collaborators) {
+                            User user = userDAO.read(id);
+                            if (user != null) emails.add(user.getEmail());
+                        }
+
+                        EmailSender.sendEmail(emails, asg.getName() + " Has Been Graded!", "You scored a " + percent + "%");
                     }
                 }
             }
