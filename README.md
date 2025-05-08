@@ -35,13 +35,9 @@
 │   ├── SubmissionDAO.java
 │   ├── UserCourseDAO.java
 │   └── UserDAO.java
-├── doc
-│   ├── design_doc.md
-│   ├── schema.dbml
-│   ├── schema.pdf
-│   ├── uml.png
-│   └── uml.puml
 ├── lib
+│   ├── dotenv-java-2.3.2.jar
+│   ├── javax.mail.jar
 │   └── sqlite-jdbc-3.49.1.0.jar
 ├── model
 │   ├── Admin.java
@@ -71,7 +67,6 @@
 │   │   │   └── panels
 │   │   └── utils
 │   └── utils
-│       └── model
 ├── ui
 │   ├── dashboard
 │   │   ├── components
@@ -111,11 +106,11 @@
 │   ├── CSVParser.java
 │   ├── CSVStudentManager.java
 │   ├── DBUtils.java
+│   ├── EmailSender.java
 │   ├── FileExtensionValidator.java
 │   ├── FileManager.java
 │   ├── Hasher.java
 │   └── SubmissionFileManager.java
-├── CS611_Final_Project_Presentation.pptx
 ├── GradingSystemApp.java
 ├── Main.java
 └── README.md
@@ -149,17 +144,17 @@ Ensure you have cloned the repository and have all required files, including the
 ### Windows
 
 ```
-javac -cp ".;lib/sqlite-jdbc-3.49.1.0.jar;lib/javax.mail.jar;lib/dotenv-java-2.3.2.jar" -d out *.java db/*.java model/*.java utils/*.java ui/*.java    // compile
-java -cp "out;lib/sqlite-jdbc-3.49.1.0.jar;lib/javax.mail.jar;lib/dotenv-java-2.3.2.jar" Main                                                          // run
-del /s /q out\*.class                                                                                     // clean
+javac -cp ".;lib/sqlite-jdbc-3.49.1.0.jar;lib/javax.mail.jar;lib/dotenv-java-2.3.2.jar" -d out *.java db/*.java model/*.java utils/*.java ui/*.java
+java -cp "out;lib/sqlite-jdbc-3.49.1.0.jar;lib/javax.mail.jar;lib/dotenv-java-2.3.2.jar" Main
+del /s /q out\*.class
 ```
 
 ### Linux/Mac
 
 ```
-javac -cp ".:lib/sqlite-jdbc-3.49.1.0.jar;lib/javax.mail.jar;lib/dotenv-java-2.3.2.jar" -d out *.java db/*.java model/*.java utils/*.java ui/*.java    // compile
-java -cp "out:lib/sqlite-jdbc-3.49.1.0.jar;lib/javax.mail.jar;lib/dotenv-java-2.3.2.jar" Main                                                          // run
-find out -type f -name "*.class" -delete                                                                  // clean
+javac -cp ".:lib/sqlite-jdbc-3.49.1.0.jar;lib/javax.mail.jar;lib/dotenv-java-2.3.2.jar" -d out *.java db/*.java model/*.java utils/*.java ui/*.java
+java -cp "out:lib/sqlite-jdbc-3.49.1.0.jar;lib/javax.mail.jar;lib/dotenv-java-2.3.2.jar" Main
+find out -type f -name "*.class" -delete
 ```
 
 ---
@@ -169,6 +164,8 @@ find out -type f -name "*.class" -delete                                        
 - Correct file structure
 - Java 8
 - sqlite-jdbc-3.49.1.0.jar
+- dotenv-java-2.3.2.jar
+- javax.mail.jar
 
 ---
 
