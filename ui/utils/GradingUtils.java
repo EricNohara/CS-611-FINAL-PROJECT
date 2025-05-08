@@ -6,6 +6,7 @@ import db.UserCourseDAO;
 import db.UserDAO;
 import model.*;
 import ui.UIConstants;
+import utils.PDFParser;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -132,12 +133,24 @@ public final class GradingUtils {
             return;
         }
 
-        try {
-            String text = new String(Files.readAllBytes(file.toPath()), "UTF-8");
-            if (text.length() > 10000) text = text.substring(0, 10000) + "\n... (truncated)";
-            area.setText(text);
-        } catch (IOException e) {
-            area.setText("Error reading file: " + e.getMessage());
+        if (file.getName().toLowerCase().endsWith(".pdf")) {
+            try {
+                String text = PDFParser.extractText(file);
+                if (text.length() > 10000) {
+                    text = text.substring(0, 10000) + "\n... (truncated)";
+                }
+                area.setText(text);
+            } catch (IOException e) {
+                area.setText("Error reading PDF file: " + e.getMessage());
+            }
+        } else {
+            try {
+                String text = new String(Files.readAllBytes(file.toPath()), "UTF-8");
+                if (text.length() > 10000) text = text.substring(0, 10000) + "\n... (truncated)";
+                area.setText(text);
+            } catch (IOException e) {
+                area.setText("Error reading file: " + e.getMessage());
+            }
         }
     }
 

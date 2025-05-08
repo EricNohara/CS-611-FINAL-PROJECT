@@ -144,16 +144,16 @@ Ensure you have cloned the repository and have all required files, including the
 ### Windows
 
 ```
-javac -cp ".;lib/sqlite-jdbc-3.49.1.0.jar;lib/javax.mail.jar;lib/dotenv-java-2.3.2.jar" -d out *.java db/*.java model/*.java utils/*.java ui/*.java
-java -cp "out;lib/sqlite-jdbc-3.49.1.0.jar;lib/javax.mail.jar;lib/dotenv-java-2.3.2.jar" Main
+javac -cp ".;lib/sqlite-jdbc-3.49.1.0.jar;lib/javax.mail.jar;lib/dotenv-java-2.3.2.jar;lib/pdfbox-app-3.0.5.jar" -d out *.java db/*.java model/*.java utils/*.java ui/*.java
+java -cp "out;lib/sqlite-jdbc-3.49.1.0.jar;lib/javax.mail.jar;lib/dotenv-java-2.3.2.jar;lib/pdfbox-app-3.0.5.jar" Main
 del /s /q out\*.class
 ```
 
 ### Linux/Mac
 
 ```
-javac -cp ".:lib/sqlite-jdbc-3.49.1.0.jar;lib/javax.mail.jar;lib/dotenv-java-2.3.2.jar" -d out *.java db/*.java model/*.java utils/*.java ui/*.java
-java -cp "out:lib/sqlite-jdbc-3.49.1.0.jar;lib/javax.mail.jar;lib/dotenv-java-2.3.2.jar" Main
+javac -cp ".:lib/sqlite-jdbc-3.49.1.0.jar:lib/javax.mail.jar:lib/dotenv-java-2.3.2.jar:lib/pdfbox-app-3.0.5.jar" -d out *.java db/*.java model/*.java utils/*.java ui/*.java
+java -cp "out:lib/sqlite-jdbc-3.49.1.0.jar:lib/javax.mail.jar:lib/dotenv-java-2.3.2.jar:lib/pdfbox-app-3.0.5.jar" Main
 find out -type f -name "*.class" -delete
 ```
 
@@ -166,6 +166,7 @@ find out -type f -name "*.class" -delete
 - sqlite-jdbc-3.49.1.0.jar
 - dotenv-java-2.3.2.jar
 - javax.mail.jar
+- pdfbox-app-3.0.5.jar
 
 ---
 
@@ -234,3 +235,4 @@ find out -type f -name "*.class" -delete
 - [Schema Generator](https://dbdiagram.io/home)
 - [Dotenv in Java](https://medium.com/@cdimascio/dotenv-for-java-and-jvm-languages-43ee0e683549)
 - [Java Mail API](https://www.oracle.com/java/technologies/javamail-api.html)
+- [PDFBox for PDF Parsing](https://pdfbox.apache.org/)
