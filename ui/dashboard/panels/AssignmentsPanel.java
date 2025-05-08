@@ -1314,6 +1314,16 @@ public final class AssignmentsPanel extends JPanel implements Refreshable {
 
     @Override
     public void refresh() {
-        loadAssignments(null, null);
+        // Re-fetch teacher courses from database
+        teacherCourses.clear();
+        teacherCourses.addAll(CourseDAO.getInstance().getCoursesForTeacher(teacher.getId()));
+
+        // Rebuild the course combo box
+        courseCombo.removeAllItems();
+        courseCombo.addItem("All Courses");
+        teacherCourses.forEach(c -> courseCombo.addItem(c.getName()));
+
+        // Reload assignments
+        loadAssignments((String) courseCombo.getSelectedItem(), (String) typeCombo.getSelectedItem());
     }
 }

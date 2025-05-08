@@ -1,0 +1,21 @@
+Quiz 1
+Student 1 (student1@bu.edu)
+
+QUESTION 1: Time Complexity Analysis
+Analyze the time complexity of the following algorithm in terms of Big O notation:
+
+```java
+int sum = 0;
+for (int i = 0; i < n; i++) {
+    for (int j = 0; j < i; j++) {
+        sum += i * j;
+    }
+}
+```
+
+ANSWER 1:
+The outer loop runs n times. For each iteration i of the outer loop, the inner loop runs i times. 
+This gives us: 0 + 1 + 2 + ... + (n-1) iterations of the inner loop, which is the sum of the first 
+(n-1) natural numbers: (n-1)n/2 ≈ n²/2.
+
+Therefore, the time complexity is O(n²).
