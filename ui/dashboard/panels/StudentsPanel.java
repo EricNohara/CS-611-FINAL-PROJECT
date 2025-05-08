@@ -3,6 +3,7 @@ package ui.dashboard.panels;
 import db.*;
 import model.*;
 import utils.CSVStudentManager;
+import utils.EmailSender;
 import utils.Hasher;
 import ui.UIConstants;
 import ui.utils.PaddedCellRenderer;
@@ -979,6 +980,8 @@ public final class StudentsPanel extends JPanel implements Refreshable {
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
+
+            EmailSender.sendEmail(studentEmail, subject, message);
 
             // In a real app, this would send an email
             JOptionPane.showMessageDialog(dialog,
